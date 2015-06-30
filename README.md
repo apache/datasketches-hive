@@ -1,2 +1,2 @@
 # sketches-hive
-Sketch adaptors for Hive
+Sketch adaptors for Hive. Depends on sketches-core.
