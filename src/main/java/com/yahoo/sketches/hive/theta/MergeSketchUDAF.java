@@ -4,8 +4,6 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
@@ -47,11 +45,6 @@ import com.yahoo.sketches.theta.Union;
     + "in the estimation of uniques.")
 public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
   public static final int DEFAULT_SKETCH_SIZE = 16384;
-
-  /**
-   * Log for warnings or errors loaded into Hive Logs.
-   */
-  private static final Log LOG = LogFactory.getLog(MergeSketchUDAF.class.getName());
 
   /**
    * Perform argument count check and argument type checking, returns an
@@ -138,7 +131,6 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      *          List of object inspectors for input arguments.
      * @return The object inspector type indicates the UDAF return type (i.e.
      *         returned type of terminate(...)).
-     * @throws HiveException
      */
     @Override
     public ObjectInspector init(Mode m, ObjectInspector[] parameters) throws HiveException {
@@ -356,7 +348,6 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      * Retrieves a new aggregation buffer and initialize it, called by hive.
      * 
      * @return a new initialized aggregation buffer.
-     * @throws HiveException
      */
     @SuppressWarnings("deprecation")
     @Override
@@ -371,7 +362,6 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      * 
      * @param agg
      *          old aggregation buffer to be reinitialized.
-     * @throws HiveException
      */
     @Override
     public void reset(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {

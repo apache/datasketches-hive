@@ -218,7 +218,6 @@ public class DataToSketchUDAFTest {
       assertEquals(sketchBuffer.getSketchSize(), DataToSketchUDAF.DEFAULT_SKETCH_SIZE);
       assertEquals(sketchBuffer.getSamplingProbability(), DataToSketchUDAF.DEFAULT_SAMPLING_PROBABILITY);
     }
-    ;
   }
 
   @Test

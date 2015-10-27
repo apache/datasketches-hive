@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 Copyright 2015, Yahoo! Inc.
 Licensed under the terms of the Apache License 2.0. 
@@ -112,6 +112,7 @@ See LICENSE file at the project root for terms.
             <id>attach-sources</id>
             <goals>
               <goal>jar-no-fork</goal>
+              <goal>test-jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -175,8 +176,7 @@ See LICENSE file at the project root for terms.
           <configuration>
             <!-- locale settings must be set on the command line before startup -->
             <!-- set heap size to work around https://github.com/travis-ci/travis-ci/issues/3396 -->
-            <argLine>-Xmx1024m -Duser.language=en -Duser.country=US
-              -Dfile.encoding=UTF-8</argLine>
+            <argLine>-Xmx1024m -Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8</argLine>
             <redirectTestOutputToFile>false</redirectTestOutputToFile>
           </configuration>
         </plugin>

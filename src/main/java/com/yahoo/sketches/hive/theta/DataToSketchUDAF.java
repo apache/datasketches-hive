@@ -4,8 +4,6 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
@@ -50,8 +48,6 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
   public static final int DEFAULT_SKETCH_SIZE = 16384;
   public static final float DEFAULT_SAMPLING_PROBABILITY = 1.0f;
 
-  private static final Log LOG = LogFactory.getLog(DataToSketchUDAF.class.getName());
-
   /**
    * Performs argument number and type validation. DataToSketch expects
    * to recieve between one and three arguments. The first (required)
@@ -63,7 +59,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
    *  
    * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver#getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
    * 
-   * @params info Parameter info to validate
+   * @param info Parameter info to validate
    * @return The GenericUDAFEvaluator that should be used to calculate the function.
    */
   @Override
@@ -399,10 +395,9 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       public void setUnion(Union union) {
         this.union = union;
       }
-    };
+    }
 
-    /*
-     * (non-Javadoc)
+    /**
      * 
      * @see org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#
      * getNewAggregationBuffer()
