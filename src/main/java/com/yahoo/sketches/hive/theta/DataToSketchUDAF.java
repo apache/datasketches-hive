@@ -399,8 +399,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
     /**
      * 
-     * @see org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#
-     * getNewAggregationBuffer()
+     * @see org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#getNewAggregationBuffer()
      */
     @SuppressWarnings("deprecation")
     @Override
@@ -415,8 +414,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * (non-Javadoc)
      * 
      * @see
-     * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#reset(org.
-     * apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
+     * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#reset(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
      */
     @Override
     public void reset(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {

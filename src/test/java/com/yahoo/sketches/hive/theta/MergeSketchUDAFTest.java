@@ -105,7 +105,8 @@ public class MergeSketchUDAFTest {
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void testParametersTooMany() throws SemanticException {
     MergeSketchUDAF udf = new MergeSketchUDAF();
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI, sketchSizeOI, sketchSizeOI }, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI, sketchSizeOI,
+        sketchSizeOI }, false, false);
 
     udf.getEvaluator(params);
   }
@@ -133,22 +134,24 @@ public class MergeSketchUDAFTest {
   }
 
   @Test
-  public void testGetEvaluator() throws SemanticException {
+  public void testGetEvaluator() throws SemanticException, IOException {
     MergeSketchUDAF udf = new MergeSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI }, false,
         false);
 
-    GenericUDAFEvaluator eval = udf.getEvaluator(params);
-    assertNotNull(eval);
-    assertThat(eval, IsInstanceOf.instanceOf(MergeSketchUDAFEvaluator.class));
+    try (GenericUDAFEvaluator eval = udf.getEvaluator(params)) {
+      assertNotNull(eval);
+      assertThat(eval, IsInstanceOf.instanceOf(MergeSketchUDAFEvaluator.class));
+    }
   }
 
   @Test(expectedExceptions = { SemanticException.class })
-  public void testGetEvaluatorDeprecated() throws SemanticException {
+  public void testGetEvaluatorDeprecated() throws SemanticException, IOException {
     MergeSketchUDAF udf = new MergeSketchUDAF();
-    GenericUDAFEvaluator eval = udf.getEvaluator(new TypeInfo[] { binaryType, intType });
-    assertNotNull(eval);
-    assertThat(eval, IsInstanceOf.instanceOf(MergeSketchUDAFEvaluator.class));
+    try (GenericUDAFEvaluator eval = udf.getEvaluator(new TypeInfo[] { binaryType, intType })) {
+      assertNotNull(eval);
+      assertThat(eval, IsInstanceOf.instanceOf(MergeSketchUDAFEvaluator.class));
+    }
   }
 
   @Test
@@ -225,31 +228,31 @@ public class MergeSketchUDAFTest {
   public void testIterate() throws IOException, HiveException {
     MergeSketchAggBuffer buf = strictMock(MergeSketchAggBuffer.class);
     Union union = strictMock(Union.class);
-    
+
     byte[] sketchBytes = SetOperation.builder().buildUnion(512).getResult(true, null).toByteArray();
-    
+
     expect(buf.getUnion()).andReturn(null);
     buf.setSketchSize(512);
-    buf.setUnion(isA(Union.class)); 
+    buf.setUnion(isA(Union.class));
     expect(buf.getUnion()).andReturn(union);
     expect(union.update(isA(Sketch.class))).andReturn(SetOpReturnState.Success);
-    
+
     expect(buf.getUnion()).andReturn(union).times(2);
     expect(union.update(isA(Sketch.class))).andReturn(SetOpReturnState.Success);
-    
+
     replay(buf, union);
-    
+
     try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
-      eval.init(Mode.COMPLETE, new ObjectInspector[] {inputOI, sketchSizeOI});
-      
-      eval.iterate(buf, new Object[] {new BytesWritable(sketchBytes), new IntWritable(512)});
-      eval.iterate(buf, new Object[] {new BytesWritable(sketchBytes), new IntWritable(512)});
+      eval.init(Mode.COMPLETE, new ObjectInspector[] { inputOI, sketchSizeOI });
+
+      eval.iterate(buf, new Object[] { new BytesWritable(sketchBytes), new IntWritable(512) });
+      eval.iterate(buf, new Object[] { new BytesWritable(sketchBytes), new IntWritable(512) });
 
     }
-    
+
     verify(buf, union);
   }
-  
+
   /**
    * testing terminatePartial
    * 
@@ -262,117 +265,117 @@ public class MergeSketchUDAFTest {
     Union union = mock(Union.class);
     CompactSketch compact = mock(CompactSketch.class);
     byte[] bytes = new byte[0];
-    
+
     expect(buf.getUnion()).andReturn(union);
-    expect(union.getResult(true,null)).andReturn(compact);
+    expect(union.getResult(true, null)).andReturn(compact);
     expect(compact.getRetainedEntries(false)).andReturn(512);
     expect(compact.toByteArray()).andReturn(bytes);
     expect(buf.getSketchSize()).andReturn(512);
-    
+
     replay(buf, union, compact);
-    
+
     try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
       Object result = eval.terminatePartial(buf);
-      
+
       assertThat(result, IsInstanceOf.instanceOf(ArrayList.class));
       ArrayList<?> r = (ArrayList<?>) result;
       assertEquals(r.size(), 2);
-      assertEquals(((IntWritable)(r.get(0))).get(), 512);
-      assertEquals(((BytesWritable)(r.get(1))).getBytes(), bytes);
+      assertEquals(((IntWritable) (r.get(0))).get(), 512);
+      assertEquals(((BytesWritable) (r.get(1))).getBytes(), bytes);
     }
-    
+
     verify(buf, union, compact);
   }
-  
+
   @Test
-  public void testMerge () throws IOException, HiveException {
+  public void testMerge() throws IOException, HiveException {
     MergeSketchAggBuffer buf = mock(MergeSketchAggBuffer.class);
     Union union = mock(Union.class);
-    
+
     replay(buf, union);
-    
+
     // test null partial
     try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
-      eval.init(Mode.PARTIAL2, new ObjectInspector[] {intermediateStructType});
-      
+      eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
+
       eval.merge(buf, null);
     }
-    
+
     verify(buf, union);
-    
+
     // test initial merge
     reset(buf, union);
-    
+
     expect(buf.getUnion()).andReturn(null);
     buf.setSketchSize(1024);
     buf.setUnion(isA(Union.class));
     expect(buf.getUnion()).andReturn(union);
-    
+
     Capture<Memory> c = EasyMock.newCapture();
     expect(union.update(and(isA(Memory.class), capture(c)))).andReturn(SetOpReturnState.Success);
-    
+
     replay(buf, union);
-    
+
     try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
-      eval.init(Mode.PARTIAL2, new ObjectInspector[] {intermediateStructType});
-      
+      eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
+
       ArrayList<Object> struct = new ArrayList<>(3);
       struct.add(new IntWritable(1024));
       struct.add(new BytesWritable(new byte[0]));
-      
-      eval.merge(buf, struct);
-    }
-    
-    verify(buf, union);
-    assertEquals(0, c.getValue().getCapacity());
-    
-    // test subsequent merge
-    reset(buf, union);
-    
-    expect(buf.getUnion()).andReturn(union).times(2);
-    c = EasyMock.newCapture();
-    expect(union.update(and(isA(Memory.class), capture(c)))).andReturn(SetOpReturnState.Success);
-    
-    replay(buf, union);
-    
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
-      eval.init(Mode.PARTIAL2, new ObjectInspector[] {intermediateStructType});
-      
-      ArrayList<Object> struct = new ArrayList<>(3);
-      struct.add(new IntWritable(1024));
-      struct.add(new BytesWritable(new byte[0]));
-      
+
       eval.merge(buf, struct);
     }
 
     verify(buf, union);
-    
+    assertEquals(0, c.getValue().getCapacity());
+
+    // test subsequent merge
+    reset(buf, union);
+
+    expect(buf.getUnion()).andReturn(union).times(2);
+    c = EasyMock.newCapture();
+    expect(union.update(and(isA(Memory.class), capture(c)))).andReturn(SetOpReturnState.Success);
+
+    replay(buf, union);
+
+    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+      eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
+
+      ArrayList<Object> struct = new ArrayList<>(3);
+      struct.add(new IntWritable(1024));
+      struct.add(new BytesWritable(new byte[0]));
+
+      eval.merge(buf, struct);
+    }
+
+    verify(buf, union);
+
     assertEquals(0, c.getValue().getCapacity());
   }
-  
+
   @Test
-  public void testTerminate () throws IOException, HiveException {
+  public void testTerminate() throws IOException, HiveException {
     MergeSketchAggBuffer buf = mock(MergeSketchAggBuffer.class);
     Union union = mock(Union.class);
     CompactSketch compact = mock(CompactSketch.class);
     byte[] bytes = new byte[0];
-        
+
     // mode = final. merged unions, but no update sketches
     expect(buf.getUnion()).andReturn(union);
-    expect(union.getResult(true,null)).andReturn(compact);
+    expect(union.getResult(true, null)).andReturn(compact);
     expect(compact.getRetainedEntries(false)).andReturn(1024);
     expect(compact.toByteArray()).andReturn(bytes);
 
     replay(buf, union, compact);
     try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
       Object retVal = eval.terminate(buf);
-      
+
       assertThat(retVal, IsInstanceOf.instanceOf(BytesWritable.class));
       BytesWritable retValBytes = (BytesWritable) retVal;
       assertEquals(retValBytes.getBytes(), bytes);
     }
-    
+
     verify(buf, union, compact);
   }
-  
+
 }
