@@ -53,13 +53,13 @@
   </properties>
 
   <dependencies>
-    <!-- Core Sketch library 
+    <!-- Core Sketch library -->
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
       <version>0.1.1</version>
     </dependency>
-    -->
+
     <!-- Hive Dependencies (provided scope) -->
     <dependency>
       <groupId>org.apache.hive</groupId>
