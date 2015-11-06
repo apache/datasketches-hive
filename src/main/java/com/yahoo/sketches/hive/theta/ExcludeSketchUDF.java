@@ -8,8 +8,6 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.theta.SetOpReturnState;
-
 import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.AnotB;
@@ -63,11 +61,7 @@ public class ExcludeSketchUDF extends UDF {
 
     AnotB anotb = (AnotB) SetOperation.builder().build(sketch_size, Family.A_NOT_B);
 
-    SetOpReturnState success = anotb.update(firstHeapSketch, secondHeapSketch);
-
-    if (success != SetOpReturnState.Success) {
-      throw new IllegalStateException("HiveSketchError: Exclude sketch operation failed.");
-    }
+    anotb.update(firstHeapSketch, secondHeapSketch);
 
     Sketch excludeSketch = anotb.getResult(false, null);
 

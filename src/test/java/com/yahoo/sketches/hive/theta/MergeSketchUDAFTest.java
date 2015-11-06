@@ -37,7 +37,6 @@ import com.yahoo.sketches.hive.theta.MergeSketchUDAF.MergeSketchUDAFEvaluator;
 import com.yahoo.sketches.hive.theta.MergeSketchUDAF.MergeSketchUDAFEvaluator.MergeSketchAggBuffer;
 import com.yahoo.sketches.memory.Memory;
 import com.yahoo.sketches.theta.CompactSketch;
-import com.yahoo.sketches.theta.SetOpReturnState;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
@@ -235,10 +234,10 @@ public class MergeSketchUDAFTest {
     buf.setSketchSize(512);
     buf.setUnion(isA(Union.class));
     expect(buf.getUnion()).andReturn(union);
-    expect(union.update(isA(Sketch.class))).andReturn(SetOpReturnState.Success);
+    union.update(isA(Sketch.class));
 
     expect(buf.getUnion()).andReturn(union).times(2);
-    expect(union.update(isA(Sketch.class))).andReturn(SetOpReturnState.Success);
+    union.update(isA(Sketch.class));
 
     replay(buf, union);
 
@@ -312,7 +311,7 @@ public class MergeSketchUDAFTest {
     expect(buf.getUnion()).andReturn(union);
 
     Capture<Memory> c = EasyMock.newCapture();
-    expect(union.update(and(isA(Memory.class), capture(c)))).andReturn(SetOpReturnState.Success);
+    union.update(and(isA(Memory.class), capture(c)));
 
     replay(buf, union);
 
@@ -334,7 +333,7 @@ public class MergeSketchUDAFTest {
 
     expect(buf.getUnion()).andReturn(union).times(2);
     c = EasyMock.newCapture();
-    expect(union.update(and(isA(Memory.class), capture(c)))).andReturn(SetOpReturnState.Success);
+    union.update(and(isA(Memory.class), capture(c)));
 
     replay(buf, union);
 

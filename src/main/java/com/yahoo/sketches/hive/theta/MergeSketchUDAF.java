@@ -27,7 +27,6 @@ import java.util.List;
 
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.CompactSketch;
-import com.yahoo.sketches.theta.SetOpReturnState;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
@@ -203,11 +202,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
 
       Sketch incomingSketch = Sketch.wrap(memorySketch);
 
-      SetOpReturnState success = buf.getUnion().update(incomingSketch);
-
-      if (success != SetOpReturnState.Success) {
-        throw new SemanticException("HiveSketchError: Merge sketch operation failed.");
-      }
+      buf.getUnion().update(incomingSketch);
     }
 
     /**
@@ -272,11 +267,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
 
       NativeMemory memorySketch = new NativeMemory(serializedSketch.getBytes());
 
-      SetOpReturnState success = buf.getUnion().update(memorySketch);
-
-      if (success != SetOpReturnState.Success) {
-        throw new SemanticException("HiveSketchError: Merge sketch operation failed.");
-      }
+      buf.getUnion().update(memorySketch);
     }
 
     /**

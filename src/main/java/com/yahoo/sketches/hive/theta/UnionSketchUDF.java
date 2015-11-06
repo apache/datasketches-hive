@@ -8,8 +8,6 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.theta.SetOpReturnState;
-
 import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.SetOperation;
@@ -49,22 +47,15 @@ public class UnionSketchUDF extends UDF {
     if (firstSketch != null && firstSketch.getLength() > 0) {
       NativeMemory firstMemory = new NativeMemory(firstSketch.getBytes());
       firstHeapSketch = Sketch.heapify(firstMemory);
-
-      SetOpReturnState success = union.update(firstHeapSketch);
-      if (success != SetOpReturnState.Success) {
-        throw new IllegalStateException("HiveSketchError: Initialize union first sketch operation failed.");
-      }
+      union.update(firstHeapSketch);
     }
 
     // update union second sketch, if null do nothing
     if (secondSketch != null && secondSketch.getLength() > 0) {
       NativeMemory secondMemory = new NativeMemory(secondSketch.getBytes());
       secondHeapSketch = Sketch.heapify(secondMemory);
+      union.update(secondHeapSketch);
 
-      SetOpReturnState success = union.update(secondHeapSketch);
-      if (success != SetOpReturnState.Success) {
-        throw new IllegalStateException("HiveSketchError: union sketch operation failed.");
-      }
     }
 
     Sketch intermediateSketch = union.getResult(false, null);

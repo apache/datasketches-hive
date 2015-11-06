@@ -8,8 +8,6 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.theta.SetOpReturnState;
-
 import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.Intersection;
@@ -62,15 +60,8 @@ public class IntersectSketchUDF extends UDF {
 
     Intersection intersect = (Intersection) SetOperation.builder().build(sketch_size, Family.INTERSECTION);
     
-    SetOpReturnState success = intersect.update(firstHeapSketch);
-    if (success != SetOpReturnState.Success) {
-      throw new IllegalStateException("HiveSketchError: Initialize intersect first sketch operation failed.");
-    }
-    
-    success = intersect.update(secondHeapSketch);
-    if (success != SetOpReturnState.Success) {
-      throw new IllegalStateException("HiveSketchError: intersect sketch operation failed.");
-    }
+    intersect.update(firstHeapSketch);
+    intersect.update(secondHeapSketch);
 
     Sketch intermediateSketch = intersect.getResult(false, null);
     byte[] resultSketch = intermediateSketch.toByteArray();

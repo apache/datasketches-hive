@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.yahoo.sketches.theta.SetOpReturnState;
 import com.yahoo.sketches.memory.Memory;
 import com.yahoo.sketches.theta.CompactSketch;
 import com.yahoo.sketches.theta.UpdateReturnState;
@@ -383,7 +382,7 @@ public class DataToSketchUDAFTest {
     expect(buf.getUnion()).andReturn(union);
 
     Capture<Memory> c = EasyMock.newCapture();
-    expect(union.update(and(isA(Memory.class), capture(c)))).andReturn(SetOpReturnState.Success);
+    union.update(and(isA(Memory.class), capture(c)));
 
     replay(buf, union);
 
@@ -406,7 +405,7 @@ public class DataToSketchUDAFTest {
 
     expect(buf.getUnion()).andReturn(union).times(2);
     c = EasyMock.newCapture();
-    expect(union.update(and(isA(Memory.class), capture(c)))).andReturn(SetOpReturnState.Success);
+    union.update(and(isA(Memory.class), capture(c)));
 
     replay(buf, union);
 
