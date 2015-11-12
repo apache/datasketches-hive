@@ -39,11 +39,14 @@ import com.yahoo.sketches.theta.UpdateSketch;
  * Hive Generic UDAF Resolver Class for MergeSketchUDAF.
  *
  */
-@Description(name = "dataToSketch", value = "_FUNC_(expr, size, prob) - Compute a sketch of size 'size' and sampling probability 'prob' on data 'expr'", extended = "Example:\n"
+@Description(
+    name = "dataToSketch", 
+    value = "_FUNC_(expr, size, prob) - Compute a sketch of size 'size' and sampling probability 'prob' on data 'expr'", 
+    extended = "Example:\n"
     + "> SELECT dataToSketch(val, 1024, 1.0) FROM src;\n"
     + "The return value is a binary blob that can be operated on by other sketch related operands."
     + "The sketch size must be a power of 2 and controls the relative error expected from the sketch."
-    + "A size of 16384 can be expected to yeild errors of roughly +/- 1.5% in the estimation of uniques.")
+    + "A size of 16384 can be expected to yield errors of roughly +/- 1.5% in the estimation of uniques.")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
   public static final int DEFAULT_SKETCH_SIZE = 16384;
   public static final float DEFAULT_SAMPLING_PROBABILITY = 1.0f;

@@ -35,7 +35,10 @@ import com.yahoo.sketches.theta.Union;
  * Hive Generic UDAF Resolver Class for MergeSketchUDAF.
  *
  */
-@Description(name = "mergeSketch", value = "_FUNC_(sketch, size) - Compute the union of sketches using a result with size 'size'", extended = "Example:\n"
+@Description(
+    name = "mergeSketch", 
+    value = "_FUNC_(sketch, size) - Compute the union of sketches using a result with size 'size'", 
+    extended = "Example:\n"
     + "> SELECT mergeSketch(sketch, 1024) FROM src;\n"
     + "The return value is a binary blob that contains a compact sketch which can "
     + "be operated on by the other sketch related operands. The sketch "
