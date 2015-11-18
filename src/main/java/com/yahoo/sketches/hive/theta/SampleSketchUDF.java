@@ -26,30 +26,35 @@ public class SampleSketchUDF extends UDF {
    * @param binarySketch
    *          sketch to be sampled passed in as bytes writable.
    * @param sketchSize 
-   *          Size to use for the new sketch
+   *          Size to use for the new sketch.
+   *          This must be a power of 2 and larger than 16. If zero, DEFAULT is used.
    * @param probability
-   *          The sampling probability to use for the new sketch
+   *          The sampling probability to use for the new sketch. 
+   *          Should be greater than zero and less than or equal to 1.0 
    * @return The sampled sketch encoded as a BytesWritable
    */
   public BytesWritable evaluate(BytesWritable binarySketch, int sketchSize, double probability) {
-    int sketch_size = DEFAULT_SIZE;
-
+    
+    // Null checks
     if (binarySketch == null) {
       return null;
     }
-
+    
     byte[] serializedSketch = binarySketch.getBytes();
-
+    
     if (serializedSketch.length <= 8) {
       return null;
     }
+    
+    //Size and probability checks that choose defaults rather than error out
+    int sketch_size = (sketchSize > 0)? sketchSize : DEFAULT_SIZE; //allows <=0.
+    
+    float p = (float) (((probability < 0.0) || (probability > 1.0))? 1.0 : probability); 
+    
+    //  The builder will catch errors with improper sketchSize or probability
+    Union union = SetOperation.builder().setP(p).buildUnion(sketch_size);
 
-    NativeMemory memorySketch = new NativeMemory(serializedSketch);
-
-    //  The SetOperation.builder will catch errors with improper sketchSize or probability
-    Union union = SetOperation.builder().setP((float) probability).buildUnion(sketch_size);
-
-    union.update(memorySketch);
+    union.update(new NativeMemory(serializedSketch)); //Union can accept Memory object directly
 
     Sketch intermediateSketch = union.getResult(false, null); //to CompactSketch(unordered, on-heap)
     byte[] resultSketch = intermediateSketch.toByteArray();
