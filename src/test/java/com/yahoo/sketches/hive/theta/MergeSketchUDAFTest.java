@@ -234,10 +234,10 @@ public class MergeSketchUDAFTest {
     buf.setSketchSize(512);
     buf.setUnion(isA(Union.class));
     expect(buf.getUnion()).andReturn(union);
-    union.update(isA(Sketch.class));
+    union.update(isA(Memory.class));
 
     expect(buf.getUnion()).andReturn(union).times(2);
-    union.update(isA(Sketch.class));
+    union.update(isA(Memory.class));
 
     replay(buf, union);
 

@@ -33,7 +33,7 @@ public class SampleSketchUDF extends UDF {
    *          Should be greater than zero and less than or equal to 1.0 
    * @return The sampled sketch encoded as a BytesWritable
    */
-  public BytesWritable evaluate(BytesWritable binarySketch, int sketchSize, double probability) {
+  public BytesWritable evaluate(BytesWritable binarySketch, int sketchSize, float probability) {
     
     // Null checks
     if (binarySketch == null) {
@@ -46,13 +46,8 @@ public class SampleSketchUDF extends UDF {
       return null;
     }
     
-    //Size and probability checks that choose defaults rather than error out
-    int sketch_size = (sketchSize > 0)? sketchSize : DEFAULT_SIZE; //allows <=0.
-    
-    float p = (float) (((probability < 0.0) || (probability > 1.0))? 1.0 : probability); 
-    
     //  The builder will catch errors with improper sketchSize or probability
-    Union union = SetOperation.builder().setP(p).buildUnion(sketch_size);
+    Union union = SetOperation.builder().setP(probability).buildUnion(sketchSize);
 
     union.update(new NativeMemory(serializedSketch)); //Union can accept Memory object directly
 
