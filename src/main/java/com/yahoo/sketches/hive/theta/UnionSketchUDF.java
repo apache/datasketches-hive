@@ -8,7 +8,6 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
@@ -41,7 +40,7 @@ public class UnionSketchUDF extends UDF {
       sketch_size = sketchSize.get();
     }
 
-    Union union = (Union) SetOperation.builder().build(sketch_size, Family.UNION);
+    Union union = SetOperation.builder().buildUnion(sketch_size);
 
     // update union first sketch, if null do nothing
     if (firstSketch != null && firstSketch.getLength() > 0) {

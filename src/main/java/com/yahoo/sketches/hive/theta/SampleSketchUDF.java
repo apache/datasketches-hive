@@ -7,14 +7,13 @@ package com.yahoo.sketches.hive.theta;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
 
 /**
- * Hive estimate sketch udf. V4
+ * Hive estimate sketch udf.
  *
  */
 public class SampleSketchUDF extends UDF {
@@ -34,7 +33,6 @@ public class SampleSketchUDF extends UDF {
    */
   public BytesWritable evaluate(BytesWritable binarySketch, int sketchSize, double probability) {
     int sketch_size = DEFAULT_SIZE;
-    double sampling_probability = 1.0;
 
     if (binarySketch == null) {
       return null;
@@ -46,22 +44,14 @@ public class SampleSketchUDF extends UDF {
       return null;
     }
 
-    if (sketchSize > 0) {
-      sketch_size = sketchSize;
-    }
-    if (probability > 0.0 && probability < 1.0) {
-      sampling_probability = probability;
-    }
-
     NativeMemory memorySketch = new NativeMemory(serializedSketch);
 
-    Sketch heapSketch = Sketch.heapify(memorySketch);
+    //  The SetOperation.builder will catch errors with improper sketchSize or probability
+    Union union = SetOperation.builder().setP((float) probability).buildUnion(sketch_size);
 
-    Union union = (Union) SetOperation.builder().setP((float) sampling_probability).build(sketch_size, Family.UNION);
+    union.update(memorySketch);
 
-    union.update(heapSketch);
-
-    Sketch intermediateSketch = union.getResult(false, null);
+    Sketch intermediateSketch = union.getResult(false, null); //to CompactSketch(unordered, on-heap)
     byte[] resultSketch = intermediateSketch.toByteArray();
 
     BytesWritable result = new BytesWritable();

@@ -55,7 +55,7 @@
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
-      <version>0.2.0</version>
+      <version>0.2.2</version>
     </dependency>
 
     <!-- Hive Dependencies (provided scope) -->
