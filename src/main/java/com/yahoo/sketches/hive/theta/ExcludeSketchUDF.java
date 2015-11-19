@@ -8,7 +8,6 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.AnotB;
 import com.yahoo.sketches.theta.SetOperation;
@@ -59,7 +58,7 @@ public class ExcludeSketchUDF extends UDF {
       sketch_size = sketchSize.get();
     }
 
-    AnotB anotb = (AnotB) SetOperation.builder().build(sketch_size, Family.A_NOT_B);
+    AnotB anotb = SetOperation.builder().buildANotB(sketch_size);
 
     anotb.update(firstHeapSketch, secondHeapSketch);
 

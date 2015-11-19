@@ -28,7 +28,6 @@ import java.util.List;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.CompactSketch;
 import com.yahoo.sketches.theta.SetOperation;
-import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
 
 /**
@@ -203,9 +202,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
 
       NativeMemory memorySketch = new NativeMemory(serializedSketch);
 
-      Sketch incomingSketch = Sketch.wrap(memorySketch);
-
-      buf.getUnion().update(incomingSketch);
+      buf.getUnion().update(memorySketch);
     }
 
     /**

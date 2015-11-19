@@ -7,14 +7,13 @@ package com.yahoo.sketches.hive.theta;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
 
 /**
- * Hive estimate sketch udf. V4
+ * Hive estimate sketch udf.
  *
  */
 public class SampleSketchUDF extends UDF {
@@ -27,41 +26,32 @@ public class SampleSketchUDF extends UDF {
    * @param binarySketch
    *          sketch to be sampled passed in as bytes writable.
    * @param sketchSize 
-   *          Size to use for the new sketch
+   *          Size to use for the new sketch.
+   *          This must be a power of 2 and larger than 16. If zero, DEFAULT is used.
    * @param probability
-   *          The sampling probability to use for the new sketch
+   *          The sampling probability to use for the new sketch. 
+   *          Should be greater than zero and less than or equal to 1.0 
    * @return The sampled sketch encoded as a BytesWritable
    */
-  public BytesWritable evaluate(BytesWritable binarySketch, int sketchSize, double probability) {
-    int sketch_size = DEFAULT_SIZE;
-    double sampling_probability = 1.0;
-
+  public BytesWritable evaluate(BytesWritable binarySketch, int sketchSize, float probability) {
+    
+    // Null checks
     if (binarySketch == null) {
       return null;
     }
-
+    
     byte[] serializedSketch = binarySketch.getBytes();
-
+    
     if (serializedSketch.length <= 8) {
       return null;
     }
+    
+    //  The builder will catch errors with improper sketchSize or probability
+    Union union = SetOperation.builder().setP(probability).buildUnion(sketchSize);
 
-    if (sketchSize > 0) {
-      sketch_size = sketchSize;
-    }
-    if (probability > 0.0 && probability < 1.0) {
-      sampling_probability = probability;
-    }
+    union.update(new NativeMemory(serializedSketch)); //Union can accept Memory object directly
 
-    NativeMemory memorySketch = new NativeMemory(serializedSketch);
-
-    Sketch heapSketch = Sketch.heapify(memorySketch);
-
-    Union union = (Union) SetOperation.builder().setP((float) sampling_probability).build(sketch_size, Family.UNION);
-
-    union.update(heapSketch);
-
-    Sketch intermediateSketch = union.getResult(false, null);
+    Sketch intermediateSketch = union.getResult(false, null); //to CompactSketch(unordered, on-heap)
     byte[] resultSketch = intermediateSketch.toByteArray();
 
     BytesWritable result = new BytesWritable();

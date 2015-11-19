@@ -38,7 +38,6 @@ import com.yahoo.sketches.hive.theta.MergeSketchUDAF.MergeSketchUDAFEvaluator.Me
 import com.yahoo.sketches.memory.Memory;
 import com.yahoo.sketches.theta.CompactSketch;
 import com.yahoo.sketches.theta.SetOperation;
-import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
 import com.yahoo.sketches.theta.UpdateSketch;
 
@@ -234,10 +233,10 @@ public class MergeSketchUDAFTest {
     buf.setSketchSize(512);
     buf.setUnion(isA(Union.class));
     expect(buf.getUnion()).andReturn(union);
-    union.update(isA(Sketch.class));
+    union.update(isA(Memory.class));
 
     expect(buf.getUnion()).andReturn(union).times(2);
-    union.update(isA(Sketch.class));
+    union.update(isA(Memory.class));
 
     replay(buf, union);
 

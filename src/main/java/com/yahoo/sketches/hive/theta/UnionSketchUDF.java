@@ -8,7 +8,6 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
@@ -31,34 +30,26 @@ public class UnionSketchUDF extends UDF {
    *          second sketch to be unioned.
    * @param sketchSize
    *          final output unioned sketch size.
+   *          This must be a power of 2 and larger than 16. If zero, DEFAULT is used.
    * @return resulting sketch of union.
    */
   public BytesWritable evaluate(BytesWritable firstSketch, BytesWritable secondSketch, IntWritable sketchSize) {
-    int sketch_size = DEFAULT_SIZE;
-    Sketch firstHeapSketch, secondHeapSketch;
+    
+    int sketch_size = (sketchSize != null)? sketchSize.get() : DEFAULT_SIZE;
+    
+    Union union = SetOperation.builder().buildUnion(sketch_size);
 
-    if (sketchSize != null) {
-      sketch_size = sketchSize.get();
-    }
-
-    Union union = (Union) SetOperation.builder().build(sketch_size, Family.UNION);
-
-    // update union first sketch, if null do nothing
-    if (firstSketch != null && firstSketch.getLength() > 0) {
-      NativeMemory firstMemory = new NativeMemory(firstSketch.getBytes());
-      firstHeapSketch = Sketch.heapify(firstMemory);
-      union.update(firstHeapSketch);
+    // update union with first sketch, if null do nothing
+    if ((firstSketch != null) && (firstSketch.getLength() >= 8)) {
+      union.update(new NativeMemory(firstSketch.getBytes()));
     }
 
     // update union second sketch, if null do nothing
-    if (secondSketch != null && secondSketch.getLength() > 0) {
-      NativeMemory secondMemory = new NativeMemory(secondSketch.getBytes());
-      secondHeapSketch = Sketch.heapify(secondMemory);
-      union.update(secondHeapSketch);
-
+    if ((secondSketch != null) && (secondSketch.getLength() >= 8)) {
+      union.update(new NativeMemory(secondSketch.getBytes()));
     }
 
-    Sketch intermediateSketch = union.getResult(false, null);
+    Sketch intermediateSketch = union.getResult(false, null); //unordered CompactSketch
     byte[] resultSketch = intermediateSketch.toByteArray();
 
     BytesWritable result = new BytesWritable();

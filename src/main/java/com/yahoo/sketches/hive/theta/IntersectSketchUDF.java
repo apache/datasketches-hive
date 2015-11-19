@@ -8,7 +8,6 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.Family;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.Intersection;
 import com.yahoo.sketches.theta.SetOperation;
@@ -58,7 +57,7 @@ public class IntersectSketchUDF extends UDF {
       sketch_size = sketchSize.get();
     }
 
-    Intersection intersect = (Intersection) SetOperation.builder().build(sketch_size, Family.INTERSECTION);
+    Intersection intersect = SetOperation.builder().buildIntersection(sketch_size);
     
     intersect.update(firstHeapSketch);
     intersect.update(secondHeapSketch);
