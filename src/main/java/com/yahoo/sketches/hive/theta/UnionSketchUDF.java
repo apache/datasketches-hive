@@ -40,12 +40,12 @@ public class UnionSketchUDF extends UDF {
     Union union = SetOperation.builder().buildUnion(sketch_size);
 
     // update union with first sketch, if null do nothing
-    if (firstSketch != null) {
+    if ((firstSketch != null) && (firstSketch.getLength() >= 8)) {
       union.update(new NativeMemory(firstSketch.getBytes()));
     }
 
     // update union second sketch, if null do nothing
-    if (secondSketch != null) {
+    if ((secondSketch != null) && (secondSketch.getLength() >= 8)) {
       union.update(new NativeMemory(secondSketch.getBytes()));
     }
 
