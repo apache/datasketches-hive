@@ -4,8 +4,10 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
+import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.testng.annotations.Test;
 
 import com.yahoo.sketches.hive.theta.ExcludeSketchUDF;
@@ -82,7 +84,7 @@ public class ExcludeSketchUDFTest {
 
   // test valid input sketches
   @Test
-  public void testEvaluateValidSketchWithSize () {
+  public void testEvaluateValidSketchWithDefaultSeed () {
     ExcludeSketchUDF testObject = new ExcludeSketchUDF();
     
     UpdateSketch sketch1 = Sketches.updateSketchBuilder().build(1024);
@@ -98,7 +100,7 @@ public class ExcludeSketchUDFTest {
     BytesWritable input1 = new BytesWritable(sketch1.compact(true, null).toByteArray());
     BytesWritable input2 = new BytesWritable(sketch2.compact(true, null).toByteArray());
     
-    BytesWritable output = testObject.evaluate(input1, input2, new IntWritable(128));
+    BytesWritable output = testObject.evaluate(input1, input2, new LongWritable(DEFAULT_UPDATE_SEED));
     
     Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()));
     

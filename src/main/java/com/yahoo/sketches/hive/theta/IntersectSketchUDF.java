@@ -4,9 +4,11 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
+import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.Intersection;
@@ -18,7 +20,6 @@ import com.yahoo.sketches.theta.Sketch;
  *
  */
 public class IntersectSketchUDF extends UDF {
-  public static final int DEFAULT_SIZE = 16384;
 
   /**
    * Main logic called by hive if sketchSize is also passed in. Computes the
@@ -28,12 +29,12 @@ public class IntersectSketchUDF extends UDF {
    *          first sketch to be intersected.
    * @param secondSketch
    *          second sketch to be intersected.
-   * @param sketchSize
-   *          final output intersected sketch size.
+   * @param hashUpdateSeed
+   *          Only required if input sketches were constructed using an update seed that was not the default.
    * @return resulting sketch of intersection.
    */
-  public BytesWritable evaluate(BytesWritable firstSketch, BytesWritable secondSketch, IntWritable sketchSize) {
-    int sketch_size = DEFAULT_SIZE;
+  public BytesWritable evaluate(BytesWritable firstSketch, BytesWritable secondSketch, LongWritable hashUpdateSeed) {
+    long hashSeed = (hashUpdateSeed == null)? DEFAULT_UPDATE_SEED : hashUpdateSeed.get();
     
     Sketch firstHeapSketch, secondHeapSketch;
     
@@ -53,16 +54,12 @@ public class IntersectSketchUDF extends UDF {
       secondHeapSketch = Sketch.heapify(secondMemory);
     }
 
-    if (sketchSize != null) {
-      sketch_size = sketchSize.get();
-    }
-
-    Intersection intersect = SetOperation.builder().buildIntersection(sketch_size);
+    Intersection intersect = SetOperation.builder().setSeed(hashSeed).buildIntersection();
     
     intersect.update(firstHeapSketch);
     intersect.update(secondHeapSketch);
 
-    Sketch intermediateSketch = intersect.getResult(false, null);
+    Sketch intermediateSketch = intersect.getResult(true, null);
     byte[] resultSketch = intermediateSketch.toByteArray();
 
     BytesWritable result = new BytesWritable();
