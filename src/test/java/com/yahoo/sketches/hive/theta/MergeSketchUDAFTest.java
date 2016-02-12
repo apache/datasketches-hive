@@ -279,13 +279,13 @@ public class MergeSketchUDAFTest {
       ArrayList<?> r = (ArrayList<?>) result;
       assertEquals(r.size(), 2);
       assertEquals(((IntWritable) (r.get(0))).get(), 512);
-      assertEquals(((BytesWritable) (r.get(1))).getBytes(), bytes);
+      assertEquals(((BytesWritable) (r.get(1))).getBytes().length, bytes.length);
     }
 
     verify(buf, union, compact);
   }
 
-  @Test
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testMerge() throws IOException, HiveException {
     MergeSketchAggBuffer buf = mock(MergeSketchAggBuffer.class);
     Union union = mock(Union.class);
@@ -370,7 +370,7 @@ public class MergeSketchUDAFTest {
 
       assertThat(retVal, IsInstanceOf.instanceOf(BytesWritable.class));
       BytesWritable retValBytes = (BytesWritable) retVal;
-      assertEquals(retValBytes.getBytes(), bytes);
+      assertEquals(retValBytes.getBytes().length, bytes.length);
     }
 
     verify(buf, union, compact);

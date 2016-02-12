@@ -309,7 +309,7 @@ public class DataToSketchUDAFTest {
       assertEquals(r.size(), 3);
       assertEquals(((IntWritable) (r.get(0))).get(), 512);
       assertEquals(((FloatWritable) (r.get(1))).get(), 0.5f);
-      assertEquals(((BytesWritable) (r.get(2))).getBytes(), bytes);
+      assertEquals(((BytesWritable) (r.get(2))).getBytes().length, bytes.length);
     }
 
     verify(buf, sketch, compact);
@@ -348,13 +348,13 @@ public class DataToSketchUDAFTest {
       assertEquals(r.size(), 3);
       assertEquals(((IntWritable) (r.get(0))).get(), 512);
       assertEquals(((FloatWritable) (r.get(1))).get(), 0.5f);
-      assertEquals(((BytesWritable) (r.get(2))).getBytes(), bytes);
+      assertEquals(((BytesWritable) (r.get(2))).getBytes().length, bytes.length);
     }
 
     verify(buf, union, compact);
   }
 
-  @Test
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testMerge() throws IOException, HiveException {
     DataToSketchAggBuffer buf = mock(DataToSketchAggBuffer.class);
     Union union = mock(Union.class);
@@ -447,7 +447,7 @@ public class DataToSketchUDAFTest {
 
       assertThat(retVal, IsInstanceOf.instanceOf(BytesWritable.class));
       BytesWritable retValBytes = (BytesWritable) retVal;
-      assertEquals(retValBytes.getBytes(), bytes);
+      assertEquals(retValBytes.getBytes().length, bytes.length);
     }
 
     verify(buf, union, sketch, compact);
@@ -466,7 +466,7 @@ public class DataToSketchUDAFTest {
 
       assertThat(retVal, IsInstanceOf.instanceOf(BytesWritable.class));
       BytesWritable retValBytes = (BytesWritable) retVal;
-      assertEquals(retValBytes.getBytes(), bytes);
+      assertEquals(retValBytes.getBytes().length, bytes.length);
     }
 
     verify(buf, union, sketch, compact);
