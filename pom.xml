@@ -55,7 +55,7 @@
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
-      <version>0.3.1</version>
+      <version>0.4.0</version>
     </dependency>
 
     <!-- Hive Dependencies (provided scope) -->
@@ -84,7 +84,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.9.9</version>
+      <version>6.9.10</version>
       <scope>test</scope>
     </dependency>
 
