@@ -53,12 +53,16 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
    * Performs argument number and type validation. DataToSketch expects
-   * to recieve between one and three arguments. The first (required)
-   * is the value to add to the sketch and must be a primitive. The second
-   * (optional) is the sketch size to use. This must be an integral value
-   * and should be constant. If not constant, the first row processed 
-   * provides the size. The third (optional) is the sampling probablility
-   * and is a floating point value between 0.0 and 1.0.
+   * to recieve between one and three arguments. 
+   * <ul>
+   * <li>The first (required) is the value to add to the sketch and must be a primitive.</li>
+   * 
+   * <li>The second (optional) is the sketch size to use. This must be an integral value
+   * and should be constant. If not constant, the first row processed provides the size.</li>
+   * 
+   * <li>The third (optional) is the sampling probablility and is a floating point value between 
+   * 0.0 and 1.0.</li>
+   * </ul>
    *  
    * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver#getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
    * 
@@ -100,7 +104,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       // all other types are invalid
       default:
         throw new UDFArgumentTypeException(1, "Only integral type arguments are accepted but "
-            + parameters[1].getTypeName() + " was passed as parameter 1.");
+            + parameters[1].getTypeName() + " was passed as parameter 2.");
       }
 
       // Also make sure it is a constant.
@@ -123,7 +127,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         break;
       default:
         throw new UDFArgumentTypeException(2, "Only floating point type arguments between 0 and 1 are accepted but "
-            + parameters[2].getTypeName() + " was passed as parameter 2");
+            + parameters[2].getTypeName() + " was passed as parameter 3");
       }
       // Also make sure it is a constant.
       if (!ObjectInspectorUtils.isConstantObjectInspector(parameters[2])) {
@@ -252,8 +256,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      */
     @Override
     public Object terminatePartial(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      // return the bytes associated with this sketch, compacted for easier
-      // merging
+      // return the bytes associated with this sketch, compacted for easier merging
       DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
       
       CompactSketch intermediate = null;
