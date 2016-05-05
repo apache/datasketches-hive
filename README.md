@@ -6,15 +6,7 @@
 
 Depends on sketches-core.
 
-To use Hive UDFs, you should do the following:
-
-1. Register the JAR file with Hive: 
-  - `hive> add jar sketches-hive-X.Y.Z-incDeps.jar`
-2. Register UDF functions with Hive:z
-  - `hive> create temporary function estimate as 'com.yahoo.sketches.hive.theta.EstimateSketchUDF';`
-  - `hive> create temporary function dataToSketch as 'com.yahoo.sketches.hive.theta.DataToSketchUDAF';`
-3. Run a query: 
-  - `hive> select estimate(dataToSketch(myCol, 16384, 1.0)) from myTable where color = blue;`
+See [Hadoop Hive UDF's](http://datasketches.github.io/docs/ThetaHiveUDFs.html)
 
 [travis]:https://travis-ci.org//DataSketches/sketches-hive/builds?branch=master
 [travis img]:https://secure.travis-ci.org/DataSketches/sketches-hive.svg?branch=master
