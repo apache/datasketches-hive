@@ -254,8 +254,8 @@ public class MergeSketchUDAFTest {
   /**
    * testing terminatePartial
    * 
-   * @throws IOException
-   * @throws HiveException
+   * @throws IOException thrown by Hive
+   * @throws HiveException thrown by Hive
    */
   @Test
   public void testTerminatePartial() throws IOException, HiveException {
