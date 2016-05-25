@@ -12,6 +12,8 @@ bin/
 
 #Test output
 test-output/
+.clover/
+tmp/
 
 # Build artifacts
 target/
@@ -19,9 +21,11 @@ out/
 build/
 jarsIn/
 *.jar
-#build.xml
+build.xml
 .idea
 *.iml
+*.properties
+*.releaseBackup
 
 # Jekyll
 Gemfile
@@ -29,4 +33,4 @@ Gemfile.lock
 _site/
 _*
 _*/
-/.clover/
+
