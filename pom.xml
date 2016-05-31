@@ -148,6 +148,10 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.3</version>
         <configuration>
+          <!-- 
+            <show>private</show> 
+          -->
+          <stylesheetfile>src/main/javadoc/stylesheet.css</stylesheetfile>
           <docfilessubdirs>true</docfilessubdirs>
         </configuration>
         <executions>
