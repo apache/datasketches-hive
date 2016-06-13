@@ -16,6 +16,8 @@ import com.yahoo.sketches.theta.Sketch;
  */
 public class EstimateSketchUDF extends UDF {
 
+  private static final int EMPTY_SKETCH_SIZE_BYTES = 8;
+
   /**
    * Main logic called by hive, calculates the estimate unique count of sketch.
    * 
@@ -23,21 +25,17 @@ public class EstimateSketchUDF extends UDF {
    *           sketch to be estimated passed in as bytes writable.
    * @return the estimate of unique count from given sketch.
    */
-  public Double evaluate(BytesWritable binarySketch) {
+  public Double evaluate(final BytesWritable binarySketch) {
     if (binarySketch == null) {
       return 0.0;
     }
 
-    byte[] serializedSketch = binarySketch.getBytes();
+    final byte[] serializedSketch = binarySketch.getBytes();
 
-    if (serializedSketch.length <= 8) {
+    if (serializedSketch.length <= EMPTY_SKETCH_SIZE_BYTES) {
       return 0.0;
     }
 
-    NativeMemory memorySketch = new NativeMemory(serializedSketch);
-
-    Sketch heapSketch = Sketch.heapify(memorySketch);
-
-    return heapSketch.getEstimate();
+    return Sketch.wrap(new NativeMemory(serializedSketch)).getEstimate();
   }
 }

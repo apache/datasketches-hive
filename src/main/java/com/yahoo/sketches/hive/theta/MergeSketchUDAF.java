@@ -60,8 +60,8 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
    * @return The GenericUDAFEvaluator to use to compute the function.
    */
   @Override
-  public GenericUDAFEvaluator getEvaluator(GenericUDAFParameterInfo info) throws SemanticException {
-    ObjectInspector[] parameters = info.getParameterObjectInspectors();
+  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
+    final ObjectInspector[] parameters = info.getParameterObjectInspectors();
 
     // Check number of arguments passed in, merge sketch only allow one or two
     // column/(int)
@@ -134,7 +134,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      *         returned type of terminate(...)).
      */
     @Override
-    public ObjectInspector init(Mode m, ObjectInspector[] parameters) throws HiveException {
+    public ObjectInspector init(final Mode m, final ObjectInspector[] parameters) throws HiveException {
       super.init(m, parameters);
 
       if (m == Mode.PARTIAL1 || m == Mode.COMPLETE) {
@@ -152,10 +152,10 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
 
       if (m == Mode.PARTIAL1 || m == Mode.PARTIAL2) {
         // build list object representing intermediate result
-        List<ObjectInspector> fields = new ArrayList<>(2);
+        final List<ObjectInspector> fields = new ArrayList<>(2);
         fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT));
         fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY));
-        List<String> fieldNames = new ArrayList<>(2);
+        final List<String> fieldNames = new ArrayList<>(2);
         fieldNames.add(SKETCH_SIZE_FIELD);
         fieldNames.add(SKETCH_FIELD);
 
@@ -174,14 +174,14 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      *          sketches in the form of Object passed in to be merged.
      */
     @Override
-    public void iterate(@SuppressWarnings("deprecation") AggregationBuffer agg, Object[] parameters)
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object[] parameters)
         throws HiveException {
       // don't bother continuing if we have a null.
       if (parameters[0] == null) {
         return;
       }
 
-      MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
 
       if (buf.getUnion() == null) {
         int sketchSize = DEFAULT_SKETCH_SIZE;
@@ -193,16 +193,14 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
         buf.setUnion(SetOperation.builder().buildUnion(sketchSize));
       }
 
-      byte[] serializedSketch = (byte[]) inputOI.getPrimitiveJavaObject(parameters[0]);
+      final byte[] serializedSketch = (byte[]) inputOI.getPrimitiveJavaObject(parameters[0]);
 
       // skip if input sketch is null
       if (serializedSketch == null) {
         return;
       }
 
-      NativeMemory memorySketch = new NativeMemory(serializedSketch);
-
-      buf.getUnion().update(memorySketch);
+      buf.getUnion().update(new NativeMemory(serializedSketch));
     }
 
     /**
@@ -214,24 +212,22 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      * @return Sketch serialized in a bytes writable object.
      */
     @Override
-    public Object terminatePartial(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
 
-      MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
-      Union union = buf.getUnion();
+      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final Union union = buf.getUnion();
       if (union == null) {
         return null;
       }
-      CompactSketch intermediateSketch = union.getResult(true, null);
-
+      final CompactSketch intermediateSketch = union.getResult(true, null);
       if (intermediateSketch.getRetainedEntries(false) == 0) {
         return null;
       } else {
-        byte[] bytes = intermediateSketch.toByteArray();
+        final byte[] bytes = intermediateSketch.toByteArray();
 
-        ArrayList<Object> results = new ArrayList<>(2);
+        final ArrayList<Object> results = new ArrayList<>(2);
         results.add(new IntWritable(buf.getSketchSize()));
         results.add(new BytesWritable(bytes));
-
         return results;
       }
     }
@@ -245,29 +241,27 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      *          intermediate sketch passed as bytes writable.
      */
     @Override
-    public void merge(@SuppressWarnings("deprecation") AggregationBuffer agg, Object partial) throws HiveException {
+    public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object partial) throws HiveException {
 
       if (partial == null) {
         return;
       }
 
-      MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
 
       if (buf.getUnion() == null) {
         // nothing has been included yet, so initialize the buffer
-        IntWritable sketchSize = (IntWritable) intermediateOI.getStructFieldData(partial,
+        final IntWritable sketchSize = (IntWritable) intermediateOI.getStructFieldData(partial,
             intermediateOI.getStructFieldRef(SKETCH_SIZE_FIELD));
 
         buf.setSketchSize(sketchSize.get());
         buf.setUnion(SetOperation.builder().buildUnion(sketchSize.get()));
       }
 
-      BytesWritable serializedSketch = ((BytesWritable) intermediateOI.getStructFieldData(partial,
+      final BytesWritable serializedSketch = ((BytesWritable) intermediateOI.getStructFieldData(partial,
           intermediateOI.getStructFieldRef(SKETCH_FIELD)));
 
-      NativeMemory memorySketch = new NativeMemory(serializedSketch.getBytes());
-
-      buf.getUnion().update(memorySketch);
+      buf.getUnion().update(new NativeMemory(serializedSketch.getBytes()));
     }
 
     /**
@@ -279,25 +273,22 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      * @return final sketch in bytes writable form to be returned by the UDAF.
      */
     @Override
-    public Object terminate(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+    public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
 
-      Union union = buf.getUnion();
+      final Union union = buf.getUnion();
       if (union == null) {
         return null;
       }
 
-      CompactSketch result = union.getResult(true, null);
+      final CompactSketch result = union.getResult(true, null);
 
       if (result.getRetainedEntries(false) == 0) {
         // no entries were ever inserted into the sketch, so null
         // should be returned.
         return null;
       } else {
-        byte[] serializedSketch = result.toByteArray();
-        BytesWritable finalResult = new BytesWritable(serializedSketch);
-
-        return finalResult;
+        return new BytesWritable(result.toByteArray());
       }
     }
 
@@ -321,7 +312,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
         return sketchSize;
       }
 
-      void setSketchSize(int sketchSize) {
+      void setSketchSize(final int sketchSize) {
         this.sketchSize = sketchSize;
       }
 
@@ -329,7 +320,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
         return union;
       }
 
-      void setUnion(Union union) {
+      void setUnion(final Union union) {
         this.union = union;
       }
 
@@ -343,7 +334,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      MergeSketchAggBuffer buf = new MergeSketchAggBuffer();
+      final MergeSketchAggBuffer buf = new MergeSketchAggBuffer();
       reset(buf);
       return buf;
     }
@@ -355,8 +346,8 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      *          old aggregation buffer to be reinitialized.
      */
     @Override
-    public void reset(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+    public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
       buf.setSketchSize(DEFAULT_SKETCH_SIZE);
       buf.setUnion(null);
     }
