@@ -6,7 +6,7 @@
 
 Depends on sketches-core.
 
-See [Hadoop Hive UDF's](http://datasketches.github.io/docs/ThetaHiveUDFs.html)
+See [Hadoop Hive UDF's](http://datasketches.github.io/docs/Theta/ThetaHiveUDFs.html)
 
 [travis]:https://travis-ci.org//DataSketches/sketches-hive/builds?branch=master
 [travis img]:https://secure.travis-ci.org/DataSketches/sketches-hive.svg?branch=master
