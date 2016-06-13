@@ -20,53 +20,38 @@ import com.yahoo.sketches.theta.Sketch;
  *
  */
 public class ExcludeSketchUDF extends UDF {
-  //public static final int DEFAULT_SIZE = 16384;
 
   /**
    * Main logic called by hive if sketchSize is also passed in. Computes the
    * hash in first sketch excluding the hash in second sketch of two sketches of
    * same or different column.
    * 
-   * @param firstSketch
+   * @param firstSketchBytes
    *          first sketch to be included.
-   * @param secondSketch
+   * @param secondSketchBytes
    *          second sketch to be excluded.
    * @param hashUpdateSeed
    *          Only required if input sketches were constructed using an update seed that was not the default.
    * @return resulting sketch of exclusion.
    */
-  public BytesWritable evaluate(BytesWritable firstSketch, BytesWritable secondSketch, LongWritable hashUpdateSeed) {
-    long hashSeed = (hashUpdateSeed == null)? DEFAULT_UPDATE_SEED : hashUpdateSeed.get();
+  public BytesWritable evaluate(final BytesWritable firstSketchBytes, final BytesWritable secondSketchBytes, final LongWritable hashUpdateSeed) {
+    final long hashSeed = (hashUpdateSeed == null) ? DEFAULT_UPDATE_SEED : hashUpdateSeed.get();
 
-    Sketch firstHeapSketch, secondHeapSketch;
-
-    // if first sketch is null, throw exception
-    if (firstSketch == null || firstSketch.getLength() == 0) {
-      firstHeapSketch = null;
-    } else {
-      NativeMemory firstMemory = new NativeMemory(firstSketch.getBytes());
-      firstHeapSketch = Sketch.heapify(firstMemory);
+    Sketch firstSketch = null;
+    if (firstSketchBytes != null && firstSketchBytes.getLength() > 0) {
+      firstSketch = Sketch.wrap(new NativeMemory(firstSketchBytes.getBytes()));
     }
 
-    // if second sketch is null, continue with second sketch as empty sketch
-    if (secondSketch == null || secondSketch.getLength() == 0) {
-      secondHeapSketch = null;
-    } else {
-      NativeMemory secondMemory = new NativeMemory(secondSketch.getBytes());
-      secondHeapSketch = Sketch.heapify(secondMemory);
+    Sketch secondSketch = null;
+    if (secondSketchBytes != null && secondSketchBytes.getLength() > 0) {
+      secondSketch = Sketch.wrap(new NativeMemory(secondSketchBytes.getBytes()));
     }
 
-    AnotB anotb = SetOperation.builder().setSeed(hashSeed).buildANotB();
-
-    anotb.update(firstHeapSketch, secondHeapSketch);
-
-    Sketch excludeSketch = anotb.getResult(true, null);
-
-    byte[] resultSketch = excludeSketch.toByteArray();
-
-    BytesWritable result = new BytesWritable();
-    result.set(resultSketch, 0, resultSketch.length);
-
+    final AnotB anotb = SetOperation.builder().setSeed(hashSeed).buildANotB();
+    anotb.update(firstSketch, secondSketch);
+    final byte[] excludeSketchBytes = anotb.getResult(true, null).toByteArray();
+    final BytesWritable result = new BytesWritable();
+    result.set(excludeSketchBytes, 0, excludeSketchBytes.length);
     return result;
   }
 
@@ -75,15 +60,13 @@ public class ExcludeSketchUDF extends UDF {
    * in first sketch excluding the hash in second sketch of two sketches of same
    * or different column.
    * 
-   * @param firstSketch
+   * @param firstSketchBytes
    *          first sketch to be included.
-   * @param secondSketch
+   * @param secondSketchBytes
    *          second sketch to be excluded.
    * @return resulting sketch of exclusion.
    */
-  public BytesWritable evaluate(BytesWritable firstSketch, BytesWritable secondSketch) {
-
-    return evaluate(firstSketch, secondSketch, null);
-
+  public BytesWritable evaluate(final BytesWritable firstSketchBytes, final BytesWritable secondSketchBytes) {
+    return evaluate(firstSketchBytes, secondSketchBytes, null);
   }
 }

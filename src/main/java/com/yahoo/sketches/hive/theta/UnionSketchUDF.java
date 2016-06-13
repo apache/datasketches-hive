@@ -10,7 +10,6 @@ import org.apache.hadoop.io.IntWritable;
 
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.SetOperation;
-import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
 
 /**
@@ -19,6 +18,8 @@ import com.yahoo.sketches.theta.Union;
  */
 public class UnionSketchUDF extends UDF {
   public static final int DEFAULT_SIZE = 16384;
+
+  private static final int EMPTY_SKETCH_SIZE_BYTES = 8;
 
   /**
    * Main logic called by hive if sketchSize is also passed in. Union two
@@ -33,28 +34,25 @@ public class UnionSketchUDF extends UDF {
    *          This must be a power of 2 and larger than 16. If zero, DEFAULT is used.
    * @return resulting sketch of union.
    */
-  public BytesWritable evaluate(BytesWritable firstSketch, BytesWritable secondSketch, IntWritable sketchSize) {
+  public BytesWritable evaluate(final BytesWritable firstSketch, final BytesWritable secondSketch, final IntWritable sketchSize) {
     
-    int sketch_size = (sketchSize != null)? sketchSize.get() : DEFAULT_SIZE;
-    
-    Union union = SetOperation.builder().buildUnion(sketch_size);
+    final int sketch_size = (sketchSize != null)? sketchSize.get() : DEFAULT_SIZE;
+
+    final Union union = SetOperation.builder().buildUnion(sketch_size);
 
     // update union with first sketch, if null do nothing
-    if ((firstSketch != null) && (firstSketch.getLength() >= 8)) {
+    if ((firstSketch != null) && (firstSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
       union.update(new NativeMemory(firstSketch.getBytes()));
     }
 
     // update union second sketch, if null do nothing
-    if ((secondSketch != null) && (secondSketch.getLength() >= 8)) {
+    if ((secondSketch != null) && (secondSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
       union.update(new NativeMemory(secondSketch.getBytes()));
     }
 
-    Sketch intermediateSketch = union.getResult(false, null); //unordered CompactSketch
-    byte[] resultSketch = intermediateSketch.toByteArray();
-
-    BytesWritable result = new BytesWritable();
+    byte[] resultSketch = union.getResult(false, null).toByteArray(); //unordered CompactSketch
+    final BytesWritable result = new BytesWritable();
     result.set(resultSketch, 0, resultSketch.length);
-
     return result;
   }
 
@@ -68,8 +66,7 @@ public class UnionSketchUDF extends UDF {
    *          second sketch to be unioned.
    * @return resulting sketch of union.
    */
-  public BytesWritable evaluate(BytesWritable firstSketch, BytesWritable secondSketch) {
-
+  public BytesWritable evaluate(final BytesWritable firstSketch, final BytesWritable secondSketch) {
     return evaluate(firstSketch, secondSketch, null);
   }
 
