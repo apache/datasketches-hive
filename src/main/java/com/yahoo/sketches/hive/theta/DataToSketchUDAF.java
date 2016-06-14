@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.yahoo.sketches.Family;
-import com.yahoo.sketches.memory.Memory;
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.theta.CompactSketch;
 import com.yahoo.sketches.theta.SetOperation;
@@ -53,14 +52,14 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
    * Performs argument number and type validation. DataToSketch expects
-   * to recieve between one and three arguments. 
+   * to receive between one and three arguments. 
    * <ul>
    * <li>The first (required) is the value to add to the sketch and must be a primitive.</li>
    * 
    * <li>The second (optional) is the sketch size to use. This must be an integral value
    * and should be constant. If not constant, the first row processed provides the size.</li>
    * 
-   * <li>The third (optional) is the sampling probablility and is a floating point value between 
+   * <li>The third (optional) is the sampling probability and is a floating point value between 
    * 0.0 and 1.0.</li>
    * </ul>
    *  
@@ -70,8 +69,8 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
    * @return The GenericUDAFEvaluator that should be used to calculate the function.
    */
   @Override
-  public GenericUDAFEvaluator getEvaluator(GenericUDAFParameterInfo info) throws SemanticException {
-    ObjectInspector[] parameters = info.getParameterObjectInspectors();
+  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
+    final ObjectInspector[] parameters = info.getParameterObjectInspectors();
 
     // Validate the correct number of parameters
     if (parameters.length < 1) {
@@ -162,7 +161,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector[])
      */
     @Override
-    public ObjectInspector init(Mode m, ObjectInspector[] parameters) throws HiveException {
+    public ObjectInspector init(final Mode m, final ObjectInspector[] parameters) throws HiveException {
       super.init(m, parameters);
 
       if (m == Mode.PARTIAL1 || m == Mode.COMPLETE) {
@@ -189,11 +188,12 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       if (m == Mode.PARTIAL1 || m == Mode.PARTIAL2) {
         // intermediate results need to include the sketch as well as the size
         // and sampling probability
-        List<ObjectInspector> fields = new ArrayList<>();
+        final List<ObjectInspector> fields = new ArrayList<>(3);
         fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT));
         fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.FLOAT));
         fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY));
-        List<String> fieldNames = new ArrayList<>();
+
+        final List<String> fieldNames = new ArrayList<>(3);
         fieldNames.add(SKETCH_SIZE_FIELD);
         fieldNames.add(SAMPLING_PROBABLILTY_FIELD);
         fieldNames.add(SKETCH_FIELD);
@@ -215,14 +215,14 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * java.lang.Object[])
      */
     @Override
-    public void iterate(@SuppressWarnings("deprecation") AggregationBuffer agg, Object[] parameters)
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object[] parameters)
         throws HiveException {
       // don't enter null's into the sketch.
       if (parameters[0] == null) {
         return;
       }
 
-      DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
+      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
 
       if (buf.getUpdateSketch() == null) {
         // need to initialize the sketch since nothing has been added yet
@@ -255,31 +255,30 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * )
      */
     @Override
-    public Object terminatePartial(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
       // return the bytes associated with this sketch, compacted for easier merging
-      DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
-      
+      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
+
       CompactSketch intermediate = null;
-      UpdateSketch update = buf.getUpdateSketch();
-      Union union = buf.getUnion();
-      
+      final UpdateSketch update = buf.getUpdateSketch();
+      final Union union = buf.getUnion();
+
       if (update != null) {
         // PARTIAL1 case - hive calls iterate then terminatePartial
-        intermediate = update.compact(true,null);
+        intermediate = update.compact(true, null);
       } else if (union != null) {
         // PARTIAL2 case - hive calls merge then terminatePartial
         intermediate = union.getResult(true, null);
       }
-      
+
       if (intermediate != null) {
         // we had results, so return them
-        byte[] bytes = intermediate.toByteArray();
+        final byte[] bytes = intermediate.toByteArray();
 
-        ArrayList<Object> results = new ArrayList<>();
+        final ArrayList<Object> results = new ArrayList<>(3);
         results.add(new IntWritable(buf.getSketchSize()));
         results.add(new FloatWritable(buf.getSamplingProbability()));
         results.add(new BytesWritable(bytes));
-        
         return results;
       } else {
         return null;
@@ -295,11 +294,11 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * java.lang.Object)
      */
     @Override
-    public void merge(@SuppressWarnings("deprecation") AggregationBuffer agg, Object partial) throws HiveException {
+    public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object partial) throws HiveException {
       if (partial == null) {
         return;
       }
-      DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
+      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
 
       if (buf.getUnion() == null) {
         // nothing has been included yet, so initialize the buffer
@@ -311,11 +310,9 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         buf.setUnion(SetOperation.builder().setP(buf.getSamplingProbability()).buildUnion(buf.getSketchSize()));
       }
 
-      BytesWritable serializedSketch = ((BytesWritable) intermediateOI.getStructFieldData(partial,
-          intermediateOI.getStructFieldRef(SKETCH_FIELD)));
-      Memory sketchMem = new NativeMemory(serializedSketch.getBytes());
-
-      buf.getUnion().update(sketchMem);
+      final BytesWritable serializedSketch = (BytesWritable) intermediateOI.getStructFieldData(partial,
+          intermediateOI.getStructFieldRef(SKETCH_FIELD));
+      buf.getUnion().update(new NativeMemory(serializedSketch.getBytes()));
     }
 
     /*
@@ -327,11 +324,11 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * .hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
      */
     @Override
-    public Object terminate(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
+    public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
 
       CompactSketch result;
-      
+
       if (buf.getUnion() != null) {
         result = buf.getUnion().getResult(true, null);
       } else if (buf.getUpdateSketch() != null) {
@@ -346,8 +343,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         // to be consistent with SQL, null should be returned.
         return null;
       } else {
-        BytesWritable retVal = new BytesWritable(result.toByteArray());
-        return retVal;
+        return new BytesWritable(result.toByteArray());
       }
     }
 
@@ -364,9 +360,8 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
       @Override
       public int estimate() {
-        int s = sketch != null ? sketch.getCurrentBytes(false) : 0;
-        int u = SetOperation.getMaxUnionBytes(sketchSize);
-
+        final int s = sketch != null ? sketch.getCurrentBytes(false) : 0;
+        final int u = SetOperation.getMaxUnionBytes(sketchSize);
         return s + u;
       }
 
@@ -374,7 +369,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         return sketchSize;
       }
 
-      public void setSketchSize(int sketchSize) {
+      public void setSketchSize(final int sketchSize) {
         this.sketchSize = sketchSize;
       }
 
@@ -382,7 +377,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         return samplingProbability;
       }
 
-      public void setSamplingProbability(float samplingProbability) {
+      public void setSamplingProbability(final float samplingProbability) {
         this.samplingProbability = samplingProbability;
       }
 
@@ -390,7 +385,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         return sketch;
       }
 
-      public void setUpdateSketch(UpdateSketch sketch) {
+      public void setUpdateSketch(final UpdateSketch sketch) {
         this.sketch = sketch;
       }
 
@@ -410,9 +405,8 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      DataToSketchAggBuffer buf = new DataToSketchAggBuffer();
+      final DataToSketchAggBuffer buf = new DataToSketchAggBuffer();
       reset(buf);
-
       return buf;
     }
 
@@ -423,44 +417,37 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#reset(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
      */
     @Override
-    public void reset(@SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
+    public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
       buf.setSketchSize(DEFAULT_SKETCH_SIZE);
       buf.setSamplingProbability(DEFAULT_SAMPLING_PROBABILITY);
       buf.setUpdateSketch(null);
       buf.setUnion(null);
     }
 
-    private static void updateData(PrimitiveObjectInspector oi, Object data, UpdateSketch sketch) {
+    private static void updateData(final PrimitiveObjectInspector oi, final Object data, final UpdateSketch sketch) {
 
       switch (oi.getPrimitiveCategory()) {
       case BINARY:
-        sketch.update(PrimitiveObjectInspectorUtils.getBinary(data,
-            PrimitiveObjectInspectorFactory.writableBinaryObjectInspector).getBytes());
+        sketch.update(PrimitiveObjectInspectorUtils.getBinary(data, oi).getBytes());
         return;
       case BYTE:
-        sketch.update(PrimitiveObjectInspectorUtils.getByte(data,
-            PrimitiveObjectInspectorFactory.writableByteObjectInspector));
+        sketch.update(PrimitiveObjectInspectorUtils.getByte(data, oi));
         return;
       case DOUBLE:
-        sketch.update(PrimitiveObjectInspectorUtils.getDouble(data,
-            PrimitiveObjectInspectorFactory.writableDoubleObjectInspector));
+        sketch.update(PrimitiveObjectInspectorUtils.getDouble(data, oi));
         return;
       case FLOAT:
-        sketch.update(PrimitiveObjectInspectorUtils.getFloat(data,
-            PrimitiveObjectInspectorFactory.writableFloatObjectInspector));
+        sketch.update(PrimitiveObjectInspectorUtils.getFloat(data, oi));
         return;
       case INT:
-        sketch.update(PrimitiveObjectInspectorUtils.getInt(data,
-            PrimitiveObjectInspectorFactory.writableIntObjectInspector));
+        sketch.update(PrimitiveObjectInspectorUtils.getInt(data, oi));
         return;
       case LONG:
-        sketch.update(PrimitiveObjectInspectorUtils.getLong(data,
-            PrimitiveObjectInspectorFactory.writableLongObjectInspector));
+        sketch.update(PrimitiveObjectInspectorUtils.getLong(data, oi));
         return;
       case STRING:
-        sketch.update(PrimitiveObjectInspectorUtils.getString(data,
-            PrimitiveObjectInspectorFactory.writableStringObjectInspector));
+        sketch.update(PrimitiveObjectInspectorUtils.getString(data, oi));
         return;
       default:
         throw new IllegalArgumentException(
