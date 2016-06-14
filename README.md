@@ -2,7 +2,12 @@
 
 =================
 
-#Sketch UDFs for Hive 
+# Sketch UDFs for Hive 
+
+## [Documentation](http://datasketches.github.io)
+
+
+## [Comments](https://groups.google.com/forum/#!forum/sketches-user)
 
 Depends on sketches-core.
 
