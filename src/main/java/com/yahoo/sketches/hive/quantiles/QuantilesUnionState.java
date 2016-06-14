@@ -9,13 +9,13 @@ import com.yahoo.sketches.quantiles.UnionBuilder;
 
 class QuantilesUnionState extends AbstractAggregationBuffer {
 
-  private int k;
+  private int k_;
   private Union union;
 
   // initializing k is needed for building sketches using update(double)
   // not needed for merging sketches using update(sketch)
   void init(final int k) {
-    this.k = k;
+    this.k_ = k;
     buildUnion();
   }
 
@@ -43,7 +43,7 @@ class QuantilesUnionState extends AbstractAggregationBuffer {
 
   private void buildUnion() {
     final UnionBuilder unionBuilder = Union.builder();
-    if (k > 0) unionBuilder.setK(k);
+    if (k_ > 0) unionBuilder.setK(k_);
     union = unionBuilder.build();
   }
 }
