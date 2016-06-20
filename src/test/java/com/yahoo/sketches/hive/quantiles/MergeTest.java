@@ -87,6 +87,7 @@ public class MergeTest {
     Assert.assertEquals(resultSketch.getRetainedEntries(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
     Assert.assertEquals(resultSketch.getMaxValue(), 2.0);
+    eval.close();
   }
 
   @Test
@@ -112,6 +113,7 @@ public class MergeTest {
     Assert.assertEquals(resultSketch.getRetainedEntries(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
     Assert.assertEquals(resultSketch.getMaxValue(), 2.0);
+    eval.close();
   }
 
   private static void checkResultInspector(ObjectInspector resultInspector) {
