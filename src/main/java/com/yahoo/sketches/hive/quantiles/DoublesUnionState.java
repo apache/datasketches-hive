@@ -1,16 +1,20 @@
+/*
+ * Copyright 2016, Yahoo! Inc.
+ * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
+ */
 package com.yahoo.sketches.hive.quantiles;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
 import com.yahoo.sketches.memory.NativeMemory;
-import com.yahoo.sketches.quantiles.QuantilesSketch;
-import com.yahoo.sketches.quantiles.Union;
-import com.yahoo.sketches.quantiles.UnionBuilder;
+import com.yahoo.sketches.quantiles.DoublesSketch;
+import com.yahoo.sketches.quantiles.DoublesUnion;
+import com.yahoo.sketches.quantiles.DoublesUnionBuilder;
 
-class QuantilesUnionState extends AbstractAggregationBuffer {
+class DoublesUnionState extends AbstractAggregationBuffer {
 
   private int k_;
-  private Union union;
+  private DoublesUnion union;
 
   // initializing k is needed for building sketches using update(double)
   // not needed for merging sketches using update(sketch)
@@ -32,7 +36,7 @@ class QuantilesUnionState extends AbstractAggregationBuffer {
     union.update(new NativeMemory(serializedSketch));
   }
 
-  public QuantilesSketch getResult() {
+  public DoublesSketch getResult() {
     if (union == null) return null;
     return union.getResultAndReset();
   }
@@ -42,8 +46,9 @@ class QuantilesUnionState extends AbstractAggregationBuffer {
   }
 
   private void buildUnion() {
-    final UnionBuilder unionBuilder = Union.builder();
+    final DoublesUnionBuilder unionBuilder = DoublesUnion.builder();
     if (k_ > 0) unionBuilder.setK(k_);
     union = unionBuilder.build();
   }
+
 }

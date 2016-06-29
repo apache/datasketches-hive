@@ -50,22 +50,20 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
-  <!--  
     <repositories>
       <repository>
-        <id>central</id>
+        <id>jcenter</id>
         <name>bintray</name>
         <url>http://jcenter.bintray.com</url>
       </repository>
     </repositories>
-  -->
 
   <dependencies>
     <!-- Core Sketch library --> 
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
-      <version>0.5.2</version>
+      <version>0.6.0</version>
     </dependency>
 
     <!-- Hive Dependencies (provided scope) -->
@@ -94,7 +92,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.9.10</version>
+      <version>6.9.12</version>
       <scope>test</scope>
     </dependency>
 

@@ -6,6 +6,7 @@ package com.yahoo.sketches.hive.quantiles;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
@@ -17,23 +18,25 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 @Description(name = "Merge", value = "_FUNC_(sketch) - "
     + "Returns a QuantilesSketch in a serialized form as a binary blob."
     + " Input values are also serialized sketches.")
-public class Merge extends AbstractGenericUDAFResolver {
+public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
     if (inspectors.length != 1) throw new UDFArgumentException("One argument expected");
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-      throw new UDFArgumentException("Primitive argument expected");
+      throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
+          + inspectors[0].getTypeName() + " was recieved");
     }
     final PrimitiveObjectInspector inspector = (PrimitiveObjectInspector) inspectors[0];
     if (inspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
-      throw new UDFArgumentException("Binary argument expected");
+      throw new UDFArgumentTypeException(0, "Binary argument expected, but "
+          + inspector.getPrimitiveCategory().name() + " was received");
     }
     return new MergeEvaluator();
   }
 
-  static class MergeEvaluator extends QuantilesEvaluator {
+  static class MergeEvaluator extends DoublesEvaluator {
 
     @SuppressWarnings("deprecation")
     @Override

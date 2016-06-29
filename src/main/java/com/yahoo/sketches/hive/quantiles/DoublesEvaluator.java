@@ -1,3 +1,7 @@
+/*
+ * Copyright 2016, Yahoo! Inc.
+ * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
+ */
 package com.yahoo.sketches.hive.quantiles;
 
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -8,9 +12,9 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.Pr
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.sketches.quantiles.QuantilesSketch;
+import com.yahoo.sketches.quantiles.DoublesSketch;
 
-abstract class QuantilesEvaluator extends GenericUDAFEvaluator {
+abstract class DoublesEvaluator extends GenericUDAFEvaluator {
 
   protected PrimitiveObjectInspector inputObjectInspector;
 
@@ -24,7 +28,7 @@ abstract class QuantilesEvaluator extends GenericUDAFEvaluator {
   @SuppressWarnings("deprecation")
   @Override
   public void reset(final AggregationBuffer buf) throws HiveException {
-    final QuantilesUnionState state = (QuantilesUnionState) buf;
+    final DoublesUnionState state = (DoublesUnionState) buf;
     state.reset();
   }
 
@@ -38,7 +42,7 @@ abstract class QuantilesEvaluator extends GenericUDAFEvaluator {
   @Override
   public void merge(final AggregationBuffer buf, Object data) throws HiveException {
     if (data == null) return;
-    final QuantilesUnionState state = (QuantilesUnionState) buf;
+    final DoublesUnionState state = (DoublesUnionState) buf;
     final BytesWritable serializedSketch = (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
     state.update(serializedSketch.getBytes());
   }
@@ -46,8 +50,8 @@ abstract class QuantilesEvaluator extends GenericUDAFEvaluator {
   @SuppressWarnings("deprecation")
   @Override
   public Object terminate(final AggregationBuffer buf) throws HiveException {
-    final QuantilesUnionState state = (QuantilesUnionState) buf;
-    final QuantilesSketch resultSketch = state.getResult();
+    final DoublesUnionState state = (DoublesUnionState) buf;
+    final DoublesSketch resultSketch = state.getResult();
     if (resultSketch == null) return null;
     return new BytesWritable(resultSketch.toByteArray());
   }
@@ -55,7 +59,7 @@ abstract class QuantilesEvaluator extends GenericUDAFEvaluator {
   @SuppressWarnings("deprecation")
   @Override
   public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-    return new QuantilesUnionState();
+    return new DoublesUnionState();
   }
 
 }
