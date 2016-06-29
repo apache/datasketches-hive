@@ -50,13 +50,13 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
-    <repositories>
-      <repository>
-        <id>jcenter</id>
-        <name>bintray</name>
-        <url>http://jcenter.bintray.com</url>
-      </repository>
-    </repositories>
+  <repositories>
+    <repository>
+      <id>jcenter</id>
+      <name>bintray</name>
+      <url>http://jcenter.bintray.com</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <!-- Core Sketch library --> 
