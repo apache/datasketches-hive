@@ -33,8 +33,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.yahoo.sketches.hive.theta.MergeSketchUDAF.MergeSketchUDAFEvaluator;
-import com.yahoo.sketches.hive.theta.MergeSketchUDAF.MergeSketchUDAFEvaluator.MergeSketchAggBuffer;
+import com.yahoo.sketches.SketchesArgumentException;
+import com.yahoo.sketches.hive.theta.UnionSketchUDAF.UnionSketchUDAFEvaluator;
+import com.yahoo.sketches.hive.theta.UnionSketchUDAF.UnionSketchUDAFEvaluator.UnionSketchAggBuffer;
 import com.yahoo.sketches.memory.Memory;
 import com.yahoo.sketches.theta.CompactSketch;
 import com.yahoo.sketches.theta.SetOperation;
@@ -61,7 +62,7 @@ import static org.testng.Assert.assertTrue;
  * Unit tests for DataToSketch UDF
  */
 @SuppressWarnings("deprecation")
-public class MergeSketchUDAFTest {
+public class UnionSketchUDAFTest {
   private static PrimitiveTypeInfo binaryType;
   private static PrimitiveTypeInfo intType;
   private static PrimitiveTypeInfo doubleType;
@@ -94,7 +95,7 @@ public class MergeSketchUDAFTest {
 
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void testParametersTooFew() throws SemanticException {
-    MergeSketchUDAF udf = new MergeSketchUDAF();
+    UnionSketchUDAF udf = new UnionSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] {}, false, false);
 
     udf.getEvaluator(params);
@@ -102,7 +103,7 @@ public class MergeSketchUDAFTest {
 
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void testParametersTooMany() throws SemanticException {
-    MergeSketchUDAF udf = new MergeSketchUDAF();
+    UnionSketchUDAF udf = new UnionSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI, sketchSizeOI,
         sketchSizeOI }, false, false);
 
@@ -111,7 +112,7 @@ public class MergeSketchUDAFTest {
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void testParametersInvalidInputArgType() throws SemanticException {
-    MergeSketchUDAF udf = new MergeSketchUDAF();
+    UnionSketchUDAF udf = new UnionSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
         new ObjectInspector[] { ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory
             .getPrimitiveWritableObjectInspector(PrimitiveCategory.INT)) }, false, false);
@@ -121,7 +122,7 @@ public class MergeSketchUDAFTest {
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void testParametersInvalidSizeArgType() throws SemanticException {
-    MergeSketchUDAF udf = new MergeSketchUDAF();
+    UnionSketchUDAF udf = new UnionSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
         new ObjectInspector[] {
             inputOI,
@@ -133,28 +134,28 @@ public class MergeSketchUDAFTest {
 
   @Test
   public void testGetEvaluator() throws SemanticException, IOException {
-    MergeSketchUDAF udf = new MergeSketchUDAF();
+    UnionSketchUDAF udf = new UnionSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI }, false,
         false);
 
     try (GenericUDAFEvaluator eval = udf.getEvaluator(params)) {
       assertNotNull(eval);
-      assertThat(eval, IsInstanceOf.instanceOf(MergeSketchUDAFEvaluator.class));
+      assertThat(eval, IsInstanceOf.instanceOf(UnionSketchUDAFEvaluator.class));
     }
   }
 
   @Test(expectedExceptions = { SemanticException.class })
   public void testGetEvaluatorDeprecated() throws SemanticException, IOException {
-    MergeSketchUDAF udf = new MergeSketchUDAF();
+    UnionSketchUDAF udf = new UnionSketchUDAF();
     try (GenericUDAFEvaluator eval = udf.getEvaluator(new TypeInfo[] { binaryType, intType })) {
       assertNotNull(eval);
-      assertThat(eval, IsInstanceOf.instanceOf(MergeSketchUDAFEvaluator.class));
+      assertThat(eval, IsInstanceOf.instanceOf(UnionSketchUDAFEvaluator.class));
     }
   }
 
   @Test
   public void testInit() throws HiveException, IOException {
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
 
       ObjectInspector[] initialParams = new ObjectInspector[] { inputOI, sketchSizeOI };
 
@@ -190,13 +191,13 @@ public class MergeSketchUDAFTest {
 
   @Test
   public void testGetNewAggregationBuffer() throws HiveException, IOException {
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
       AggregationBuffer buffer = eval.getNewAggregationBuffer();
 
-      assertThat(buffer, IsInstanceOf.instanceOf(MergeSketchAggBuffer.class));
-      MergeSketchAggBuffer sketchBuffer = (MergeSketchAggBuffer) buffer;
+      assertThat(buffer, IsInstanceOf.instanceOf(UnionSketchAggBuffer.class));
+      UnionSketchAggBuffer sketchBuffer = (UnionSketchAggBuffer) buffer;
       assertNull(sketchBuffer.getUnion());
-      assertEquals(sketchBuffer.getSketchSize(), MergeSketchUDAF.DEFAULT_SKETCH_SIZE);
+      assertEquals(sketchBuffer.getSketchSize(), UnionSketchUDAF.DEFAULT_SKETCH_SIZE);
     }
   }
 
@@ -208,15 +209,15 @@ public class MergeSketchUDAFTest {
 
     replay(union, sketch);
 
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
-      MergeSketchAggBuffer buf = new MergeSketchAggBuffer();
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
+      UnionSketchAggBuffer buf = new UnionSketchAggBuffer();
       buf.setUnion(union);
       buf.setSketchSize(1024);
 
       eval.reset(buf);
 
       assertNull(buf.getUnion());
-      assertEquals(buf.getSketchSize(), MergeSketchUDAF.DEFAULT_SKETCH_SIZE);
+      assertEquals(buf.getSketchSize(), UnionSketchUDAF.DEFAULT_SKETCH_SIZE);
     }
 
     verify(union, sketch);
@@ -224,7 +225,7 @@ public class MergeSketchUDAFTest {
 
   @Test
   public void testIterate() throws IOException, HiveException {
-    MergeSketchAggBuffer buf = strictMock(MergeSketchAggBuffer.class);
+    UnionSketchAggBuffer buf = strictMock(UnionSketchAggBuffer.class);
     Union union = strictMock(Union.class);
 
     byte[] sketchBytes = SetOperation.builder().buildUnion(512).getResult(true, null).toByteArray();
@@ -240,7 +241,7 @@ public class MergeSketchUDAFTest {
 
     replay(buf, union);
 
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
       eval.init(Mode.COMPLETE, new ObjectInspector[] { inputOI, sketchSizeOI });
 
       eval.iterate(buf, new Object[] { new BytesWritable(sketchBytes), new IntWritable(512) });
@@ -259,7 +260,7 @@ public class MergeSketchUDAFTest {
    */
   @Test
   public void testTerminatePartial() throws IOException, HiveException {
-    MergeSketchAggBuffer buf = mock(MergeSketchAggBuffer.class);
+    UnionSketchAggBuffer buf = mock(UnionSketchAggBuffer.class);
     Union union = mock(Union.class);
     CompactSketch compact = mock(CompactSketch.class);
     byte[] bytes = new byte[0];
@@ -272,7 +273,7 @@ public class MergeSketchUDAFTest {
 
     replay(buf, union, compact);
 
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
       Object result = eval.terminatePartial(buf);
 
       assertThat(result, IsInstanceOf.instanceOf(ArrayList.class));
@@ -285,15 +286,15 @@ public class MergeSketchUDAFTest {
     verify(buf, union, compact);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = SketchesArgumentException.class)
   public void testMerge() throws IOException, HiveException {
-    MergeSketchAggBuffer buf = mock(MergeSketchAggBuffer.class);
+    UnionSketchAggBuffer buf = mock(UnionSketchAggBuffer.class);
     Union union = mock(Union.class);
 
     replay(buf, union);
 
     // test null partial
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
       eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
 
       eval.merge(buf, null);
@@ -314,7 +315,7 @@ public class MergeSketchUDAFTest {
 
     replay(buf, union);
 
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
       eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
 
       ArrayList<Object> struct = new ArrayList<>(3);
@@ -336,7 +337,7 @@ public class MergeSketchUDAFTest {
 
     replay(buf, union);
 
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
       eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
 
       ArrayList<Object> struct = new ArrayList<>(3);
@@ -353,7 +354,7 @@ public class MergeSketchUDAFTest {
 
   @Test
   public void testTerminate() throws IOException, HiveException {
-    MergeSketchAggBuffer buf = mock(MergeSketchAggBuffer.class);
+    UnionSketchAggBuffer buf = mock(UnionSketchAggBuffer.class);
     Union union = mock(Union.class);
     CompactSketch compact = mock(CompactSketch.class);
     byte[] bytes = new byte[0];
@@ -365,7 +366,7 @@ public class MergeSketchUDAFTest {
     expect(compact.toByteArray()).andReturn(bytes);
 
     replay(buf, union, compact);
-    try (MergeSketchUDAFEvaluator eval = new MergeSketchUDAFEvaluator()) {
+    try (UnionSketchUDAFEvaluator eval = new UnionSketchUDAFEvaluator()) {
       Object retVal = eval.terminate(buf);
 
       assertThat(retVal, IsInstanceOf.instanceOf(BytesWritable.class));

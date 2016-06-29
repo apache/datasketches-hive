@@ -4,8 +4,10 @@
  */
 package com.yahoo.sketches.hive.quantiles;
 
-import org.apache.hadoop.hive.ql.exec.Description;
+import java.util.Comparator;
+
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
@@ -15,12 +17,13 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
-@Description(name = "DataToSketch", value = "_FUNC_(value, k) - "
-  + "Returns a QuantilesSketch in a serialized form as a binary blob."
-  + " Values must be of type double."
-  + " Parameter k controls the accuracy and the size of the sketch."
-  + " If k is ommitted, the default value of 128 is used.")
-public class DataToSketch extends AbstractGenericUDAFResolver {
+import com.yahoo.sketches.ArrayOfItemsSerDe;
+
+/**
+ * This is a generic implementation to be specialized in subclasses
+ * @param <T> type of item
+ */
+public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolver {
 
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
@@ -28,29 +31,34 @@ public class DataToSketch extends AbstractGenericUDAFResolver {
     if (inspectors.length != 1 && inspectors.length != 2) throw new UDFArgumentException("One or two arguments expected");
 
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-      throw new UDFArgumentException("Primitive argument expected");
-    }
-    final PrimitiveObjectInspector inspector1 = (PrimitiveObjectInspector) inspectors[0];
-    if (inspector1.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.DOUBLE) {
-      throw new UDFArgumentException("Double value expected as the first argument");
+      throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
+          + inspectors[0].getTypeName() + " was recieved");
     }
 
     if (inspectors.length == 2) {
       if (inspectors[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-        throw new UDFArgumentException("Primitive argument expected");
+        throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
+            + inspectors[1].getTypeName() + " was recieved");
       }
       final PrimitiveObjectInspector inspector2 = (PrimitiveObjectInspector) inspectors[1];
       if (inspector2.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.INT) {
-        throw new UDFArgumentException("Integer value expected as the second argument");
+        throw new UDFArgumentTypeException(0, "Integer value expected as the second argument, but "
+            + inspector2.getPrimitiveCategory().name() + " was received");
       }
     }
 
-    return new DataToSketchEvaluator();
+    return createEvaluator();
   }
 
-  static class DataToSketchEvaluator extends QuantilesEvaluator {
+  abstract GenericUDAFEvaluator createEvaluator();
+
+  public static abstract class DataToSketchEvaluator<T> extends ItemsEvaluator<T> {
 
     private PrimitiveObjectInspector kObjectInspector;
+
+    DataToSketchEvaluator(final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
+      super(comparator, serDe);
+    }
 
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
@@ -70,7 +78,8 @@ public class DataToSketch extends AbstractGenericUDAFResolver {
     @Override
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
       if (data[0] == null) return;
-      final QuantilesUnionState state = (QuantilesUnionState) buf;
+      @SuppressWarnings("unchecked")
+      final ItemsUnionState<T> state = (ItemsUnionState<T>) buf;
       if (!state.isInitialized()) {
         int k = 0;
         if (kObjectInspector != null) {
@@ -78,9 +87,10 @@ public class DataToSketch extends AbstractGenericUDAFResolver {
         }
         state.init(k);
       }
-      final double value = (double) inputObjectInspector.getPrimitiveJavaObject(data[0]);
-      state.update(value);
+      state.update(extractValue(data[0], inputObjectInspector));
     }
+
+    abstract T extractValue(final Object data, final ObjectInspector objectInspector) throws HiveException;
 
   }
 

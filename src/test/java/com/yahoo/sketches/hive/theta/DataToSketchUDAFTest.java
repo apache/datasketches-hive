@@ -37,6 +37,7 @@ import java.util.List;
 import com.yahoo.sketches.memory.Memory;
 import com.yahoo.sketches.theta.CompactSketch;
 import com.yahoo.sketches.theta.UpdateReturnState;
+import com.yahoo.sketches.SketchesArgumentException;
 import com.yahoo.sketches.hive.theta.DataToSketchUDAF.DataToSketchEvaluator;
 import com.yahoo.sketches.hive.theta.DataToSketchUDAF.DataToSketchEvaluator.DataToSketchAggBuffer;
 import com.yahoo.sketches.theta.Union;
@@ -354,7 +355,7 @@ public class DataToSketchUDAFTest {
     verify(buf, union, compact);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = SketchesArgumentException.class)
   public void testMerge() throws IOException, HiveException {
     DataToSketchAggBuffer buf = mock(DataToSketchAggBuffer.class);
     Union union = mock(Union.class);

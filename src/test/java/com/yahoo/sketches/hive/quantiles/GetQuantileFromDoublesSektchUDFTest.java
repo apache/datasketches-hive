@@ -4,27 +4,27 @@
  */
 package com.yahoo.sketches.hive.quantiles;
 
-import com.yahoo.sketches.quantiles.QuantilesSketch;
+import com.yahoo.sketches.quantiles.DoublesSketch;
 
 import org.testng.annotations.Test;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 
-public class GetQuantileTest {
+public class GetQuantileFromDoublesSektchUDFTest {
 
   @Test
   public void nullSketch() {
-    Double result = new GetQuantile().evaluate(null, 0);
+    Double result = new GetQuantileFromDoublesSketchUDF().evaluate(null, 0);
     Assert.assertNull(result);
   }
 
   @Test
   public void normalCase() {
-    QuantilesSketch sketch = QuantilesSketch.builder().build();
+    DoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
-    Double result = new GetQuantile().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
+    Double result = new GetQuantileFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
     Assert.assertNotNull(result);
     Assert.assertEquals(result, 2.0);
   }

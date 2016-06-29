@@ -1,7 +1,3 @@
-/*
- * Copyright 2016, Yahoo! Inc.
- * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- */
 package com.yahoo.sketches.hive.quantiles;
 
 import java.util.Arrays;
@@ -17,74 +13,89 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.IntWritable;
 
 import com.yahoo.sketches.memory.NativeMemory;
-import com.yahoo.sketches.quantiles.QuantilesSketch;
+import com.yahoo.sketches.quantiles.DoublesSketch;
 
 import org.testng.annotations.Test;
 import org.testng.Assert;
 
-public class MergeTest {
+public class DataToDoublesSketchUDAFTest {
+
+  static final ObjectInspector doubleInspector =
+    PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.DOUBLE);
+
+  static final ObjectInspector intInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
 
   static final ObjectInspector binaryInspector =
-    PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooFewInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new Merge().getEvaluator(info);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooManyInspectors() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, binaryInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, intInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new Merge().getEvaluator(info);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongType() throws Exception {
-    ObjectInspector intInspector =
-      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
-
+  public void getEvaluatorWrongTypeArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new Merge().getEvaluator(info);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongCategory() throws Exception {
-    ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
-      Arrays.asList("a"),
-      Arrays.asList(binaryInspector)
-    );
+  public void getEvaluatorWrongTypeArg2() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, doubleInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
+  }
+
+  static final ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
+    Arrays.asList("a"),
+    Arrays.asList(intInspector)
+  );
+
+  @Test(expectedExceptions = UDFArgumentException.class)
+  public void getEvaluatorWrongCategoryArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new Merge().getEvaluator(info);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
+  }
+
+  @Test(expectedExceptions = UDFArgumentException.class)
+  public void getEvaluatorWrongCategoryArg2() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, structInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
   }
 
   @Test
   public void iterateTerminatePartial() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new Merge().getEvaluator(info);
+    GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
     checkResultInspector(resultInspector);
 
-    QuantilesUnionState state = (QuantilesUnionState) eval.getNewAggregationBuffer();
-    state.init(256);
-    state.update(1.0);
-
-    QuantilesSketch sketch = QuantilesSketch.builder().setK(256).build();
-    sketch.update(2.0);
-
-    eval.iterate(state, new Object[] { new BytesWritable(sketch.toByteArray()) });
+    DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] { new DoubleWritable(1.0), new IntWritable(256) });
+    eval.iterate(state, new Object[] { new DoubleWritable(2.0), new IntWritable(256) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    QuantilesSketch resultSketch = QuantilesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getK(), 256);
-    Assert.assertEquals(resultSketch.getRetainedEntries(), 2);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
     Assert.assertEquals(resultSketch.getMaxValue(), 2.0);
     eval.close();
@@ -92,25 +103,24 @@ public class MergeTest {
 
   @Test
   public void mergeTerminate() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new Merge().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, inspectors);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { doubleInspector }, false, false);
+    GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {binaryInspector});
     checkResultInspector(resultInspector);
 
-    QuantilesUnionState state = (QuantilesUnionState) eval.getNewAggregationBuffer();
+    DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
     state.init(256);
     state.update(1.0);
 
-    QuantilesSketch sketch = QuantilesSketch.builder().setK(256).build();
+    DoublesSketch sketch = DoublesSketch.builder().setK(256).build();
     sketch.update(2.0);
 
     eval.merge(state, new BytesWritable(sketch.toByteArray()));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
-    QuantilesSketch resultSketch = QuantilesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getK(), 256);
-    Assert.assertEquals(resultSketch.getRetainedEntries(), 2);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
     Assert.assertEquals(resultSketch.getMaxValue(), 2.0);
     eval.close();

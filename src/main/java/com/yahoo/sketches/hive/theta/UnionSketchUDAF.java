@@ -36,15 +36,15 @@ import com.yahoo.sketches.theta.Union;
  */
 @Description(
     name = "mergeSketch", 
-    value = "_FUNC_(sketch, size) - Compute the union of sketches using a result with size 'size'", 
+    value = "_FUNC_(sketch, size) - Compute the union of sketches of given size",
     extended = "Example:\n"
-    + "> SELECT mergeSketch(sketch, 1024) FROM src;\n"
-    + "The return value is a binary blob that contains a compact sketch which can "
-    + "be operated on by the other sketch related operands. The sketch "
+    + "> SELECT UnionSketch(sketch, 1024) FROM src;\n"
+    + "The return value is a binary blob that contains a compact sketch, which can "
+    + "be operated on by the other sketch-related functions. The union "
     + "size must be a power of 2 and controls the relative error of the expected "
-    + "result. A size of 16384 (the default) can be expected to yeild errors of roughly +/- 1.5% "
-    + "in the estimation of uniques.")
-public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
+    + "result. A size of 16384 (the default) can be expected to yeild errors of roughly +-1.5% "
+    + "in the estimation of uniques with 95% confidence.")
+public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
   public static final int DEFAULT_SKETCH_SIZE = 16384;
 
   /**
@@ -55,8 +55,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
    * 
    * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver#getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
    * 
-   * @param info
-   *          The parameter info to validate
+   * @param info The parameter info to validate
    * @return The GenericUDAFEvaluator to use to compute the function.
    */
   @Override
@@ -86,7 +85,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
     if (parameters.length > 1) {
       if (parameters[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
         throw new UDFArgumentTypeException(1, "Only integral type arguments are accepted but "
-            + parameters[1].getTypeName() + " was passed as parameter 1.");
+            + parameters[1].getTypeName() + " was passed as parameter 1");
       }
       switch (((PrimitiveObjectInspector) parameters[1]).getPrimitiveCategory()) {
       case BYTE:
@@ -97,18 +96,18 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
       // all other types are invalid
       default:
         throw new UDFArgumentTypeException(1, "Only integral type assignments are accepted but "
-            + parameters[1].getTypeName() + " was passed as paramete 2");
+            + parameters[1].getTypeName() + " was passed as parameter 2");
       }
     }
 
-    return new MergeSketchUDAFEvaluator();
+    return new UnionSketchUDAFEvaluator();
   }
 
   /**
    * Evaluator class of Generic UDAF, main logic of our UDAF.
    * 
    */
-  public static class MergeSketchUDAFEvaluator extends GenericUDAFEvaluator {
+  public static class UnionSketchUDAFEvaluator extends GenericUDAFEvaluator {
 
     private static final String SKETCH_FIELD = "sketch";
     private static final String SKETCH_SIZE_FIELD = "sketchSize";
@@ -181,7 +180,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
         return;
       }
 
-      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
 
       if (buf.getUnion() == null) {
         int sketchSize = DEFAULT_SKETCH_SIZE;
@@ -214,7 +213,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
 
-      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
       final Union union = buf.getUnion();
       if (union == null) {
         return null;
@@ -247,7 +246,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
         return;
       }
 
-      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
 
       if (buf.getUnion() == null) {
         // nothing has been included yet, so initialize the buffer
@@ -274,7 +273,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      */
     @Override
     public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
 
       final Union union = buf.getUnion();
       if (union == null) {
@@ -299,7 +298,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      * @author weijialuo
      */
     @AggregationType(estimable = true)
-    public static class MergeSketchAggBuffer extends AbstractAggregationBuffer {
+    public static class UnionSketchAggBuffer extends AbstractAggregationBuffer {
       private int sketchSize;
       private Union union;
 
@@ -334,7 +333,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      final MergeSketchAggBuffer buf = new MergeSketchAggBuffer();
+      final UnionSketchAggBuffer buf = new UnionSketchAggBuffer();
       reset(buf);
       return buf;
     }
@@ -347,7 +346,7 @@ public class MergeSketchUDAF extends AbstractGenericUDAFResolver {
      */
     @Override
     public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      final MergeSketchAggBuffer buf = (MergeSketchAggBuffer) agg;
+      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
       buf.setSketchSize(DEFAULT_SKETCH_SIZE);
       buf.setUnion(null);
     }
