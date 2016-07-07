@@ -25,7 +25,7 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
     serDe_ = serDe;
   }
 
-  // initializing k is needed for building sketches using update(double)
+  // initializing k is needed for building sketches using update(value)
   // not needed for merging sketches using update(sketch)
   void init(final int k) {
     k_ = k;

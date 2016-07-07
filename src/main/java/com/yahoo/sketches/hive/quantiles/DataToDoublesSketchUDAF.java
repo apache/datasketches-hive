@@ -6,6 +6,7 @@ package com.yahoo.sketches.hive.quantiles;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
@@ -19,7 +20,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
   + "Returns a QuantilesSketch in a serialized form as a binary blob."
   + " Values must be of type double."
   + " Parameter k controls the accuracy and the size of the sketch."
-  + " If k is ommitted, the default value of 128 is used.")
+  + " If k is ommitted, the default is used.")
 public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -28,20 +29,24 @@ public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     if (inspectors.length != 1 && inspectors.length != 2) throw new UDFArgumentException("One or two arguments expected");
 
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-      throw new UDFArgumentException("Primitive argument expected");
+      throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
+          + inspectors[0].getCategory().name() + " was recieved");
     }
     final PrimitiveObjectInspector inspector1 = (PrimitiveObjectInspector) inspectors[0];
     if (inspector1.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.DOUBLE) {
-      throw new UDFArgumentException("Double value expected as the first argument");
+      throw new UDFArgumentTypeException(0, "Double value expected as the first argument, but "
+          + inspector1.getPrimitiveCategory().name() + " was received");
     }
 
     if (inspectors.length == 2) {
       if (inspectors[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-        throw new UDFArgumentException("Primitive argument expected");
+        throw new UDFArgumentTypeException(1, "Primitive argument expected, but "
+            + inspectors[1].getCategory().name() + " was recieved");
       }
       final PrimitiveObjectInspector inspector2 = (PrimitiveObjectInspector) inspectors[1];
       if (inspector2.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.INT) {
-        throw new UDFArgumentException("Integer value expected as the second argument");
+        throw new UDFArgumentTypeException(1, "Integer value expected as the second argument, but "
+            + inspector2.getPrimitiveCategory().name() + " was received");
       }
     }
 
@@ -72,7 +77,7 @@ public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
       if (data[0] == null) return;
       final DoublesUnionState state = (DoublesUnionState) buf;
       if (!state.isInitialized()) {
-        int k = 128; // FIXME
+        int k = 0;
         if (kObjectInspector != null) {
           k = PrimitiveObjectInspectorUtils.getInt(data[1], kObjectInspector);
         }

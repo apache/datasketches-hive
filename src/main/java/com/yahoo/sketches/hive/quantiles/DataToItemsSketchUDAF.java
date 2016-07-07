@@ -32,13 +32,13 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
 
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
-          + inspectors[0].getTypeName() + " was recieved");
+          + inspectors[0].getCategory().name() + " was recieved");
     }
 
     if (inspectors.length == 2) {
       if (inspectors[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
         throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
-            + inspectors[1].getTypeName() + " was recieved");
+            + inspectors[1].getCategory().name() + " was recieved");
       }
       final PrimitiveObjectInspector inspector2 = (PrimitiveObjectInspector) inspectors[1];
       if (inspector2.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.INT) {
