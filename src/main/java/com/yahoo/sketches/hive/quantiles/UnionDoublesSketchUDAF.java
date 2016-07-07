@@ -15,7 +15,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 
-@Description(name = "Merge", value = "_FUNC_(sketch) - "
+@Description(name = "Union", value = "_FUNC_(sketch) - "
     + "Returns a QuantilesSketch in a serialized form as a binary blob."
     + " Input values are also serialized sketches.")
 public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
@@ -26,17 +26,17 @@ public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     if (inspectors.length != 1) throw new UDFArgumentException("One argument expected");
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
-          + inspectors[0].getTypeName() + " was recieved");
+          + inspectors[0].getCategory().name() + " was recieved");
     }
     final PrimitiveObjectInspector inspector = (PrimitiveObjectInspector) inspectors[0];
     if (inspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
       throw new UDFArgumentTypeException(0, "Binary argument expected, but "
           + inspector.getPrimitiveCategory().name() + " was received");
     }
-    return new MergeEvaluator();
+    return new UnionEvaluator();
   }
 
-  static class MergeEvaluator extends DoublesEvaluator {
+  static class UnionEvaluator extends DoublesEvaluator {
 
     @SuppressWarnings("deprecation")
     @Override
