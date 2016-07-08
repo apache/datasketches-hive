@@ -11,7 +11,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 
-@Description(name = "Merge", value = "_FUNC_(sketch) - "
+@Description(name = "Union", value = "_FUNC_(sketch) - "
     + "Returns an ItemsSketch<String> in a serialized form as a binary blob."
     + " Input values must also be serialized sketches.")
 public class UnionStringsSketchUDAF extends UnionItemsSketchUDAF<String> {
