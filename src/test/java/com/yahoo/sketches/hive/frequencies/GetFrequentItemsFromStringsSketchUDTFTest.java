@@ -160,6 +160,6 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
       list.add(object);
     }
 
-  };
+  }
 
 }
