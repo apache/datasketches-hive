@@ -10,9 +10,11 @@
   <artifactId>sketches-hive</artifactId>
   <version>0.6.1-SNAPSHOT</version>
 
+  <!-- Project Information -->
   <name>${project.groupId}:${project.artifactId}</name>
-  <description>Data Sketches Hive UDFs</description>
+  <description>Data Sketches Hive</description>
   <url>http://datasketches.github.io/</url>
+  <inceptionYear>2015</inceptionYear>
 
   <licenses>
     <license>
@@ -21,26 +23,41 @@
     </license>
   </licenses>
 
-  <developers>
-    <developer>
-      <name>Will Lauer</name>
-      <url>https://github.com/will-lauer</url>
-    </developer>
-  </developers>
-
   <organization>
     <name>Yahoo! Inc.</name>
     <url>http://www.yahoo.com</url>
   </organization>
 
-  <inceptionYear>2015</inceptionYear>
+  <developers>
+    <developer>
+      <name>Lee Rhodes</name>
+      <roles>
+        <role>founder, project admin, developer</role>
+      </roles>
+      <url>https://github.com/leerho</url>
+    </developer>
+    <developer>
+      <name>Alexander Saydakov</name>
+      <roles>
+        <role>lead developer</role>
+      </roles>
+      <url>https://github.com/AlexanderSaydakov</url>
+    </developer>
+    <developer>
+      <name>Will Lauer</name>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <url>https://github.com/will-lauer</url>
+    </developer>
+  </developers>
 
-  <scm>
-    <connection>scm:git:ssh://git@github.com/DataSketches/sketches-hive.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/DataSketches/sketches-hive.git</developerConnection>
-    <url>https://github.com/DataSketches/sketches-hive.git</url>
-    <tag>HEAD</tag>
-  </scm>
+  <contributors>
+    <contributor>
+      <url>https://github.com/DataSketches/sketches-hive/graphs/contributors</url>
+    </contributor>
+  </contributors>
+  <!-- End Project Information -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,6 +67,38 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
+  <!-- Environment Settings -->
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/DataSketches/sketches-hive/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>travis</system>
+    <url>https://travis-ci.org/DataSketches/sketches-hive</url>
+  </ciManagement>
+
+  <mailingLists>
+    <mailingList>
+      <name>sketches-user</name>
+      <archive>https://groups.google.com/forum/#!forum/sketches-user</archive>
+      <subscribe>mailto:sketches-user%2Bsubscribe@googlegroups.com</subscribe>
+      <unsubscribe>mailto:sketches-user%2Bunsubscribe@googlegroups.com</unsubscribe>
+      <post>mailto:sketches-user@googlegroups.com</post>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:ssh://git@github.com/DataSketches/sketches-hive.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/DataSketches/sketches-hive.git</developerConnection>
+    <url>https://github.com/DataSketches/sketches-hive.git</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <prerequisites>
+    <maven>3.0.4</maven>
+  </prerequisites>
+
   <repositories>
     <repository>
       <id>jcenter</id>
@@ -58,8 +107,48 @@
     </repository>
   </repositories>
 
+  <distributionManagement>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <profiles>
+    <profile>
+      <id>strict</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.5.1</version>
+              <configuration>
+                <source>${maven.compiler.source}</source>
+                <target>${maven.compiler.target}</target>
+                <compilerId>javac-with-errorprone</compilerId>
+                <forceJavacCompilerUse>true</forceJavacCompilerUse>
+              </configuration>
+              <dependencies>
+                <dependency>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                  <version>2.8</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+  <!-- End of Environment Settings -->
+
   <dependencies>
-    <!-- Core Sketch library --> 
+    <!-- sketches-core -->
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
@@ -74,6 +163,7 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- hadoop -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
@@ -113,6 +203,7 @@
 
   <build>
     <plugins>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -366,42 +457,4 @@
     </pluginManagement>
   </build>
 
-  <profiles>
-
-    <profile>
-      <id>strict</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                <source>1.8</source>
-                <target>1.8</target>
-                <compilerId>javac-with-errorprone</compilerId>
-                <forceJavacCompilerUse>true</forceJavacCompilerUse>
-              </configuration>
-              <dependencies>
-                <dependency>
-                  <groupId>org.codehaus.plexus</groupId>
-                  <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                  <version>2.7</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
-
-  <distributionManagement>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
 </project>
