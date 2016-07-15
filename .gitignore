@@ -13,6 +13,9 @@ bin/
 #Test output
 test-output/
 .clover/
+local/
+reports/
+.pmd
 tmp/
 
 # Build artifacts
