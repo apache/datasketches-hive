@@ -15,7 +15,6 @@ import com.yahoo.sketches.quantiles.ItemsUnion;
 
 class ItemsUnionState<T> extends AbstractAggregationBuffer {
 
-  private int k_;
   private final Comparator<? super T> comparator_;
   private final ArrayOfItemsSerDe<T> serDe_;
   private ItemsUnion<T> union;
@@ -25,11 +24,13 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
     serDe_ = serDe;
   }
 
-  // initializing k is needed for building sketches using update(value)
-  // not needed for merging sketches using update(sketch)
+  // initializing is needed only in the first phase (iterate)
   void init(final int k) {
-    k_ = k;
-    buildUnion();
+    if (k > 0) {
+      union = ItemsUnion.getInstance(k, comparator_);
+    } else {
+      union = ItemsUnion.getInstance(comparator_);
+    }
   }
 
   boolean isInitialized() {
@@ -37,12 +38,17 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
   }
 
   void update(final T value) {
+    if (union == null) union = ItemsUnion.getInstance(comparator_);
     union.update(value);
   }
 
   void update(final byte[] serializedSketch) {
-    if (union == null) buildUnion();
-    union.update(ItemsSketch.getInstance(new NativeMemory(serializedSketch), comparator_, serDe_));
+    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(new NativeMemory(serializedSketch), comparator_, serDe_);
+    if (union == null) {
+      union = ItemsUnion.getInstance(incomingSketch);
+    } else {
+      union.update(incomingSketch);
+    }
   }
 
   public ItemsSketch<T> getResult() {
@@ -54,11 +60,4 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
     union = null;
   }
 
-  private void buildUnion() {
-    if (k_ > 0) {
-      union = ItemsUnion.getInstance(k_, comparator_);
-    } else {
-      union = ItemsUnion.getInstance(comparator_);
-    }
-  }
 }

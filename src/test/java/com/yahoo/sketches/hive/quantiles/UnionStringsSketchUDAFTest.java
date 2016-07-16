@@ -19,6 +19,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.IntWritable;
 
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
@@ -36,6 +37,9 @@ public class UnionStringsSketchUDAFTest {
   static final ObjectInspector binaryInspector =
     PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
 
+  static final ObjectInspector intInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
+
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooFewInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
@@ -45,34 +49,46 @@ public class UnionStringsSketchUDAFTest {
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooManyInspectors() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, binaryInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, binaryInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new UnionStringsSketchUDAF().getEvaluator(info);
+  }
+
+  static final ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
+      Arrays.asList("a"),
+      Arrays.asList(binaryInspector)
+    );
+
+  @Test(expectedExceptions = UDFArgumentTypeException.class)
+  public void getEvaluatorWrongCategoryArg1() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new UnionStringsSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentTypeException.class)
-  public void getEvaluatorWrongType() throws Exception {
-    ObjectInspector intInspector =
-      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
-
+  public void getEvaluatorWrongTypeArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new UnionStringsSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentTypeException.class)
-  public void getEvaluatorWrongCategory() throws Exception {
-    ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
-      Arrays.asList("a"),
-      Arrays.asList(binaryInspector)
-    );
-    ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
+  public void getEvaluatorWrongCategoryArg2() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, structInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new UnionStringsSketchUDAF().getEvaluator(info);
+  }
+
+  @Test(expectedExceptions = UDFArgumentTypeException.class)
+  public void getEvaluatorWrongTypeArg2() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, binaryInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new UnionStringsSketchUDAF().getEvaluator(info);
   }
 
   @Test
-  public void iterateTerminatePartial() throws Exception {
+  public void iterateTerminatePartialDefaultK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info);
@@ -81,13 +97,42 @@ public class UnionStringsSketchUDAFTest {
 
     @SuppressWarnings("unchecked")
     ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-    state.init(256);
-    state.update("a");
 
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(256, comparator);
-    sketch.update("b");
+    ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+    sketch1.update("a");
+    eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)) });
 
-    eval.iterate(state, new Object[] { new BytesWritable(sketch.toByteArray(serDe)) });
+    ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+    sketch2.update("b");
+    eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)) });
+
+    BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    Assert.assertEquals(resultSketch.getK(), 128);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
+    Assert.assertEquals(resultSketch.getMinValue(), "a");
+    Assert.assertEquals(resultSketch.getMaxValue(), "b");
+    eval.close();
+  }
+
+  @Test
+  public void iterateTerminatePartialGivenK() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+    checkResultInspector(resultInspector);
+
+    @SuppressWarnings("unchecked")
+    ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
+
+    ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+    sketch1.update("a");
+    eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)), new IntWritable(256) });
+
+    ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+    sketch2.update("b");
+    eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)), new IntWritable(256) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
     ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
@@ -108,13 +153,14 @@ public class UnionStringsSketchUDAFTest {
 
     @SuppressWarnings("unchecked")
     ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-    state.init(256);
-    state.update("a");
 
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(256, comparator);
-    sketch.update("b");
+    ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+    sketch1.update("a");
+    eval.merge(state, new BytesWritable(sketch1.toByteArray(serDe)));
 
-    eval.merge(state, new BytesWritable(sketch.toByteArray(serDe)));
+    ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+    sketch2.update("b");
+    eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
     ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);

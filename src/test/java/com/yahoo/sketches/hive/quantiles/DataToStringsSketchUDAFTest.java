@@ -79,7 +79,29 @@ public class DataToStringsSketchUDAFTest {
   }
 
   @Test
-  public void iterateTerminatePartial() throws Exception {
+  public void iterateTerminatePartialDefaultK() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+    checkResultInspector(resultInspector);
+
+    @SuppressWarnings("unchecked")
+    ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("a") });
+    eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b") });
+
+    BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    Assert.assertEquals(resultSketch.getK(), 128);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
+    Assert.assertEquals(resultSketch.getMinValue(), "a");
+    Assert.assertEquals(resultSketch.getMaxValue(), "b");
+    eval.close();
+  }
+
+  @Test
+  public void iterateTerminatePartialGivenK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
@@ -110,13 +132,14 @@ public class DataToStringsSketchUDAFTest {
 
     @SuppressWarnings("unchecked")
     ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-    state.init(256);
-    state.update("a");
 
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(256, comparator);
-    sketch.update("b");
+    ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+    sketch1.update("a");
+    eval.merge(state, new BytesWritable(sketch1.toByteArray(serDe)));
 
-    eval.merge(state, new BytesWritable(sketch.toByteArray(serDe)));
+    ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+    sketch2.update("b");
+    eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
     ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);

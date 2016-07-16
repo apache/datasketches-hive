@@ -13,14 +13,13 @@ import com.yahoo.sketches.quantiles.DoublesUnionBuilder;
 
 class DoublesUnionState extends AbstractAggregationBuffer {
 
-  private int k_;
   private DoublesUnion union;
 
-  // initializing k is needed for building sketches using update(double)
-  // not needed for merging sketches using update(sketch)
+  // initializing is needed only in the first phase (iterate)
   void init(final int k) {
-    this.k_ = k;
-    buildUnion();
+    final DoublesUnionBuilder unionBuilder = DoublesUnion.builder();
+    if (k > 0) unionBuilder.setK(k);
+    union = unionBuilder.build();
   }
 
   boolean isInitialized() {
@@ -28,12 +27,17 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   }
 
   void update(final double value) {
+    if (union == null) union = DoublesUnion.builder().build();
     union.update(value);
   }
 
   void update(final byte[] serializedSketch) {
-    if (union == null) buildUnion();
-    union.update(new NativeMemory(serializedSketch));
+    final DoublesSketch incomingSketch = DoublesSketch.heapify(new NativeMemory(serializedSketch));
+    if (union == null) {
+      union = DoublesUnion.builder().build(incomingSketch);
+    } else {
+      union.update(incomingSketch);
+    }
   }
 
   public DoublesSketch getResult() {
@@ -43,12 +47,6 @@ class DoublesUnionState extends AbstractAggregationBuffer {
 
   void reset() {
     union = null;
-  }
-
-  private void buildUnion() {
-    final DoublesUnionBuilder unionBuilder = DoublesUnion.builder();
-    if (k_ > 0) unionBuilder.setK(k_);
-    union = unionBuilder.build();
   }
 
 }
