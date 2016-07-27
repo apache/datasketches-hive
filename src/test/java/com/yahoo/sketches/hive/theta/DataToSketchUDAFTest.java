@@ -6,100 +6,76 @@ package com.yahoo.sketches.hive.theta;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
-import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.ql.udf.generic.SimpleGenericUDAFParameterInfo;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.StructField;
+import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.hamcrest.core.IsInstanceOf;
-import org.testng.annotations.BeforeClass;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import com.yahoo.sketches.memory.Memory;
-import com.yahoo.sketches.theta.CompactSketch;
-import com.yahoo.sketches.theta.UpdateReturnState;
-import com.yahoo.sketches.SketchesArgumentException;
-import com.yahoo.sketches.hive.theta.DataToSketchUDAF.DataToSketchEvaluator;
-import com.yahoo.sketches.hive.theta.DataToSketchUDAF.DataToSketchEvaluator.DataToSketchAggBuffer;
-import com.yahoo.sketches.theta.Union;
+import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.UpdateSketch;
-import static org.easymock.EasyMock.and;
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.mock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.strictMock;
-import static org.easymock.EasyMock.verify;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import com.yahoo.sketches.theta.Sketches;
+import com.yahoo.sketches.theta.SetOperation;
+import com.yahoo.sketches.theta.Union;
+
+import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
+import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
 
 /**
  * Unit tests for DataToSketch UDF
  */
-@SuppressWarnings("deprecation")
+//@SuppressWarnings("deprecation")
 public class DataToSketchUDAFTest {
-  private static PrimitiveTypeInfo binaryType;
-  private static PrimitiveTypeInfo intType;
-  private static PrimitiveTypeInfo doubleType;
-  private static ObjectInspector intermediateStructType;
-  private static ObjectInspector inputOI;
-  private static ObjectInspector sketchSizeOI;
-  private static ObjectInspector samplingOI;
 
-  @BeforeClass
-  public static void setupClass() {
-    binaryType = new PrimitiveTypeInfo();
-    binaryType.setTypeName("binary");
-    intType = new PrimitiveTypeInfo();
-    intType.setTypeName("int");
-    doubleType = new PrimitiveTypeInfo();
-    doubleType.setTypeName("double");
+  static final ObjectInspector intInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
 
-    inputOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
-    sketchSizeOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(intType,
-        new IntWritable(1024));
-    samplingOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(doubleType,
-        new DoubleWritable(1.0));
+  static final ObjectInspector doubleInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.DOUBLE);
 
-    List<ObjectInspector> fields = new ArrayList<>();
-    fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT));
-    fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.FLOAT));
-    fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY));
-    List<String> fieldNames = new ArrayList<>();
-    fieldNames.add("sketchSize");
-    fieldNames.add("samplingProbability");
-    fieldNames.add("sketch");
+  static final ObjectInspector stringInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.STRING);
 
-    intermediateStructType = ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fields);
-  }
+  static final ObjectInspector intConstantInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, null);
+
+  static final ObjectInspector floatConstantInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.floatTypeInfo, null);
+
+  static final ObjectInspector longConstantInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.longTypeInfo, null);
+
+  static final ObjectInspector binaryInspector =
+      PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
+
+  static final ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
+      Arrays.asList("nominalEntries", "seed", "sketch"),
+      Arrays.asList(intConstantInspector, longConstantInspector, binaryInspector)
+    );
 
   @Test(expectedExceptions = { UDFArgumentException.class })
-  public void testParametersTooFew() throws SemanticException {
+  public void initTooFewArguments() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] {}, false, false);
 
@@ -107,370 +83,286 @@ public class DataToSketchUDAFTest {
   }
 
   @Test(expectedExceptions = { UDFArgumentException.class })
-  public void testParametersTooMany() throws SemanticException {
+  public void initTooManyArguments() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI, sketchSizeOI,
-        samplingOI, samplingOI }, false, false);
-
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] {
+      intInspector, intConstantInspector, floatConstantInspector, longConstantInspector, longConstantInspector
+    }, false, false);
     udf.getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
-  public void testParametersInvalidInputArgType() throws SemanticException {
+  public void initInvalidCategoryArg1() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory
-            .getPrimitiveWritableObjectInspector(PrimitiveCategory.INT)) }, false, false);
-
+        new ObjectInspector[] { structInspector }, false, false);
     udf.getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
-  public void testParametersInvalidSizeArgType() throws SemanticException {
+  public void initInvalidCategoryArg2() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] {
-            inputOI,
-            PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(doubleType, new DoubleWritable(
-                1.0)), samplingOI }, false, false);
-
+        new ObjectInspector[] { intInspector, structInspector }, false, false);
     udf.getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
-  public void testParametersInvalidSamplingArgType() throws SemanticException {
+  public void initInvalidTypeArg2() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI, sketchSizeOI,
-        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(intType, new IntWritable(1)) },
-        false, false);
-
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
+        new ObjectInspector[] { intInspector, floatConstantInspector }, false, false);
     udf.getEvaluator(params);
   }
 
-  @Test
-  public void testGetEvaluator() throws SemanticException, IOException {
+  @Test(expectedExceptions = { UDFArgumentTypeException.class })
+  public void initInvalidCategoryArg3() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { inputOI }, false,
-        false);
-
-    try (GenericUDAFEvaluator eval = udf.getEvaluator(params)) {
-      assertNotNull(eval);
-      assertThat(eval, IsInstanceOf.instanceOf(DataToSketchEvaluator.class));
-    }
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
+        new ObjectInspector[] { stringInspector, intConstantInspector, structInspector }, false, false);
+    udf.getEvaluator(params);
   }
 
-  @Test(expectedExceptions = { SemanticException.class })
-  public void testGetEvaluatorDeprecated() throws SemanticException, IOException {
+  @Test(expectedExceptions = { UDFArgumentTypeException.class })
+  public void initInvalidTypeArg3() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
+        new ObjectInspector[] { stringInspector, intConstantInspector, intConstantInspector }, false, false);
+    udf.getEvaluator(params);
+  }
 
-    try (GenericUDAFEvaluator eval = udf.getEvaluator(new TypeInfo[] { binaryType, intType, doubleType })) {
-      assertNotNull(eval);
-      assertThat(eval, IsInstanceOf.instanceOf(DataToSketchEvaluator.class));
-    }
+  @Test(expectedExceptions = { UDFArgumentTypeException.class })
+  public void initInvalidCategoryArg4() throws SemanticException {
+    DataToSketchUDAF udf = new DataToSketchUDAF();
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
+        new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, structInspector }, false, false);
+    udf.getEvaluator(params);
+  }
+
+  @Test(expectedExceptions = { UDFArgumentTypeException.class })
+  public void initInvalidTypeArg4() throws SemanticException {
+    DataToSketchUDAF udf = new DataToSketchUDAF();
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
+        new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, floatConstantInspector }, false, false);
+    udf.getEvaluator(params);
+  }
+
+  // PARTIAL1 mode (Map phase in Map-Reduce): iterate + terminatePartial
+  @Test
+  public void partial1ModeIntValuesDefaultParams() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+    checkIntermediateResultInspector(resultInspector);
+
+    State state = (State) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] {new IntWritable(1)});
+    eval.iterate(state, new Object[] {new IntWritable(2)});
+
+    Object result = eval.terminatePartial(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof List);
+    List<?> r = (List<?>) result;
+    Assert.assertEquals(r.size(), 3);
+    Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
+    Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
+    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()));
+    Assert.assertFalse(resultSketch.isEstimationMode());
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+
+    eval.close();
   }
 
   @Test
-  public void testInit() throws HiveException, IOException {
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
+  public void partial1ModeStringValuesExplicitParameters() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, longConstantInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+    checkIntermediateResultInspector(resultInspector);
 
-      ObjectInspector[] initialParams = new ObjectInspector[] { inputOI, sketchSizeOI, samplingOI };
+    final long seed = 1;
+    State state = (State) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] {new Text("a"), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
+    eval.iterate(state, new Object[] {new Text("b"), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
 
-      ObjectInspector retType = eval.init(Mode.COMPLETE, initialParams);
+    Object result = eval.terminatePartial(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof List);
+    List<?> r = (List<?>) result;
+    Assert.assertEquals(r.size(), 3);
+    Assert.assertEquals(((IntWritable) (r.get(0))).get(), 8);
+    Assert.assertEquals(((LongWritable) (r.get(1))).get(), seed);
+    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()), seed);
+    // because of sampling probability < 1
+    Assert.assertTrue(resultSketch.isEstimationMode());
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
 
-      assertSame(eval.getInputOI(), inputOI);
-      assertEquals(eval.getSketchSizeOI(), sketchSizeOI);
-      assertEquals(eval.getSamplingProbOI(), samplingOI);
-      assertEquals(eval.getIntermediateOI(), null);
-      assertTrue(ObjectInspectorUtils.compareTypes(retType,
-          PrimitiveObjectInspectorFactory.writableBinaryObjectInspector));
+    // check if seed is correct in the result
+    Union union = SetOperation.builder().setSeed(seed).buildUnion();
+    // this must fail if the seed is incompatible
+    union.update(resultSketch);
 
-      retType = eval.init(Mode.PARTIAL1, initialParams);
-      assertSame(eval.getInputOI(), inputOI);
-      assertEquals(eval.getSketchSizeOI(), sketchSizeOI);
-      assertEquals(eval.getSamplingProbOI(), samplingOI);
-      assertEquals(eval.getIntermediateOI(), null);
-      assertTrue(ObjectInspectorUtils.compareTypes(retType, intermediateStructType));
+    eval.close();
+  }
 
-      retType = eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
-      assertSame(eval.getIntermediateOI(), intermediateStructType);
-      assertEquals(eval.getSketchSizeOI(), null);
-      assertEquals(eval.getSamplingProbOI(), null);
-      assertEquals(eval.getInputOI(), null);
-      assertTrue(ObjectInspectorUtils.compareTypes(retType, intermediateStructType));
+  // PARTIAL2 mode (Combine phase in Map-Reduce): merge + terminatePartial
+  @Test
+  public void partial2Mode() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
+    checkIntermediateResultInspector(resultInspector);
 
-      retType = eval.init(Mode.FINAL, new ObjectInspector[] { intermediateStructType });
-      assertSame(eval.getIntermediateOI(), intermediateStructType);
-      assertEquals(eval.getSketchSizeOI(), null);
-      assertEquals(eval.getSamplingProbOI(), null);
-      assertEquals(eval.getInputOI(), null);
-      assertTrue(ObjectInspectorUtils.compareTypes(retType,
-          PrimitiveObjectInspectorFactory.writableBinaryObjectInspector));
+    State state = (State) eval.getNewAggregationBuffer();
 
-    }
+    UpdateSketch sketch1 = UpdateSketch.builder().build();
+    sketch1.update(1);
+    eval.merge(state, Arrays.asList(
+      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+      new LongWritable(DEFAULT_UPDATE_SEED),
+      new BytesWritable(sketch1.compact().toByteArray()))
+    );
+
+    UpdateSketch sketch2 = UpdateSketch.builder().build();
+    sketch2.update(2);
+    eval.merge(state, Arrays.asList(
+      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+      new LongWritable(DEFAULT_UPDATE_SEED),
+      new BytesWritable(sketch2.compact().toByteArray()))
+    );
+
+    Object result = eval.terminatePartial(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof List);
+    List<?> r = (List<?>) result;
+    Assert.assertEquals(r.size(), 3);
+    Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
+    Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
+    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()));
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+
+    eval.close();
+  }
+  
+  // FINAL mode (Reduce phase in Map-Reduce): merge + terminate
+  @Test
+  public void finalMode() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
+    checkFinalResultInspector(resultInspector);
+
+    State state = (State) eval.getNewAggregationBuffer();
+
+    UpdateSketch sketch1 = UpdateSketch.builder().build();
+    sketch1.update(1);
+    eval.merge(state, Arrays.asList(
+      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+      new LongWritable(DEFAULT_UPDATE_SEED),
+      new BytesWritable(sketch1.compact().toByteArray()))
+    );
+
+    UpdateSketch sketch2 = UpdateSketch.builder().build();
+    sketch2.update(2);
+    eval.merge(state, Arrays.asList(
+      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+      new LongWritable(DEFAULT_UPDATE_SEED),
+      new BytesWritable(sketch2.compact().toByteArray()))
+    );
+
+    Object result = eval.terminate(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof BytesWritable);
+    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+
+    eval.close();
+  }
+
+  // COMPLETE mode (single mode, alternative to MapReduce): iterate + terminate
+  @Test
+  public void completeModeIntValuesDefaultParams() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+    checkFinalResultInspector(resultInspector);
+
+    State state = (State) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] {new IntWritable(1)});
+    eval.iterate(state, new Object[] {new IntWritable(2)});
+
+    Object result = eval.terminate(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof BytesWritable);
+    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+
+    eval.reset(state);
+    result = eval.terminate(state);
+    Assert.assertNull(result);
+
+    eval.close();
   }
 
   @Test
-  public void testGetNewAggregationBuffer() throws HiveException, IOException {
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      AggregationBuffer buffer = eval.getNewAggregationBuffer();
+  public void completeModeDoubleValuesExplicitParameters() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, intConstantInspector, floatConstantInspector, longConstantInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+    checkFinalResultInspector(resultInspector);
 
-      assertThat(buffer, IsInstanceOf.instanceOf(DataToSketchAggBuffer.class));
-      DataToSketchAggBuffer sketchBuffer = (DataToSketchAggBuffer) buffer;
-      assertNull(sketchBuffer.getUnion());
-      assertNull(sketchBuffer.getUpdateSketch());
-      assertEquals(sketchBuffer.getSketchSize(), DataToSketchUDAF.DEFAULT_SKETCH_SIZE);
-      assertEquals(sketchBuffer.getSamplingProbability(), DataToSketchUDAF.DEFAULT_SAMPLING_PROBABILITY);
-    }
+    final long seed = 2;
+    State state = (State) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] {new DoubleWritable(1), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
+    eval.iterate(state, new Object[] {new DoubleWritable(2), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
+
+    Object result = eval.terminate(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof BytesWritable);
+    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()), seed);
+    // because of sampling probability < 1
+    Assert.assertTrue(resultSketch.isEstimationMode());
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
+
+    eval.close();
   }
 
-  @Test
-  public void testReset() throws IOException, HiveException {
+  static void checkIntermediateResultInspector(ObjectInspector resultInspector) {
+    Assert.assertNotNull(resultInspector);
+    Assert.assertEquals(resultInspector.getCategory(), ObjectInspector.Category.STRUCT);
+    StructObjectInspector structResultInspector = (StructObjectInspector) resultInspector;
+    List<?> fields = structResultInspector.getAllStructFieldRefs();
+    Assert.assertEquals(fields.size(), 3);
+ 
+    ObjectInspector inspector1 = ((StructField) fields.get(0)).getFieldObjectInspector(); 
+    Assert.assertEquals(inspector1.getCategory(), ObjectInspector.Category.PRIMITIVE);
+    PrimitiveObjectInspector primitiveInspector1 = (PrimitiveObjectInspector) inspector1;
+    Assert.assertEquals(primitiveInspector1.getPrimitiveCategory(), PrimitiveCategory.INT);
 
-    Union union = mock(Union.class);
-    UpdateSketch sketch = mock(UpdateSketch.class);
+    ObjectInspector inspector2 = ((StructField) fields.get(1)).getFieldObjectInspector(); 
+    Assert.assertEquals(inspector2.getCategory(), ObjectInspector.Category.PRIMITIVE);
+    PrimitiveObjectInspector primitiveInspector2 = (PrimitiveObjectInspector) inspector2;
+    Assert.assertEquals(primitiveInspector2.getPrimitiveCategory(), PrimitiveCategory.LONG);
 
-    replay(union, sketch);
+    ObjectInspector inspector3 = ((StructField) fields.get(2)).getFieldObjectInspector(); 
+    Assert.assertEquals(inspector3.getCategory(), ObjectInspector.Category.PRIMITIVE);
+    PrimitiveObjectInspector primitiveInspector3 = (PrimitiveObjectInspector) inspector3;
+    Assert.assertEquals(primitiveInspector3.getPrimitiveCategory(), PrimitiveCategory.BINARY);
+}
 
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      DataToSketchAggBuffer buf = new DataToSketchAggBuffer();
-      buf.setUnion(union);
-      buf.setUpdateSketch(sketch);
-      buf.setSamplingProbability(.5f);
-      buf.setSketchSize(1024);
-
-      eval.reset(buf);
-
-      assertNull(buf.getUnion());
-      assertNull(buf.getUpdateSketch());
-      assertEquals(buf.getSketchSize(), DataToSketchUDAF.DEFAULT_SKETCH_SIZE);
-      assertEquals(buf.getSamplingProbability(), DataToSketchUDAF.DEFAULT_SAMPLING_PROBABILITY);
-    }
-
-    verify(union, sketch);
-  }
-
-  @Test
-  public void testIterate() throws IOException, HiveException {
-    DataToSketchAggBuffer buf = strictMock(DataToSketchAggBuffer.class);
-    UpdateSketch sketch = strictMock(UpdateSketch.class);
-
-    expect(buf.getUpdateSketch()).andReturn(null);
-    buf.setSketchSize(512);
-    buf.setSamplingProbability(DataToSketchUDAF.DEFAULT_SAMPLING_PROBABILITY);
-    buf.setUpdateSketch(isA(UpdateSketch.class));
-    expect(buf.getUpdateSketch()).andReturn(sketch);
-    expect(sketch.update(1234)).andReturn(UpdateReturnState.InsertedCountIncremented);
-
-    expect(buf.getUpdateSketch()).andReturn(sketch).times(2);
-    expect(sketch.update(234)).andReturn(UpdateReturnState.InsertedCountIncremented);
-
-    replay(buf, sketch);
-
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      eval.init(Mode.COMPLETE, new ObjectInspector[] { inputOI, sketchSizeOI });
-
-      eval.iterate(buf, new Object[] { new IntWritable(1234), new IntWritable(512) });
-      eval.iterate(buf, new Object[] { new IntWritable(234), new IntWritable(512) });
-
-    }
-
-    verify(buf, sketch);
-  }
-
-  /**
-   * testing terminatePartial when in Mode.PARTIAL1, which should merge values
-   * generated by iterate.
-   * 
-   * @throws IOException thrown by Hive
-   * @throws HiveException thrown by Hive
-   */
-  @Test
-  public void testTerminatePartial1() throws IOException, HiveException {
-    DataToSketchAggBuffer buf = mock(DataToSketchAggBuffer.class);
-    UpdateSketch sketch = mock(UpdateSketch.class);
-    CompactSketch compact = mock(CompactSketch.class);
-    byte[] bytes = new byte[0];
-
-    expect(buf.getUpdateSketch()).andReturn(sketch);
-    expect(buf.getUnion()).andReturn(null);
-    expect(buf.getSketchSize()).andReturn(512);
-    expect(buf.getSamplingProbability()).andReturn(0.5f);
-
-    expect(sketch.compact(true, null)).andReturn(compact);
-
-    expect(compact.toByteArray()).andReturn(bytes);
-
-    replay(buf, sketch, compact);
-
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      Object result = eval.terminatePartial(buf);
-
-      assertThat(result, IsInstanceOf.instanceOf(ArrayList.class));
-      ArrayList<?> r = (ArrayList<?>) result;
-      assertEquals(r.size(), 3);
-      assertEquals(((IntWritable) (r.get(0))).get(), 512);
-      assertEquals(((FloatWritable) (r.get(1))).get(), 0.5f);
-      assertEquals(((BytesWritable) (r.get(2))).getBytes().length, bytes.length);
-    }
-
-    verify(buf, sketch, compact);
-  }
-
-  /**
-   * testing terminatePartial when in Mode.PARTIAL2, which should merge values
-   * generated by merge.
-   * 
-   * @throws IOException thrown by Hive
-   * @throws HiveException thrown by Hive
-   */
-  @Test
-  public void testTerminatePartial2() throws IOException, HiveException {
-    DataToSketchAggBuffer buf = mock(DataToSketchAggBuffer.class);
-    Union union = mock(Union.class);
-    CompactSketch compact = mock(CompactSketch.class);
-    byte[] bytes = new byte[0];
-
-    expect(buf.getUpdateSketch()).andReturn(null);
-    expect(buf.getUnion()).andReturn(union);
-    expect(buf.getSketchSize()).andReturn(512);
-    expect(buf.getSamplingProbability()).andReturn(0.5f);
-
-    expect(union.getResult(true, null)).andReturn(compact);
-
-    expect(compact.toByteArray()).andReturn(bytes);
-
-    replay(buf, union, compact);
-
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      Object result = eval.terminatePartial(buf);
-
-      assertThat(result, IsInstanceOf.instanceOf(ArrayList.class));
-      ArrayList<?> r = (ArrayList<?>) result;
-      assertEquals(r.size(), 3);
-      assertEquals(((IntWritable) (r.get(0))).get(), 512);
-      assertEquals(((FloatWritable) (r.get(1))).get(), 0.5f);
-      assertEquals(((BytesWritable) (r.get(2))).getBytes().length, bytes.length);
-    }
-
-    verify(buf, union, compact);
-  }
-
-  @Test(expectedExceptions = SketchesArgumentException.class)
-  public void testMerge() throws IOException, HiveException {
-    DataToSketchAggBuffer buf = mock(DataToSketchAggBuffer.class);
-    Union union = mock(Union.class);
-
-    replay(buf, union);
-
-    // test null partial
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
-
-      eval.merge(buf, null);
-    }
-
-    verify(buf, union);
-
-    // test initial merge
-    reset(buf, union);
-
-    expect(buf.getUnion()).andReturn(null);
-    buf.setSketchSize(1024);
-    buf.setSamplingProbability(1.0f);
-    expect(buf.getSamplingProbability()).andReturn(1.0f);
-    expect(buf.getSketchSize()).andReturn(1024);
-    buf.setUnion(isA(Union.class));
-    expect(buf.getUnion()).andReturn(union);
-
-    Capture<Memory> c = EasyMock.newCapture();
-    union.update(and(isA(Memory.class), capture(c)));
-
-    replay(buf, union);
-
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
-
-      ArrayList<Object> struct = new ArrayList<>(3);
-      struct.add(new IntWritable(1024));
-      struct.add(new FloatWritable(1.0f));
-      struct.add(new BytesWritable(new byte[0]));
-
-      eval.merge(buf, struct);
-    }
-
-    verify(buf, union);
-    assertEquals(0, c.getValue().getCapacity());
-
-    // test subsequent merge
-    reset(buf, union);
-
-    expect(buf.getUnion()).andReturn(union).times(2);
-    c = EasyMock.newCapture();
-    union.update(and(isA(Memory.class), capture(c)));
-
-    replay(buf, union);
-
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      eval.init(Mode.PARTIAL2, new ObjectInspector[] { intermediateStructType });
-
-      ArrayList<Object> struct = new ArrayList<>(3);
-      struct.add(new IntWritable(1024));
-      struct.add(new FloatWritable(1.0f));
-      struct.add(new BytesWritable(new byte[0]));
-
-      eval.merge(buf, struct);
-    }
-
-    verify(buf, union);
-
-    assertEquals(0, c.getValue().getCapacity());
-  }
-
-  @Test
-  public void testTerminate() throws IOException, HiveException {
-    DataToSketchAggBuffer buf = mock(DataToSketchAggBuffer.class);
-    Union union = mock(Union.class);
-    UpdateSketch sketch = mock(UpdateSketch.class);
-    CompactSketch compact = mock(CompactSketch.class);
-    byte[] bytes = new byte[0];
-
-    // mode = complete. initial update sketches but no unions
-
-    expect(buf.getUnion()).andReturn(null);
-    expect(buf.getUpdateSketch()).andReturn(sketch).times(2);
-    expect(sketch.compact(true, null)).andReturn(compact);
-    expect(compact.getRetainedEntries(false)).andReturn(1024);
-    expect(compact.toByteArray()).andReturn(bytes);
-    replay(buf, union, sketch, compact);
-
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      Object retVal = eval.terminate(buf);
-
-      assertThat(retVal, IsInstanceOf.instanceOf(BytesWritable.class));
-      BytesWritable retValBytes = (BytesWritable) retVal;
-      assertEquals(retValBytes.getBytes().length, bytes.length);
-    }
-
-    verify(buf, union, sketch, compact);
-
-    // mode = final. merged unions, but no update sketches
-    reset(buf, union, sketch, compact);
-
-    expect(buf.getUnion()).andReturn(union).times(2);
-    expect(union.getResult(true, null)).andReturn(compact);
-    expect(compact.getRetainedEntries(false)).andReturn(1024);
-    expect(compact.toByteArray()).andReturn(bytes);
-
-    replay(buf, union, sketch, compact);
-    try (DataToSketchEvaluator eval = new DataToSketchEvaluator()) {
-      Object retVal = eval.terminate(buf);
-
-      assertThat(retVal, IsInstanceOf.instanceOf(BytesWritable.class));
-      BytesWritable retValBytes = (BytesWritable) retVal;
-      assertEquals(retValBytes.getBytes().length, bytes.length);
-    }
-
-    verify(buf, union, sketch, compact);
+  static void checkFinalResultInspector(ObjectInspector resultInspector) {
+    Assert.assertNotNull(resultInspector);
+    Assert.assertEquals(resultInspector.getCategory(), ObjectInspector.Category.PRIMITIVE);
+    Assert.assertEquals(
+      ((PrimitiveObjectInspector) resultInspector).getPrimitiveCategory(),
+      PrimitiveObjectInspector.PrimitiveCategory.BINARY
+    );
   }
 
 }

@@ -4,6 +4,9 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
+import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
+import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
@@ -19,39 +22,34 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.Pr
 import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.IntWritable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import com.yahoo.sketches.memory.NativeMemory;
-import com.yahoo.sketches.theta.CompactSketch;
-import com.yahoo.sketches.theta.SetOperation;
-import com.yahoo.sketches.theta.Union;
 
 /**
  * Hive Generic UDAF Resolver Class for MergeSketchUDAF.
  *
  */
 @Description(
-    name = "mergeSketch", 
-    value = "_FUNC_(sketch, size) - Compute the union of sketches of given size",
+    name = "unionSketch", 
+    value = "_FUNC_(sketch, size, seed) - Compute the union of sketches of given size and seed",
     extended = "Example:\n"
-    + "> SELECT UnionSketch(sketch, 1024) FROM src;\n"
+    + "> SELECT UnionSketch(sketch, 16384) FROM src;\n"
     + "The return value is a binary blob that contains a compact sketch, which can "
-    + "be operated on by the other sketch-related functions. The union "
-    + "size must be a power of 2 and controls the relative error of the expected "
-    + "result. A size of 16384 (the default) can be expected to yeild errors of roughly +-1.5% "
-    + "in the estimation of uniques with 95% confidence.")
+    + "be operated on by the other sketch-related functions. The optional "
+    + "size must be a power of 2, and controls the relative error of the expected "
+    + "result. A size of 16384 can be expected to yeild errors of roughly +-1.5% "
+    + "in the estimation of uniques with 95% confidence. "
+    + "The default size is defined in the sketches-core library and at the time of this writing "
+    + "was 4096 (about 3% error). "
+    + "The seed is optional, and using it is not recommended unless you really know why you need it")
 public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
-  public static final int DEFAULT_SKETCH_SIZE = 16384;
 
   /**
    * Perform argument count check and argument type checking, returns an
    * appropriate evaluator to perform based on input type (which should always
-   * be BINARY sketch for now). Also update sketch_size if size argument is
-   * passed in.
+   * be BINARY sketch). Also check sketch size and seed params if they are passed in.
    * 
    * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver#getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
    * 
@@ -62,44 +60,23 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] parameters = info.getParameterObjectInspectors();
 
-    // Check number of arguments passed in, merge sketch only allow one or two
-    // column/(int)
     if (parameters.length < 1) {
       throw new UDFArgumentException("Please specify at least 1 argument");
     }
 
-    if (parameters.length > 2) {
-      throw new UDFArgumentTypeException(parameters.length - 1, "Please specify no more than 2 arguments");
+    if (parameters.length > 3) {
+      throw new UDFArgumentTypeException(parameters.length - 1, "Please specify no more than 3 arguments");
     }
 
-    // validate first parameter type (sketch to merge)
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-      throw new UDFArgumentTypeException(0, "Only primitive type arguments are accepted but "
-          + parameters[0].getTypeName() + " was passed as parameter 1");
-    }
-
-    if (((PrimitiveObjectInspector) parameters[0]).getPrimitiveCategory() != PrimitiveCategory.BINARY) {
-      throw new UDFArgumentTypeException(0, "First argument must be a sketch to merge");
-    }
+    ObjectInspectorValidator.validateGivenPrimitiveCategory(parameters[0], 0, PrimitiveCategory.BINARY);
 
     if (parameters.length > 1) {
-      if (parameters[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-        throw new UDFArgumentTypeException(1, "Only integral type arguments are accepted but "
-            + parameters[1].getTypeName() + " was passed as parameter 1");
-      }
-      switch (((PrimitiveObjectInspector) parameters[1]).getPrimitiveCategory()) {
-      case BYTE:
-      case SHORT:
-      case INT:
-      case LONG:
-        break;
-      // all other types are invalid
-      default:
-        throw new UDFArgumentTypeException(1, "Only integral type assignments are accepted but "
-            + parameters[1].getTypeName() + " was passed as parameter 2");
-      }
+      ObjectInspectorValidator.validateIntegralParameter(parameters[1], 1);
     }
 
+    if (parameters.length > 2) {
+      ObjectInspectorValidator.validateIntegralParameter(parameters[2], 2);
+    }
     return new UnionSketchUDAFEvaluator();
   }
 
@@ -107,24 +84,13 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    * Evaluator class of Generic UDAF, main logic of our UDAF.
    * 
    */
-  public static class UnionSketchUDAFEvaluator extends GenericUDAFEvaluator {
-
-    private static final String SKETCH_FIELD = "sketch";
-    private static final String SKETCH_SIZE_FIELD = "sketchSize";
-
-    // FOR PARTIAL1 and COMPLETE modes, expect ObjectInspectors for the
-    // prime api: incoming sketch to merge and sketch size
-    private PrimitiveObjectInspector inputOI;
-    private transient PrimitiveObjectInspector sketchSizeOI;
-
-    // Intermediate reports
-    private transient StandardStructObjectInspector intermediateOI;
+  public static class UnionSketchUDAFEvaluator extends Evaluator {
 
     /**
      * Receives the passed in argument object inspectors and returns the desired
      * return type's object inspector to inform hive of return type of UDAF.
      * 
-     * @param m
+     * @param mode
      *          Mode (i.e. PARTIAL 1, COMPLETE...) for determining input/output
      *          object inspector type.
      * @param parameters
@@ -133,39 +99,43 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
      *         returned type of terminate(...)).
      */
     @Override
-    public ObjectInspector init(final Mode m, final ObjectInspector[] parameters) throws HiveException {
-      super.init(m, parameters);
+    public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
+      super.init(mode, parameters);
 
-      if (m == Mode.PARTIAL1 || m == Mode.COMPLETE) {
-        inputOI = (PrimitiveObjectInspector) parameters[0];
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+        inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          sketchSizeOI = (PrimitiveObjectInspector) parameters[1];
+          nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }
-        intermediateOI = null;
+        if (parameters.length > 2) {
+          seedObjectInspector = (PrimitiveObjectInspector) parameters[2];
+        }
+        intermediateObjectInspector = null;
       } else {
         // mode = partial2 || final
-        inputOI = null;
-        sketchSizeOI = null;
-        intermediateOI = (StandardStructObjectInspector) parameters[0];
+        inputObjectInspector = null;
+        nominalEntriesObjectInspector = null;
+        intermediateObjectInspector = (StandardStructObjectInspector) parameters[0];
       }
 
-      if (m == Mode.PARTIAL1 || m == Mode.PARTIAL2) {
-        // build list object representing intermediate result
-        final List<ObjectInspector> fields = new ArrayList<>(2);
-        fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT));
-        fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY));
-        final List<String> fieldNames = new ArrayList<>(2);
-        fieldNames.add(SKETCH_SIZE_FIELD);
-        fieldNames.add(SKETCH_FIELD);
-
-        return ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fields);
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+        // intermediate results need to include the the nominal number of entries and the seed
+        return ObjectInspectorFactory.getStandardStructObjectInspector(
+          Arrays.asList(NOMINAL_ENTRIES_FIELD, SEED_FIELD, SKETCH_FIELD),
+          Arrays.asList(
+            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
+            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.LONG),
+            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
+          )
+        );
       } else {
+        // final results include just the sketch
         return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
       }
     }
 
     /**
-     * Aggregate incoming sketch into aggregation buffer.
+     * Add the incoming sketch into the internal state.
      * 
      * @param agg
      *          aggregation buffer storing intermediate results.
@@ -175,192 +145,28 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object[] parameters)
         throws HiveException {
-      // don't bother continuing if we have a null.
-      if (parameters[0] == null) {
-        return;
+      if (parameters[0] == null) return;
+      final State state = (State) agg;
+      if (!state.isInitialized()) {
+        initializeState(state, parameters);
       }
-
-      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
-
-      if (buf.getUnion() == null) {
-        int sketchSize = DEFAULT_SKETCH_SIZE;
-        if (sketchSizeOI != null) {
-          sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], sketchSizeOI);
-        }
-        buf.setSketchSize(sketchSize);
-
-        buf.setUnion(SetOperation.builder().buildUnion(sketchSize));
-      }
-
-      final byte[] serializedSketch = (byte[]) inputOI.getPrimitiveJavaObject(parameters[0]);
-
-      // skip if input sketch is null
-      if (serializedSketch == null) {
-        return;
-      }
-
-      buf.getUnion().update(new NativeMemory(serializedSketch));
+      final byte[] serializedSketch = (byte[]) inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
+      if (serializedSketch == null) return;
+      state.update(new NativeMemory(serializedSketch));
     }
 
-    /**
-     * Retrieves the intermediate result sketch from aggregation buffer for
-     * merging with an other intermediate result.
-     * 
-     * @param agg
-     *          aggregation buffer storing intermediate results.
-     * @return Sketch serialized in a bytes writable object.
-     */
-    @Override
-    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-
-      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
-      final Union union = buf.getUnion();
-      if (union == null) {
-        return null;
+    private void initializeState(final State state, final Object[] parameters) {
+      int nominalEntries = DEFAULT_NOMINAL_ENTRIES;
+      if (nominalEntriesObjectInspector != null) {
+        nominalEntries = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);
       }
-      final CompactSketch intermediateSketch = union.getResult(true, null);
-      if (intermediateSketch.getRetainedEntries(false) == 0) {
-        return null;
-      } else {
-        final byte[] bytes = intermediateSketch.toByteArray();
-
-        final ArrayList<Object> results = new ArrayList<>(2);
-        results.add(new IntWritable(buf.getSketchSize()));
-        results.add(new BytesWritable(bytes));
-        return results;
+      long seed = DEFAULT_UPDATE_SEED;
+      if (seedObjectInspector != null) {
+        seed = PrimitiveObjectInspectorUtils.getLong(parameters[2], seedObjectInspector);
       }
+      state.init(nominalEntries, seed);
     }
 
-    /**
-     * Merge two intermediate into aggregation buffer.
-     * 
-     * @param agg
-     *          aggregation buffer where intermediate sketch merge into.
-     * @param partial
-     *          intermediate sketch passed as bytes writable.
-     */
-    @Override
-    public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object partial) throws HiveException {
-
-      if (partial == null) {
-        return;
-      }
-
-      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
-
-      if (buf.getUnion() == null) {
-        // nothing has been included yet, so initialize the buffer
-        final IntWritable sketchSize = (IntWritable) intermediateOI.getStructFieldData(partial,
-            intermediateOI.getStructFieldRef(SKETCH_SIZE_FIELD));
-
-        buf.setSketchSize(sketchSize.get());
-        buf.setUnion(SetOperation.builder().buildUnion(sketchSize.get()));
-      }
-
-      final BytesWritable serializedSketch = ((BytesWritable) intermediateOI.getStructFieldData(partial,
-          intermediateOI.getStructFieldRef(SKETCH_FIELD)));
-
-      buf.getUnion().update(new NativeMemory(serializedSketch.getBytes()));
-    }
-
-    /**
-     * Retrieves the final merged sketch from aggregation buffer to be returned
-     * as UDAF result and terminate UDAF.
-     * 
-     * @param agg
-     *          buffer which contains the final merged sketch is stored.
-     * @return final sketch in bytes writable form to be returned by the UDAF.
-     */
-    @Override
-    public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
-
-      final Union union = buf.getUnion();
-      if (union == null) {
-        return null;
-      }
-
-      final CompactSketch result = union.getResult(true, null);
-
-      if (result.getRetainedEntries(false) == 0) {
-        // no entries were ever inserted into the sketch, so null
-        // should be returned.
-        return null;
-      } else {
-        return new BytesWritable(result.toByteArray());
-      }
-    }
-
-    /**
-     * Aggregation buffer class stores the intermediate results of UDAF, which
-     * is sketch buffered in SetOperations.
-     * 
-     * @author weijialuo
-     */
-    @AggregationType(estimable = true)
-    public static class UnionSketchAggBuffer extends AbstractAggregationBuffer {
-      private int sketchSize;
-      private Union union;
-
-      @Override
-      public int estimate() {
-        return SetOperation.getMaxUnionBytes(sketchSize);
-      }
-
-      int getSketchSize() {
-        return sketchSize;
-      }
-
-      void setSketchSize(final int sketchSize) {
-        this.sketchSize = sketchSize;
-      }
-
-      Union getUnion() {
-        return union;
-      }
-
-      void setUnion(final Union union) {
-        this.union = union;
-      }
-
-    }
-
-    /**
-     * Retrieves a new aggregation buffer and initialize it, called by hive.
-     * 
-     * @return a new initialized aggregation buffer.
-     */
-    @SuppressWarnings("deprecation")
-    @Override
-    public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      final UnionSketchAggBuffer buf = new UnionSketchAggBuffer();
-      reset(buf);
-      return buf;
-    }
-
-    /**
-     * Reinitializes an used aggregation buffer for further reuse.
-     * 
-     * @param agg
-     *          old aggregation buffer to be reinitialized.
-     */
-    @Override
-    public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      final UnionSketchAggBuffer buf = (UnionSketchAggBuffer) agg;
-      buf.setSketchSize(DEFAULT_SKETCH_SIZE);
-      buf.setUnion(null);
-    }
-
-    PrimitiveObjectInspector getInputOI() {
-      return inputOI;
-    }
-
-    PrimitiveObjectInspector getSketchSizeOI() {
-      return sketchSizeOI;
-    }
-
-    StandardStructObjectInspector getIntermediateOI() {
-      return intermediateOI;
-    }
   }
+
 }
