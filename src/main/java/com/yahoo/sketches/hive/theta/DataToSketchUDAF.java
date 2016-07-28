@@ -4,6 +4,9 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
+import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
+import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
@@ -17,52 +20,41 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
-import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.FloatWritable;
-import org.apache.hadoop.io.IntWritable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-import com.yahoo.sketches.Family;
-import com.yahoo.sketches.memory.NativeMemory;
-import com.yahoo.sketches.theta.CompactSketch;
-import com.yahoo.sketches.theta.SetOperation;
-import com.yahoo.sketches.theta.Union;
-import com.yahoo.sketches.theta.UpdateSketch;
-
-/**
- * Hive Generic UDAF Resolver Class for MergeSketchUDAF.
- *
- */
 @Description(
     name = "dataToSketch", 
-    value = "_FUNC_(expr, size, prob) - Compute a sketch of size 'size' and sampling probability 'prob' on data 'expr'", 
+    value = "_FUNC_(expr, size, prob, seed) - Compute a sketch of given size, sampling probability and seed on data 'expr'", 
     extended = "Example:\n"
-    + "> SELECT dataToSketch(val, 1024, 1.0) FROM src;\n"
-    + "The return value is a binary blob that can be operated on by other sketch related operands."
-    + "The sketch size must be a power of 2 and controls the relative error expected from the sketch."
-    + "A size of 16384 can be expected to yield errors of roughly +/- 1.5% in the estimation of uniques.")
+    + "> SELECT dataToSketch(val, 16384) FROM src;\n"
+    + "The return value is a binary blob that can be operated on by other sketch related functions."
+    + " The sketch size is optional, must be a power of 2 and controls the relative error expected from the sketch."
+    + " A size of 16384 can be expected to yield errors of roughly +-1.5% in the estimation of uniques."
+    + " The default size is defined in the sketches-core library and at the time of this writing was 4096 (about 3% error)."
+    + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)"
+    + " The seed is optional, and using it is not recommended unless you really know why you need it")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
-  public static final int DEFAULT_SKETCH_SIZE = 16384;
-  public static final float DEFAULT_SAMPLING_PROBABILITY = 1.0f;
 
   /**
    * Performs argument number and type validation. DataToSketch expects
-   * to receive between one and three arguments. 
+   * to receive between one and four arguments. 
    * <ul>
    * <li>The first (required) is the value to add to the sketch and must be a primitive.</li>
    * 
    * <li>The second (optional) is the sketch size to use. This must be an integral value
-   * and should be constant. If not constant, the first row processed provides the size.</li>
+   * and must be constant.</li>
    * 
    * <li>The third (optional) is the sampling probability and is a floating point value between 
-   * 0.0 and 1.0.</li>
+   * 0.0 and 1.0. It must be a constant</li>
    * </ul>
    *  
+   * <li>The fourth (optional) is an update seed. It must be an integral value and must be constant.</li>
+   * </ul>
+   *
    * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver#getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
    * 
    * @param info Parameter info to validate
@@ -77,80 +69,45 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       throw new UDFArgumentException("Please specify at least 1 argument");
     }
 
-    if (parameters.length > 3) {
-      throw new UDFArgumentException("Please specify no more than 3 arguments");
+    if (parameters.length > 4) {
+      throw new UDFArgumentException("Please specify no more than 4 arguments");
     }
 
     // Validate first parameter type
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-      throw new UDFArgumentTypeException(0, "Only primitive type arguments are accepted but "
-          + parameters[0].getTypeName() + " was passed as parameter 1");
-    }
+    ObjectInspectorValidator.validateCategoryPrimitive(parameters[0], 0);
 
     // Validate second argument if present
     if (parameters.length > 1) {
-      if (parameters[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-        throw new UDFArgumentTypeException(1, "Only primitive integral arguments are accepted but "
-            + parameters[1].getTypeName() + " was passed as parameter 2 (sketch size)");
-      }
-      switch (((PrimitiveObjectInspector) parameters[1]).getPrimitiveCategory()) {
-      // supported integral types
-      case BYTE:
-      case SHORT:
-      case INT:
-      case LONG:
-        break;
-      // all other types are invalid
-      default:
-        throw new UDFArgumentTypeException(1, "Only integral type arguments are accepted but "
-            + parameters[1].getTypeName() + " was passed as parameter 2.");
-      }
-
-      // Also make sure it is a constant.
+      ObjectInspectorValidator.validateIntegralParameter(parameters[1], 1);
       if (!ObjectInspectorUtils.isConstantObjectInspector(parameters[1])) {
-        throw new UDFArgumentTypeException(1, "The second argument must be a constant, but "
-            + parameters[1].getTypeName() + " was passed instead.");
+        throw new UDFArgumentTypeException(1, "The second argument must be a constant");
       }
     }
 
     // Validate third argument if present
     if (parameters.length > 2) {
-      if (parameters[2].getCategory() != ObjectInspector.Category.PRIMITIVE) {
-        throw new UDFArgumentTypeException(2, "Only primitive floating point arguments are accepted but "
-            + parameters[2].getTypeName() + " was passed as parameter 3 (sampling probablity)");
-      }
-      switch (((PrimitiveObjectInspector) parameters[2]).getPrimitiveCategory()) {
-      case FLOAT:
-      case DOUBLE:
-      case DECIMAL:
-        break;
-      default:
-        throw new UDFArgumentTypeException(2, "Only floating point type arguments between 0 and 1 are accepted but "
-            + parameters[2].getTypeName() + " was passed as parameter 3");
-      }
-      // Also make sure it is a constant.
+      ObjectInspectorValidator.validateFloatingPointParameter(parameters[2], 2);
       if (!ObjectInspectorUtils.isConstantObjectInspector(parameters[2])) {
-        throw new UDFArgumentTypeException(1, "The third argument must be a constant, but "
-            + parameters[2].getTypeName() + " was passed instead.");
+        throw new UDFArgumentTypeException(2, "The third argument must be a constant");
+      }
+    }
+
+    // Validate fourth argument if present
+    if (parameters.length > 3) {
+      ObjectInspectorValidator.validateIntegralParameter(parameters[3], 3);
+      if (!ObjectInspectorUtils.isConstantObjectInspector(parameters[3])) {
+        throw new UDFArgumentTypeException(3, "The fourth argument must be a constant");
       }
     }
 
     return new DataToSketchEvaluator();
   }
 
-  public static class DataToSketchEvaluator extends GenericUDAFEvaluator {
-
-    private static final String SKETCH_FIELD = "sketch";
-    private static final String SAMPLING_PROBABLILTY_FIELD = "samplingProbability";
-    private static final String SKETCH_SIZE_FIELD = "sketchSize";
+  public static class DataToSketchEvaluator extends Evaluator {
 
     // FOR PARTIAL1 and COMPLETE modes: ObjectInspectors for original data
-    private PrimitiveObjectInspector inputOI;
-    private transient PrimitiveObjectInspector sketchSizeOI;
-    private transient PrimitiveObjectInspector samplingProbOI;
+    private transient PrimitiveObjectInspector samplingProbabilityObjectInspector;
 
-    // FOR PARTIAL2 and FINAL modes: ObjectInspectors for partial aggregations
-    private transient StandardStructObjectInspector intermediateOI;
 
     /*
      * (non-Javadoc)
@@ -161,44 +118,36 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector[])
      */
     @Override
-    public ObjectInspector init(final Mode m, final ObjectInspector[] parameters) throws HiveException {
-      super.init(m, parameters);
+    public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
+      super.init(mode, parameters);
 
-      if (m == Mode.PARTIAL1 || m == Mode.COMPLETE) {
-        // capture the inputs for partial and complete modes (standard
-        // arguments)
-        inputOI = (PrimitiveObjectInspector) parameters[0];
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+        // input is original data
+        inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          sketchSizeOI = (PrimitiveObjectInspector) parameters[1];
+          nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          samplingProbOI = (PrimitiveObjectInspector) parameters[2];
+          samplingProbabilityObjectInspector = (PrimitiveObjectInspector) parameters[2];
         }
-        intermediateOI = null;
+        if (parameters.length > 3) {
+          seedObjectInspector = (PrimitiveObjectInspector) parameters[3];
+        }
       } else {
-        // capture the inputs for partial2 and FINAL modes
-        // Inputs for partial2 and final should be the same as the output from
-        // partial1 or complete
-        inputOI = null;
-        sketchSizeOI = null;
-        samplingProbOI = null;
-        intermediateOI = (StandardStructObjectInspector) parameters[0];
+        // input for PARTIAL2 and FINAL is the output from PARTIAL1
+        intermediateObjectInspector = (StructObjectInspector) parameters[0];
       }
 
-      if (m == Mode.PARTIAL1 || m == Mode.PARTIAL2) {
-        // intermediate results need to include the sketch as well as the size
-        // and sampling probability
-        final List<ObjectInspector> fields = new ArrayList<>(3);
-        fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT));
-        fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.FLOAT));
-        fields.add(PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY));
-
-        final List<String> fieldNames = new ArrayList<>(3);
-        fieldNames.add(SKETCH_SIZE_FIELD);
-        fieldNames.add(SAMPLING_PROBABLILTY_FIELD);
-        fieldNames.add(SKETCH_FIELD);
-
-        return ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fields);
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+        // intermediate results need to include the the nominal number of entries and the seed
+        return ObjectInspectorFactory.getStandardStructObjectInspector(
+          Arrays.asList(NOMINAL_ENTRIES_FIELD, SEED_FIELD, SKETCH_FIELD),
+          Arrays.asList(
+            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
+            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.LONG),
+            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
+          )
+        );
       } else {
         // final results include just the sketch
         return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
@@ -215,260 +164,33 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * java.lang.Object[])
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object[] parameters)
-        throws HiveException {
-      // don't enter null's into the sketch.
-      if (parameters[0] == null) {
-        return;
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
+        final Object[] parameters) throws HiveException {
+      if (parameters[0] == null) return;
+      final State state = (State) agg;
+      if (!state.isInitialized()) {
+        initializeState(state, parameters);
       }
-
-      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
-
-      if (buf.getUpdateSketch() == null) {
-        // need to initialize the sketch since nothing has been added yet
-        int sketchSize = DEFAULT_SKETCH_SIZE;
-        if (sketchSizeOI != null) {
-          sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], sketchSizeOI);
-        } 
-        buf.setSketchSize(sketchSize);
-        
-        float samplingProbability = DEFAULT_SAMPLING_PROBABILITY;
-        if (samplingProbOI != null) {
-          samplingProbability = PrimitiveObjectInspectorUtils.getFloat(parameters[2], samplingProbOI);
-        }
-        buf.setSamplingProbability(samplingProbability);
-        
-        buf.setUpdateSketch(UpdateSketch.builder().setP(samplingProbability).setFamily(Family.QUICKSELECT)
-            .build(sketchSize));
-      }
-
-      updateData(inputOI, parameters[0], buf.getUpdateSketch());
+      state.update(parameters[0], inputObjectInspector);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#terminatePartial
-     * (
-     * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer
-     * )
-     */
-    @Override
-    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      // return the bytes associated with this sketch, compacted for easier merging
-      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
-
-      CompactSketch intermediate = null;
-      final UpdateSketch update = buf.getUpdateSketch();
-      final Union union = buf.getUnion();
-
-      if (update != null) {
-        // PARTIAL1 case - hive calls iterate then terminatePartial
-        intermediate = update.compact(true, null);
-      } else if (union != null) {
-        // PARTIAL2 case - hive calls merge then terminatePartial
-        intermediate = union.getResult(true, null);
+    private void initializeState(final State state, final Object[] parameters) {
+      int sketchSize = DEFAULT_NOMINAL_ENTRIES;
+      if (nominalEntriesObjectInspector != null) {
+        sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);
+      } 
+      float samplingProbability = State.DEFAULT_SAMPLING_PROBABILITY;
+      if (samplingProbabilityObjectInspector != null) {
+        samplingProbability = PrimitiveObjectInspectorUtils.getFloat(parameters[2],
+            samplingProbabilityObjectInspector);
       }
-
-      if (intermediate != null) {
-        // we had results, so return them
-        final byte[] bytes = intermediate.toByteArray();
-
-        final ArrayList<Object> results = new ArrayList<>(3);
-        results.add(new IntWritable(buf.getSketchSize()));
-        results.add(new FloatWritable(buf.getSamplingProbability()));
-        results.add(new BytesWritable(bytes));
-        return results;
-      } else {
-        return null;
+      long seed = DEFAULT_UPDATE_SEED;
+      if (seedObjectInspector != null) {
+        seed = PrimitiveObjectInspectorUtils.getLong(parameters[3], seedObjectInspector);
       }
+      state.init(sketchSize, samplingProbability, seed);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#merge(org.
-     * apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer,
-     * java.lang.Object)
-     */
-    @Override
-    public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object partial) throws HiveException {
-      if (partial == null) {
-        return;
-      }
-      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
-
-      if (buf.getUnion() == null) {
-        // nothing has been included yet, so initialize the buffer
-        buf.setSketchSize(((IntWritable) intermediateOI.getStructFieldData(partial,
-            intermediateOI.getStructFieldRef(SKETCH_SIZE_FIELD))).get());
-        buf.setSamplingProbability(((FloatWritable) intermediateOI.getStructFieldData(partial,
-            intermediateOI.getStructFieldRef(SAMPLING_PROBABLILTY_FIELD))).get());
-
-        buf.setUnion(SetOperation.builder().setP(buf.getSamplingProbability()).buildUnion(buf.getSketchSize()));
-      }
-
-      final BytesWritable serializedSketch = (BytesWritable) intermediateOI.getStructFieldData(partial,
-          intermediateOI.getStructFieldRef(SKETCH_FIELD));
-      buf.getUnion().update(new NativeMemory(serializedSketch.getBytes()));
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#terminate(
-     * org.apache
-     * .hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
-     */
-    @Override
-    public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
-
-      CompactSketch result;
-
-      if (buf.getUnion() != null) {
-        result = buf.getUnion().getResult(true, null);
-      } else if (buf.getUpdateSketch() != null) {
-        result = buf.getUpdateSketch().compact(true, null);
-      } else {
-        // sketch and union are both invalid. there was nothing merged
-        return null;
-      }
-
-      if (result.getRetainedEntries(false) == 0) {
-        // no entries in the sketch. This means that no entries were inserted
-        // to be consistent with SQL, null should be returned.
-        return null;
-      } else {
-        return new BytesWritable(result.toByteArray());
-      }
-    }
-
-    /**
-     * Aggregation buffer for DataToSketch operations. Contains an update sketch
-     * that will be updated for each row.
-     */
-    @AggregationType(estimable = true)
-    static class DataToSketchAggBuffer extends AbstractAggregationBuffer {
-      private int sketchSize;
-      private float samplingProbability;
-      private UpdateSketch sketch;
-      private Union union;
-
-      @Override
-      public int estimate() {
-        final int s = sketch != null ? sketch.getCurrentBytes(false) : 0;
-        final int u = SetOperation.getMaxUnionBytes(sketchSize);
-        return s + u;
-      }
-
-      public int getSketchSize() {
-        return sketchSize;
-      }
-
-      public void setSketchSize(final int sketchSize) {
-        this.sketchSize = sketchSize;
-      }
-
-      public float getSamplingProbability() {
-        return samplingProbability;
-      }
-
-      public void setSamplingProbability(final float samplingProbability) {
-        this.samplingProbability = samplingProbability;
-      }
-
-      public UpdateSketch getUpdateSketch() {
-        return sketch;
-      }
-
-      public void setUpdateSketch(final UpdateSketch sketch) {
-        this.sketch = sketch;
-      }
-
-      public Union getUnion() {
-        return union;
-      }
-
-      public void setUnion(Union union) {
-        this.union = union;
-      }
-    }
-
-    /**
-     * 
-     * @see org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#getNewAggregationBuffer()
-     */
-    @SuppressWarnings("deprecation")
-    @Override
-    public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      final DataToSketchAggBuffer buf = new DataToSketchAggBuffer();
-      reset(buf);
-      return buf;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#reset(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
-     */
-    @Override
-    public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
-      final DataToSketchAggBuffer buf = (DataToSketchAggBuffer) agg;
-      buf.setSketchSize(DEFAULT_SKETCH_SIZE);
-      buf.setSamplingProbability(DEFAULT_SAMPLING_PROBABILITY);
-      buf.setUpdateSketch(null);
-      buf.setUnion(null);
-    }
-
-    private static void updateData(final PrimitiveObjectInspector oi, final Object data, final UpdateSketch sketch) {
-
-      switch (oi.getPrimitiveCategory()) {
-      case BINARY:
-        sketch.update(PrimitiveObjectInspectorUtils.getBinary(data, oi).getBytes());
-        return;
-      case BYTE:
-        sketch.update(PrimitiveObjectInspectorUtils.getByte(data, oi));
-        return;
-      case DOUBLE:
-        sketch.update(PrimitiveObjectInspectorUtils.getDouble(data, oi));
-        return;
-      case FLOAT:
-        sketch.update(PrimitiveObjectInspectorUtils.getFloat(data, oi));
-        return;
-      case INT:
-        sketch.update(PrimitiveObjectInspectorUtils.getInt(data, oi));
-        return;
-      case LONG:
-        sketch.update(PrimitiveObjectInspectorUtils.getLong(data, oi));
-        return;
-      case STRING:
-        sketch.update(PrimitiveObjectInspectorUtils.getString(data, oi));
-        return;
-      default:
-        throw new IllegalArgumentException(
-            "Unrecongnized input data type, please use data of type binary, byte, double, float, int, long, or string only.");
-      }
-    }
-
-    PrimitiveObjectInspector getInputOI() {
-      return inputOI;
-    }
-
-    PrimitiveObjectInspector getSketchSizeOI() {
-      return sketchSizeOI;
-    }
-
-    PrimitiveObjectInspector getSamplingProbOI() {
-      return samplingProbOI;
-    }
-
-    StandardStructObjectInspector getIntermediateOI() {
-      return intermediateOI;
-    }
   }
+
 }
