@@ -47,20 +47,6 @@ public class DataToDoublesSketchUDAFTest {
     new DataToDoublesSketchUDAF().getEvaluator(info);
   }
 
-  @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongTypeArg1() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new DataToDoublesSketchUDAF().getEvaluator(info);
-  }
-
-  @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongTypeArg2() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, doubleInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new DataToDoublesSketchUDAF().getEvaluator(info);
-  }
-
   static final ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
     Arrays.asList("a"),
     Arrays.asList(intInspector)
@@ -74,14 +60,49 @@ public class DataToDoublesSketchUDAFTest {
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
+  public void getEvaluatorWrongTypeArg1() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
+  }
+
+  @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongCategoryArg2() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, structInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new DataToDoublesSketchUDAF().getEvaluator(info);
   }
 
+  @Test(expectedExceptions = UDFArgumentException.class)
+  public void getEvaluatorWrongTypeArg2() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, doubleInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToDoublesSketchUDAF().getEvaluator(info);
+  }
+
   @Test
-  public void iterateTerminatePartial() throws Exception {
+  public void iterateTerminatePartialDefaultK() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+    checkResultInspector(resultInspector);
+
+    DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] { new DoubleWritable(1.0) });
+    eval.iterate(state, new Object[] { new DoubleWritable(2.0) });
+
+    BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
+    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    Assert.assertEquals(resultSketch.getK(), 128);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
+    Assert.assertEquals(resultSketch.getMinValue(), 1.0);
+    Assert.assertEquals(resultSketch.getMaxValue(), 2.0);
+    eval.close();
+  }
+
+  @Test
+  public void iterateTerminatePartialGivenK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info);
@@ -109,13 +130,14 @@ public class DataToDoublesSketchUDAFTest {
     checkResultInspector(resultInspector);
 
     DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
-    state.init(256);
-    state.update(1.0);
 
-    DoublesSketch sketch = DoublesSketch.builder().setK(256).build();
-    sketch.update(2.0);
+    DoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
+    sketch1.update(1.0);
+    eval.merge(state, new BytesWritable(sketch1.toByteArray()));
 
-    eval.merge(state, new BytesWritable(sketch.toByteArray()));
+    DoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
+    sketch2.update(2.0);
+    eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
     DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));

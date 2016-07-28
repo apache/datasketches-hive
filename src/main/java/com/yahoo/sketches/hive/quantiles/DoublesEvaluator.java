@@ -17,11 +17,20 @@ import com.yahoo.sketches.quantiles.DoublesSketch;
 abstract class DoublesEvaluator extends GenericUDAFEvaluator {
 
   protected PrimitiveObjectInspector inputObjectInspector;
+  protected PrimitiveObjectInspector kObjectInspector;
 
   @Override
   public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
     super.init(mode, parameters);
     inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+
+    // Parameters:
+    // In PARTIAL1 and COMPLETE mode, the parameters are original data.
+    // In PARTIAL2 and FINAL mode, the parameters are partial aggregations.
+    if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if (parameters.length > 1) kObjectInspector = (PrimitiveObjectInspector) parameters[1];
+    }
+
     return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
   }
 
