@@ -216,6 +216,10 @@ public class UnionDoublesSketchUDAFTest {
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
     Assert.assertEquals(resultSketch.getMaxValue(), 2.0);
+
+    eval.reset(state);
+    Assert.assertNull(eval.terminate(state));
+
     eval.close();
   }
 
