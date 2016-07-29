@@ -36,22 +36,6 @@ public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   static class DataToSketchEvaluator extends DoublesEvaluator {
 
-    private PrimitiveObjectInspector kObjectInspector;
-
-    @Override
-    public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
-      final ObjectInspector result = super.init(mode, parameters);
-
-      // Parameters:
-      // In PARTIAL1 and COMPLETE mode, the parameters are original data.
-      // In PARTIAL2 and FINAL mode, the parameters are just partial aggregations.
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
-        if (parameters.length > 1) kObjectInspector = (PrimitiveObjectInspector) parameters[1];
-      }
-
-      return result;
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
