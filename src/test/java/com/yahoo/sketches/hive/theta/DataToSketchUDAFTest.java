@@ -156,7 +156,7 @@ public class DataToSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
     checkIntermediateResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
     eval.iterate(state, new Object[] {new IntWritable(1)});
     eval.iterate(state, new Object[] {new IntWritable(2)});
 
@@ -183,7 +183,7 @@ public class DataToSketchUDAFTest {
     checkIntermediateResultInspector(resultInspector);
 
     final long seed = 1;
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
     eval.iterate(state, new Object[] {new Text("a"), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
     eval.iterate(state, new Object[] {new Text("b"), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
 
@@ -216,7 +216,7 @@ public class DataToSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
     checkIntermediateResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().build();
     sketch1.update(1);
@@ -256,7 +256,7 @@ public class DataToSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
     checkFinalResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().build();
     sketch1.update(1);
@@ -292,7 +292,7 @@ public class DataToSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
     checkFinalResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
     eval.iterate(state, new Object[] {new IntWritable(1)});
     eval.iterate(state, new Object[] {new IntWritable(2)});
 
@@ -318,7 +318,7 @@ public class DataToSketchUDAFTest {
     checkFinalResultInspector(resultInspector);
 
     final long seed = 2;
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
     eval.iterate(state, new Object[] {new DoubleWritable(1), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
     eval.iterate(state, new Object[] {new DoubleWritable(2), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
 

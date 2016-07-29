@@ -84,7 +84,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    * Evaluator class of Generic UDAF, main logic of our UDAF.
    * 
    */
-  public static class UnionSketchUDAFEvaluator extends Evaluator {
+  public static class UnionSketchUDAFEvaluator extends UnionEvaluator {
 
     /**
      * Receives the passed in argument object inspectors and returns the desired
@@ -110,16 +110,13 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
         if (parameters.length > 2) {
           seedObjectInspector = (PrimitiveObjectInspector) parameters[2];
         }
-        intermediateObjectInspector = null;
       } else {
         // mode = partial2 || final
-        inputObjectInspector = null;
-        nominalEntriesObjectInspector = null;
         intermediateObjectInspector = (StandardStructObjectInspector) parameters[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
-        // intermediate results need to include the the nominal number of entries and the seed
+        // intermediate results need to include the nominal number of entries and the seed
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_ENTRIES_FIELD, SEED_FIELD, SKETCH_FIELD),
           Arrays.asList(
@@ -146,7 +143,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object[] parameters)
         throws HiveException {
       if (parameters[0] == null) return;
-      final State state = (State) agg;
+      final UnionState state = (UnionState) agg;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
@@ -155,7 +152,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       state.update(new NativeMemory(serializedSketch));
     }
 
-    private void initializeState(final State state, final Object[] parameters) {
+    private void initializeState(final UnionState state, final Object[] parameters) {
       int nominalEntries = DEFAULT_NOMINAL_ENTRIES;
       if (nominalEntriesObjectInspector != null) {
         nominalEntries = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);

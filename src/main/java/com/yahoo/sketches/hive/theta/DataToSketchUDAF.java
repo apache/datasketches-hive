@@ -103,7 +103,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     return new DataToSketchEvaluator();
   }
 
-  public static class DataToSketchEvaluator extends Evaluator {
+  public static class DataToSketchEvaluator extends UnionEvaluator {
 
     // FOR PARTIAL1 and COMPLETE modes: ObjectInspectors for original data
     private transient PrimitiveObjectInspector samplingProbabilityObjectInspector;
@@ -167,19 +167,19 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) return;
-      final State state = (State) agg;
+      final UnionState state = (UnionState) agg;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
       state.update(parameters[0], inputObjectInspector);
     }
 
-    private void initializeState(final State state, final Object[] parameters) {
+    private void initializeState(final UnionState state, final Object[] parameters) {
       int sketchSize = DEFAULT_NOMINAL_ENTRIES;
       if (nominalEntriesObjectInspector != null) {
         sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);
       } 
-      float samplingProbability = State.DEFAULT_SAMPLING_PROBABILITY;
+      float samplingProbability = UnionState.DEFAULT_SAMPLING_PROBABILITY;
       if (samplingProbabilityObjectInspector != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(parameters[2],
             samplingProbabilityObjectInspector);

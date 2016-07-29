@@ -13,7 +13,7 @@ import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
 
-class State extends AbstractAggregationBuffer {
+class UnionState extends AbstractAggregationBuffer {
 
   static final float DEFAULT_SAMPLING_PROBABILITY = 1;
 
@@ -27,7 +27,7 @@ class State extends AbstractAggregationBuffer {
 
   // sampling probability is not relevant for merging
   public void init(final int nominalEntries, final long seed) {
-    init(nominalEntries, State.DEFAULT_SAMPLING_PROBABILITY, seed);
+    init(nominalEntries, UnionState.DEFAULT_SAMPLING_PROBABILITY, seed);
   }
 
   public void init(final int nominalEntries, final float samplingProbability, final long seed) {
@@ -48,6 +48,7 @@ class State extends AbstractAggregationBuffer {
   public void update(final NativeMemory mem) {
     union.update(mem);
   }
+
   public void update(final Object value, final PrimitiveObjectInspector objectInspector) {
     switch (objectInspector.getPrimitiveCategory()) {
     case BINARY:

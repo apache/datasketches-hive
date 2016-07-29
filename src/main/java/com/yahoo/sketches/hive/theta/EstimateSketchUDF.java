@@ -4,6 +4,8 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
+import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
@@ -19,13 +21,23 @@ public class EstimateSketchUDF extends UDF {
   private static final int EMPTY_SKETCH_SIZE_BYTES = 8;
 
   /**
-   * Main logic called by hive, calculates the estimate unique count of sketch.
+   * Returns the estimate unique count of sketch.
    * 
-   * @param binarySketch
-   *           sketch to be estimated passed in as bytes writable.
+   * @param binarySketch sketch to be estimated passed in as bytes writable.
    * @return the estimate of unique count from given sketch.
    */
   public Double evaluate(final BytesWritable binarySketch) {
+    return evaluate(binarySketch, DEFAULT_UPDATE_SEED);
+  }
+
+  /**
+   * Returns the estimate unique count of sketch.
+   * 
+   * @param binarySketch sketch to be estimated passed in as bytes writable.
+   * @param seed value used to build the sketch if different from the default 
+   * @return the estimate of unique count from given sketch.
+   */
+  public Double evaluate(final BytesWritable binarySketch, final long seed) {
     if (binarySketch == null) {
       return 0.0;
     }
@@ -36,6 +48,7 @@ public class EstimateSketchUDF extends UDF {
       return 0.0;
     }
 
-    return Sketch.wrap(new NativeMemory(serializedSketch)).getEstimate();
+    return Sketch.wrap(new NativeMemory(serializedSketch), seed).getEstimate();
   }
+
 }

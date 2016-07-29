@@ -125,7 +125,7 @@ public class UnionSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
     DataToSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().build();
     sketch1.update(1);
@@ -159,7 +159,7 @@ public class UnionSketchUDAFTest {
 
     final int nomEntries = 8;
     final long seed = 1;
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().setSeed(seed).build();
     sketch1.update(1);
@@ -192,7 +192,7 @@ public class UnionSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
     DataToSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().build();
     sketch1.update(1);
@@ -232,23 +232,23 @@ public class UnionSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
     DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().build();
     sketch1.update(1);
     eval.merge(state, Arrays.asList(
       new IntWritable(DEFAULT_NOMINAL_ENTRIES),
       new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch1.compact().toByteArray()))
-    );
+      new BytesWritable(sketch1.compact().toByteArray())
+    ));
 
     UpdateSketch sketch2 = UpdateSketch.builder().build();
     sketch2.update(2);
     eval.merge(state, Arrays.asList(
       new IntWritable(DEFAULT_NOMINAL_ENTRIES),
       new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch2.compact().toByteArray()))
-    );
+      new BytesWritable(sketch2.compact().toByteArray())
+    ));
 
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
@@ -268,7 +268,7 @@ public class UnionSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
     DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
 
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().build();
     sketch1.update(1);
@@ -301,7 +301,7 @@ public class UnionSketchUDAFTest {
 
     final int nomEntries = 8;
     final long seed = 1;
-    State state = (State) eval.getNewAggregationBuffer();
+    UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
     UpdateSketch sketch1 = UpdateSketch.builder().setSeed(seed).build();
     sketch1.update(1);

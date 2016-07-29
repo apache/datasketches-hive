@@ -16,9 +16,8 @@ import static org.testng.AssertJUnit.assertEquals;
 
 public class EstimateSketchUDFTest {
 
-  // test null input
   @Test
-  public void testEvaluateNull() {
+  public void evaluateNull() {
     EstimateSketchUDF testObject = new EstimateSketchUDF();
 
     Double testResult = testObject.evaluate(null);
@@ -26,9 +25,8 @@ public class EstimateSketchUDFTest {
     assertEquals(testResult, 0.0);
   }
 
-  // test empty input
   @Test
-  public void testEvaluateEmptyInput() {
+  public void evaluateEmptyInput() {
     EstimateSketchUDF testObject = new EstimateSketchUDF();
 
     BytesWritable testInput = new BytesWritable();
@@ -38,9 +36,8 @@ public class EstimateSketchUDFTest {
     assertEquals(testResult, 0.0);
   }
   
-  // test valid input
   @Test
-  public void testEvaluateValid() {
+  public void evaluateValid() {
     EstimateSketchUDF testObject = new EstimateSketchUDF();
     
     UpdateSketch sketch = Sketches.updateSketchBuilder().build(1024);
@@ -59,6 +56,30 @@ public class EstimateSketchUDFTest {
     
     testResult = testObject.evaluate(input);
     
+    assertEquals(128.0, testResult);
+  }
+
+  @Test
+  public void evaluateValidExplicitSeed() {
+    EstimateSketchUDF testObject = new EstimateSketchUDF();
+    
+    final long seed = 1;
+    UpdateSketch sketch = Sketches.updateSketchBuilder().setSeed(seed).build(1024);
+    for (int i = 0; i<128; i++) {
+      sketch.update(i);
+    }
+
+    BytesWritable input = new BytesWritable(sketch.toByteArray());
+
+    Double testResult = testObject.evaluate(input, seed);
+
+    assertEquals(128.0, testResult);
+
+    CompactSketch compactSketch = sketch.compact(false, null);
+    input = new BytesWritable(compactSketch.toByteArray());
+
+    testResult = testObject.evaluate(input, seed);
+
     assertEquals(128.0, testResult);
   }
 
