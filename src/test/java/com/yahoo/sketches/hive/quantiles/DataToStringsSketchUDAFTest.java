@@ -10,7 +10,6 @@ import org.apache.hadoop.hive.ql.udf.generic.SimpleGenericUDAFParameterInfo;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
@@ -38,6 +37,11 @@ public class DataToStringsSketchUDAFTest {
   static final ObjectInspector binaryInspector =
       PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
 
+  static final ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
+      Arrays.asList("a"),
+      Arrays.asList(intInspector)
+    );
+
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooFewInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
@@ -53,18 +57,6 @@ public class DataToStringsSketchUDAFTest {
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongTypeArg2() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, stringInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new DataToStringsSketchUDAF().getEvaluator(info);
-  }
-
-  static final ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
-    Arrays.asList("a"),
-    Arrays.asList(intInspector)
-  );
-
-  @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongCategoryArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
@@ -78,13 +70,21 @@ public class DataToStringsSketchUDAFTest {
     new DataToStringsSketchUDAF().getEvaluator(info);
   }
 
+  @Test(expectedExceptions = UDFArgumentException.class)
+  public void getEvaluatorWrongTypeArg2() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, stringInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToStringsSketchUDAF().getEvaluator(info);
+  }
+
+  // PARTIAL1 mode (Map phase in Map-Reduce): iterate + terminatePartial
   @Test
-  public void iterateTerminatePartialDefaultK() throws Exception {
+  public void partial1ModeDefaultK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    checkResultInspector(resultInspector);
+    DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
 
     @SuppressWarnings("unchecked")
     ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
@@ -101,12 +101,12 @@ public class DataToStringsSketchUDAFTest {
   }
 
   @Test
-  public void iterateTerminatePartialGivenK() throws Exception {
+  public void partial1ModeGivenK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    checkResultInspector(resultInspector);
+    DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
 
     @SuppressWarnings("unchecked")
     ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
@@ -122,13 +122,14 @@ public class DataToStringsSketchUDAFTest {
     eval.close();
   }
 
+  // PARTIAL2 mode (Combine phase in Map-Reduce): merge + terminatePartial
   @Test
-  public void mergeTerminate() throws Exception {
+  public void partial2Mode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] { binaryInspector });
-    checkResultInspector(resultInspector);
+    DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
 
     @SuppressWarnings("unchecked")
     ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
@@ -141,7 +142,7 @@ public class DataToStringsSketchUDAFTest {
     sketch2.update("b");
     eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
-    BytesWritable bytes = (BytesWritable) eval.terminate(state);
+    BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
     ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
     Assert.assertEquals(resultSketch.getK(), 256);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
@@ -150,13 +151,78 @@ public class DataToStringsSketchUDAFTest {
     eval.close();
   }
 
-  private static void checkResultInspector(ObjectInspector resultInspector) {
-    Assert.assertNotNull(resultInspector);
-    Assert.assertEquals(resultInspector.getCategory(), ObjectInspector.Category.PRIMITIVE);
-    Assert.assertEquals(
-      ((PrimitiveObjectInspector) resultInspector).getPrimitiveCategory(),
-      PrimitiveObjectInspector.PrimitiveCategory.BINARY
-    );
+  // FINAL mode (Reduce phase in Map-Reduce): merge + terminate
+  @Test
+  public void finalMode() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] { binaryInspector });
+    DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
+
+    @SuppressWarnings("unchecked")
+    ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
+
+    ItemsSketch<String> sketch1 = ItemsSketch.getInstance(comparator);
+    sketch1.update("a");
+    eval.merge(state, new BytesWritable(sketch1.toByteArray(serDe)));
+
+    ItemsSketch<String> sketch2 = ItemsSketch.getInstance(comparator);
+    sketch2.update("b");
+    eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
+
+    BytesWritable bytes = (BytesWritable) eval.terminate(state);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    Assert.assertEquals(resultSketch.getK(), 128);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
+    Assert.assertEquals(resultSketch.getMinValue(), "a");
+    Assert.assertEquals(resultSketch.getMaxValue(), "b");
+    eval.close();
+  }
+
+  // COMPLETE mode (single mode, alternative to MapReduce): iterate + terminate
+  @Test
+  public void completeModeDefaultK() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+    DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
+
+    @SuppressWarnings("unchecked")
+    ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("a") });
+    eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b") });
+
+    BytesWritable bytes = (BytesWritable) eval.terminate(state);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    Assert.assertEquals(resultSketch.getK(), 128);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
+    Assert.assertEquals(resultSketch.getMinValue(), "a");
+    Assert.assertEquals(resultSketch.getMaxValue(), "b");
+    eval.close();
+  }
+
+  @Test
+  public void completeModeGivenK() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToStringsSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+    DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
+
+    @SuppressWarnings("unchecked")
+    ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
+    eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("a"), new IntWritable(256) });
+    eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b"), new IntWritable(256) });
+
+    BytesWritable bytes = (BytesWritable) eval.terminate(state);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    Assert.assertEquals(resultSketch.getK(), 256);
+    Assert.assertEquals(resultSketch.getRetainedItems(), 2);
+    Assert.assertEquals(resultSketch.getMinValue(), "a");
+    Assert.assertEquals(resultSketch.getMaxValue(), "b");
+    eval.close();
   }
 
 }
