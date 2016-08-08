@@ -2,6 +2,7 @@
  * Copyright 2016, Yahoo Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
  *******************************************************************************/
+
 package com.yahoo.sketches.hive.theta;
 
 import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
@@ -19,19 +20,19 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 
 import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.sketches.theta.Intersection;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
-import com.yahoo.sketches.theta.Intersection;
 
 @Description(
     name = "intersectSketch", 
@@ -91,16 +92,16 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(SEED_FIELD, SKETCH_FIELD),
           Arrays.asList(
-            PrimitiveObjectInspectorFactory.
-              getPrimitiveWritableObjectInspector(PrimitiveCategory.LONG),
-            PrimitiveObjectInspectorFactory.
-              getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
+            PrimitiveObjectInspectorFactory
+              .getPrimitiveWritableObjectInspector(PrimitiveCategory.LONG),
+            PrimitiveObjectInspectorFactory
+              .getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
         );
       } else {
         // final results include just the sketch
-        return PrimitiveObjectInspectorFactory.
-            getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
+        return PrimitiveObjectInspectorFactory
+            .getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
       }
     }
 

@@ -2,10 +2,13 @@
  * Copyright 2015, Yahoo Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
  *******************************************************************************/
+
 package com.yahoo.sketches.hive.theta;
 
 import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
+import java.util.Arrays;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -22,8 +25,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.Pr
 import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-
-import java.util.Arrays;
 
 import com.yahoo.sketches.memory.NativeMemory;
 
@@ -51,7 +52,8 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    * appropriate evaluator to perform based on input type (which should always
    * be BINARY sketch). Also check sketch size and seed params if they are passed in.
    * 
-   * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver#getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
+   * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver
+   * #getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
    * 
    * @param info The parameter info to validate
    * @return The GenericUDAFEvaluator to use to compute the function.

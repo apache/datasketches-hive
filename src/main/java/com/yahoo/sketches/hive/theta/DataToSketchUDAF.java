@@ -2,10 +2,13 @@
  * Copyright 2015, Yahoo Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
  *******************************************************************************/
+
 package com.yahoo.sketches.hive.theta;
 
 import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
+import java.util.Arrays;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -23,8 +26,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.Pr
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-
-import java.util.Arrays;
 
 @Description(
     name = "dataToSketch", 
@@ -50,12 +51,13 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
    * 
    * <li>The third (optional) is the sampling probability and is a floating point value between 
    * 0.0 and 1.0. It must be a constant</li>
-   * </ul>
    *  
-   * <li>The fourth (optional) is an update seed. It must be an integral value and must be constant.</li>
+   * <li>The fourth (optional) is an update seed. 
+   * It must be an integral value and must be constant.</li>
    * </ul>
    *
-   * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver#getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
+   * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver
+   * #getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
    * 
    * @param info Parameter info to validate
    * @return The GenericUDAFEvaluator that should be used to calculate the function.

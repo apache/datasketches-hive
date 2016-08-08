@@ -2,6 +2,7 @@
  * Copyright 2016, Yahoo Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
  *******************************************************************************/
+
 package com.yahoo.sketches.hive.theta;
 
 import java.util.Arrays;
@@ -67,14 +68,16 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
    * java.lang.Object)
    */
   @Override
-  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object partial) throws HiveException {
+  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg, 
+      final Object partial) throws HiveException {
     if (partial == null) return;
     final UnionState state = (UnionState) agg;
     if (!state.isInitialized()) {
       initializeState(state, partial);
     }
-    final BytesWritable serializedSketch = (BytesWritable) intermediateObjectInspector.getStructFieldData(
-        partial, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD));
+    final BytesWritable serializedSketch = 
+        (BytesWritable) intermediateObjectInspector.getStructFieldData(
+            partial, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD));
     state.update(new NativeMemory(serializedSketch.getBytes()));
   }
 
@@ -95,7 +98,8 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
    * .hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
    */
   @Override
-  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) 
+      throws HiveException {
     final UnionState state = (UnionState) agg;
     Sketch result = state.getResult();
     if (result == null) return null;
@@ -106,10 +110,12 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
    * (non-Javadoc)
    * 
    * @see
-   * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#reset(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
+   * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator
+   * #reset(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
    */
   @Override
-  public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) throws HiveException {
+  public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) 
+      throws HiveException {
     final UnionState state = (UnionState) agg;
     state.reset();
   }
