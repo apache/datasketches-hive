@@ -17,12 +17,12 @@ class UnionState extends AbstractAggregationBuffer {
 
   static final float DEFAULT_SAMPLING_PROBABILITY = 1;
 
-  private int nominalEntries;
-  private long seed;
-  private Union union;
+  private int nominalEntries_;
+  private long seed_;
+  private Union union_;
 
   public boolean isInitialized() {
-    return union != null;
+    return union_ != null;
   }
 
   // sampling probability is not relevant for merging
@@ -31,46 +31,46 @@ class UnionState extends AbstractAggregationBuffer {
   }
 
   public void init(final int nominalEntries, final float samplingProbability, final long seed) {
-    this.nominalEntries = nominalEntries;
-    this.seed = seed;
-    union = SetOperation.builder().setNominalEntries(nominalEntries).setP(samplingProbability)
+    this.nominalEntries_ = nominalEntries;
+    this.seed_ = seed;
+    union_ = SetOperation.builder().setNominalEntries(nominalEntries).setP(samplingProbability)
         .setSeed(seed).buildUnion();
   }
 
   public int getNominalEntries() {
-    return nominalEntries;
+    return nominalEntries_;
   }
 
   public long getSeed() {
-    return seed;
+    return seed_;
   }
 
   public void update(final NativeMemory mem) {
-    union.update(mem);
+    union_.update(mem);
   }
 
   public void update(final Object value, final PrimitiveObjectInspector objectInspector) {
     switch (objectInspector.getPrimitiveCategory()) {
     case BINARY:
-      union.update(PrimitiveObjectInspectorUtils.getBinary(value, objectInspector).getBytes());
+      union_.update(PrimitiveObjectInspectorUtils.getBinary(value, objectInspector).getBytes());
       return;
     case BYTE:
-      union.update(PrimitiveObjectInspectorUtils.getByte(value, objectInspector));
+      union_.update(PrimitiveObjectInspectorUtils.getByte(value, objectInspector));
       return;
     case DOUBLE:
-      union.update(PrimitiveObjectInspectorUtils.getDouble(value, objectInspector));
+      union_.update(PrimitiveObjectInspectorUtils.getDouble(value, objectInspector));
       return;
     case FLOAT:
-      union.update(PrimitiveObjectInspectorUtils.getFloat(value, objectInspector));
+      union_.update(PrimitiveObjectInspectorUtils.getFloat(value, objectInspector));
       return;
     case INT:
-      union.update(PrimitiveObjectInspectorUtils.getInt(value, objectInspector));
+      union_.update(PrimitiveObjectInspectorUtils.getInt(value, objectInspector));
       return;
     case LONG:
-      union.update(PrimitiveObjectInspectorUtils.getLong(value, objectInspector));
+      union_.update(PrimitiveObjectInspectorUtils.getLong(value, objectInspector));
       return;
     case STRING:
-      union.update(PrimitiveObjectInspectorUtils.getString(value, objectInspector));
+      union_.update(PrimitiveObjectInspectorUtils.getString(value, objectInspector));
       return;
     default:
       throw new IllegalArgumentException(
@@ -79,12 +79,12 @@ class UnionState extends AbstractAggregationBuffer {
   }
 
   public Sketch getResult() {
-    if (union == null) return null;
-    return union.getResult();
+    if (union_ == null) return null;
+    return union_.getResult();
   }
 
   public void reset() {
-    union = null;
+    union_ = null;
   }
 
 }

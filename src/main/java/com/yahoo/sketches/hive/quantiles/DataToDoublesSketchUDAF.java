@@ -12,7 +12,6 @@ import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
@@ -24,12 +23,17 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
-  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
+  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) 
+      throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
-    if (inspectors.length != 1 && inspectors.length != 2) throw new UDFArgumentException("One or two arguments expected");
-    ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, PrimitiveCategory.DOUBLE);
+    if (inspectors.length != 1 && inspectors.length != 2) {
+      throw new UDFArgumentException("One or two arguments expected");
+    }
+    ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, 
+        PrimitiveCategory.DOUBLE);
     if (inspectors.length == 2) {
-      ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[1], 1, PrimitiveCategory.INT);
+      ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[1], 1, 
+          PrimitiveCategory.INT);
     }
     return new DataToSketchEvaluator();
   }

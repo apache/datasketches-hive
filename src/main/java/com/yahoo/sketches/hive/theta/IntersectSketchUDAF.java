@@ -40,19 +40,23 @@ import com.yahoo.sketches.theta.Intersection;
     + "> SELECT intersectSketch(sketch) FROM src;\n"
     + "The return value is a binary blob that contains a compact sketch, which can "
     + "be operated on by the other sketch-related functions. "
-    + "The seed is optional, and using it is not recommended unless you really know why you need it.")
+    + "The seed is optional, "
+    + "and using it is not recommended unless you really know why you need it.")
 public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
-  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
+  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) 
+      throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
     if (inspectors.length < 1) {
       throw new UDFArgumentException("Please specify at least 1 argument");
     }
     if (inspectors.length > 2) {
-      throw new UDFArgumentTypeException(inspectors.length - 1, "Please specify no more than 2 arguments");
+      throw new 
+      UDFArgumentTypeException(inspectors.length - 1, "Please specify no more than 2 arguments");
     }
-    ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, PrimitiveCategory.BINARY);
+    ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, 
+        PrimitiveCategory.BINARY);
     if (inspectors.length > 1) {
       ObjectInspectorValidator.validateIntegralParameter(inspectors[1], 1);
     }
@@ -60,7 +64,6 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
   }
 
   static class IntersectSketchUDAFEvaluator extends GenericUDAFEvaluator {
-
     protected static final String SEED_FIELD = "seed";
     protected static final String SKETCH_FIELD = "sketch";
 
@@ -88,18 +91,22 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(SEED_FIELD, SKETCH_FIELD),
           Arrays.asList(
-            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.LONG),
-            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
+            PrimitiveObjectInspectorFactory.
+              getPrimitiveWritableObjectInspector(PrimitiveCategory.LONG),
+            PrimitiveObjectInspectorFactory.
+              getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
         );
       } else {
         // final results include just the sketch
-        return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
+        return PrimitiveObjectInspectorFactory.
+            getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
       }
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data) throws HiveException {
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, 
+        final Object[] data) throws HiveException {
       if (data[0] == null) return;
       final IntersectionState state = (IntersectionState) buf;
       if (!state.isInitialized()) {
@@ -115,7 +122,8 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf) 
+        throws HiveException {
       final IntersectionState state = (IntersectionState) buf;
       final Sketch intermediate = state.getResult();
       if (intermediate == null) return null;
@@ -127,7 +135,8 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object data) throws HiveException {
+    public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, 
+        final Object data) throws HiveException {
       if (data == null) return;
       final IntersectionState state = (IntersectionState) buf;
       if (!state.isInitialized()) {
@@ -136,13 +145,15 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
         state.init(seed);
       }
 
-      final BytesWritable serializedSketch = (BytesWritable) intermediateObjectInspector.getStructFieldData(
+      final BytesWritable serializedSketch = 
+          (BytesWritable) intermediateObjectInspector.getStructFieldData(
           data, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD));
       state.update(serializedSketch.getBytes());
     }
 
     @Override
-    public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+    public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf) 
+        throws HiveException {
       final IntersectionState state = (IntersectionState) buf;
       final Sketch resultSketch = state.getResult();
       if (resultSketch == null) return null;
@@ -156,44 +167,41 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void reset(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+    public void reset(final @SuppressWarnings("deprecation") AggregationBuffer buf) 
+        throws HiveException {
       final IntersectionState state = (IntersectionState) buf;
       state.reset();
     }
 
     static class IntersectionState extends AbstractAggregationBuffer {
-
-      private long seed;
-      private Intersection intersection;
+      private long seed_;
+      private Intersection intersection_;
 
       boolean isInitialized() {
-        return intersection != null;
+        return intersection_ != null;
       }
 
       void init(final long seed) {
-        this.seed = seed;
-        intersection = SetOperation.builder().setSeed(seed).buildIntersection();
+        this.seed_ = seed;
+        intersection_ = SetOperation.builder().setSeed(seed).buildIntersection();
       }
 
       long getSeed() {
-        return seed;
+        return seed_;
       }
 
       void update(final byte[] serializedSketch) {
-        intersection.update(Sketches.wrapSketch(new NativeMemory(serializedSketch), seed));
+        intersection_.update(Sketches.wrapSketch(new NativeMemory(serializedSketch), seed_));
       }
 
       Sketch getResult() {
-        if (intersection == null) return null;
-        return intersection.getResult();
+        if (intersection_ == null) return null;
+        return intersection_.getResult();
       }
 
       void reset() {
-        intersection = null;
+        intersection_ = null;
       }
-
     }
-
   }
-
 }
