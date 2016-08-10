@@ -5,7 +5,6 @@
 
 package com.yahoo.sketches.hive.quantiles;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -39,7 +38,7 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
     if (serializedSketch == null) return null;
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
-    return primitivesToList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
+    return Util.primitivesToList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
   }
 
   /**
@@ -51,13 +50,7 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final int number) {
     if (serializedSketch == null) return null;
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
-    return primitivesToList(sketch.getQuantiles(number));
-  }
-
-  private static List<Double> primitivesToList(final double[] array) {
-    final List<Double> result = new ArrayList<Double>(array.length);
-    for (double item: array) result.add(item);
-    return result;
+    return Util.primitivesToList(sketch.getQuantiles(number));
   }
 
 }
