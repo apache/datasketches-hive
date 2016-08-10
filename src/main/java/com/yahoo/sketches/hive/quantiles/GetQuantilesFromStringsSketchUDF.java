@@ -32,6 +32,12 @@ import com.yahoo.sketches.quantiles.ItemsSketch;
     + " A value of 3 will return the min, the median and the max value (ranks 0.0, 0.5, and 1.0), etc.")
 public class GetQuantilesFromStringsSketchUDF extends UDF {
 
+  /**
+   * Returns a list of quantile values from a given sketch
+   * @param serializedSketch serialized sketch
+   * @param fractions list of values from 0 to 1 inclusive
+   * @return list of quantile values
+   */
   public List<String> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
     if (serializedSketch == null) return null;
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
@@ -42,6 +48,12 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
     return Arrays.asList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
   }
 
+  /**
+   * Returns a list of quantile values from a given sketch
+   * @param serializedSketch serialized sketch
+   * @param number of evenly spaced fractions
+   * @return list of quantile values
+   */
   public List<String> evaluate(final BytesWritable serializedSketch, final int number) {
     if (serializedSketch == null) return null;
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(

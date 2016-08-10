@@ -16,6 +16,11 @@ import com.yahoo.sketches.quantiles.DoublesSketch;
 extended = " Returns parameter K from a given DoublesSketch sketch.")
 public class GetKFromDoublesSketchUDF extends UDF {
 
+  /**
+   * Returns parameter K from a given sketch
+   * @param serializedSketch serialized sketch
+   * @return parameter K
+   */
   public Integer evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) return null;
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
