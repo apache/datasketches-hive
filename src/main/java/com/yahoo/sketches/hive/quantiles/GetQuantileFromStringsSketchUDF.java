@@ -24,6 +24,12 @@ import com.yahoo.sketches.quantiles.ItemsSketch;
     + " of the probability distribution from the lower half).")
 public class GetQuantileFromStringsSketchUDF extends UDF {
 
+  /**
+   * Returns a quantile value from a given sketch
+   * @param serializedSketch serialized sketch
+   * @param fraction value from 0 to 1 inclusive
+   * @return quantile value
+   */
   public String evaluate(final BytesWritable serializedSketch, final double fraction) {
     if (serializedSketch == null) return null;
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(

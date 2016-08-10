@@ -19,6 +19,11 @@ import com.yahoo.sketches.quantiles.ItemsSketch;
 extended = " Returns parameter K from a given ItemsSketch<String> sketch.")
 public class GetKFromStringsSketchUDF extends UDF {
 
+  /**
+   * Returns parameter K from a given sketch
+   * @param serializedSketch serialized sketch
+   * @return parameter K
+   */
   public Integer evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) return null;
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(

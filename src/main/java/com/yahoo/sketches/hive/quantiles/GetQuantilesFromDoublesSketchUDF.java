@@ -30,12 +30,24 @@ import com.yahoo.sketches.quantiles.DoublesSketch;
   + " A value of 3 will return the min, the median and the max value (ranks 0.0, 0.5, and 1.0), etc.")
 public class GetQuantilesFromDoublesSketchUDF extends UDF {
 
+  /**
+   * Returns a list of quantile values from a given sketch
+   * @param serializedSketch serialized sketch
+   * @param fractions list of values from 0 to 1 inclusive
+   * @return list of quantile values
+   */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
     if (serializedSketch == null) return null;
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
     return primitivesToList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
   }
 
+  /**
+   * Returns a list of quantile values from a given sketch
+   * @param serializedSketch serialized sketch
+   * @param number of evenly spaced fractions
+   * @return list of quantile values
+   */
   public List<Double> evaluate(final BytesWritable serializedSketch, final int number) {
     if (serializedSketch == null) return null;
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));

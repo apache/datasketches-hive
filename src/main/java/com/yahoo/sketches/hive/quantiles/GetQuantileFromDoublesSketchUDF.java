@@ -21,6 +21,12 @@ extended = " Returns a quantile value from a given DoublesSketch sketch."
 + " of the probability distribution from the lower half).")
 public class GetQuantileFromDoublesSketchUDF extends UDF {
 
+  /**
+   * Returns a quantile value from a given sketch
+   * @param serializedSketch serialized sketch
+   * @param fraction value from 0 to 1 inclusive
+   * @return quantile value
+   */
   public Double evaluate(final BytesWritable serializedSketch, final double fraction) {
     if (serializedSketch == null) return null;
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
