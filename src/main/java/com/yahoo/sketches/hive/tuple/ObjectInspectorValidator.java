@@ -45,19 +45,4 @@ class ObjectInspectorValidator {
     }
   }
 
-  static void validateFloatingPointParameter(final ObjectInspector inspector, final int index) throws UDFArgumentTypeException {
-    validateCategoryPrimitive(inspector, index);
-    PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspector;
-    switch (primitiveInspector.getPrimitiveCategory()) {
-    case FLOAT:
-    case DOUBLE:
-    case DECIMAL:
-      break;
-    // all other types are invalid
-    default:
-      throw new UDFArgumentTypeException(index, "Only floating point type parameters are expected but "
-          + primitiveInspector.getPrimitiveCategory().name() + " was passed as parameter " + (index + 1));
-    }
-  }
-
 }
