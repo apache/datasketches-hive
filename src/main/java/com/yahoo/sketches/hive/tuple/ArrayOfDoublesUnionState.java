@@ -17,6 +17,7 @@ class ArrayOfDoublesUnionState extends ArrayOfDoublesState {
     return union_ != null;
   }
 
+  @Override
   void init(final int numNominalEntries, final int numValues) {
     super.init(numNominalEntries, numValues);
     union_ = new ArrayOfDoublesSetOperationBuilder().setNominalEntries(numNominalEntries).setNumberOfValues(numValues).buildUnion();
