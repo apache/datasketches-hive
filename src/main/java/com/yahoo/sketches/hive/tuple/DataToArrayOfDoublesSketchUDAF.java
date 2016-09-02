@@ -26,12 +26,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 
 @Description(
   name = "DataToArrayOfDoublesSketch",
-  value = "_FUNC_(sketch, doulbe param 1, ..., double param N, sketch size, sampling probability)",
+  value = "_FUNC_(key, double param 1, ..., double param N, nominal number of entries, sampling probability)",
   extended = "Returns an ArrayOfDoublesSketch as a binary blob that can be operated on by other"
-    + " tuple sketch related functions. The sketch size is optional, must be a power of 2"
+    + " ArrayOfDoublesSketch related functions. The nominal number of entries is optional, must be a power of 2,"
     + " and controls the relative error expected from the sketch."
-    + " A size of 16384 can be expected to yield errors of roughly +-1.5% in the estimation of"
-    + " uniques. The default size is defined in the sketches-core library and at the time of this"
+    + " A number of 16384 can be expected to yield errors of roughly +-1.5% in the estimation of"
+    + " uniques. The default number is defined in the sketches-core library, and at the time of this"
     + " writing was 4096 (about 3% error)."
     + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)")
 public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
@@ -47,7 +47,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
 
     int numValues = 0;
     while (numValues + 1 < inspectors.length) {
-      ObjectInspectorValidator.validateCategoryPrimitive(inspectors[numValues + 1], 0);
+      ObjectInspectorValidator.validateCategoryPrimitive(inspectors[numValues + 1], numValues + 1);
       PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspectors[numValues + 1];
       if (primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.DOUBLE) break;
       numValues++;
@@ -56,7 +56,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
       throw new UDFArgumentException("Expected at least 1 double value");
     }
 
-    // number of nominal entries
+    // nominal number of entries
     if (inspectors.length > numValues + 1) {
       ObjectInspectorValidator.validateIntegralParameter(inspectors[numValues + 1], numValues + 1);
     }
@@ -105,7 +105,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
           valuesInspectors_[i] = (PrimitiveObjectInspector) parameters[i + 1];
         }
         if (parameters.length > numValues_ + 1) {
-          numNominalEntriesInspector_ = (PrimitiveObjectInspector) parameters[numValues_ + 1];
+          nominalNumEntriesInspector_ = (PrimitiveObjectInspector) parameters[numValues_ + 1];
         }
         if (parameters.length > numValues_ + 2) {
           samplingProbabilityInspector_ = (PrimitiveObjectInspector) parameters[numValues_ + 2];
@@ -116,9 +116,9 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
-        // intermediate results need to include the the nominal number of entries and the seed
+        // intermediate results need to include the the nominal number of entries and number of values
         return ObjectInspectorFactory.getStandardStructObjectInspector(
-          Arrays.asList(NUM_NOMINAL_ENTRIES_FIELD, NUM_VALUES_FIELD, SKETCH_FIELD),
+          Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, NUM_VALUES_FIELD, SKETCH_FIELD),
           Arrays.asList(
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
@@ -142,16 +142,16 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     }
 
     private void initializeState(final ArrayOfDoublesSketchState state, final Object[] data) {
-      int numNominalEntries = DEFAULT_NOMINAL_ENTRIES;
-      if (numNominalEntriesInspector_ != null) {
-        numNominalEntries = PrimitiveObjectInspectorUtils.getInt(data[numValues_ + 1], numNominalEntriesInspector_);
+      int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
+      if (nominalNumEntriesInspector_ != null) {
+        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[numValues_ + 1], nominalNumEntriesInspector_);
       } 
       float samplingProbability = DEFAULT_SAMPLING_PROBABILITY;
       if (samplingProbabilityInspector_ != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[numValues_ + 2],
             samplingProbabilityInspector_);
       }
-      state.init(numNominalEntries, samplingProbability, numValues_);
+      state.init(nominalNumEntries, samplingProbability, numValues_);
     }
 
     @SuppressWarnings("deprecation")

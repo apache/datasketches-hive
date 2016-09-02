@@ -7,27 +7,22 @@ package com.yahoo.sketches.hive.tuple;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
-import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
+import com.yahoo.sketches.tuple.Sketch;
+import com.yahoo.sketches.tuple.Summary;
 
-abstract class ArrayOfDoublesState extends AbstractAggregationBuffer {
+abstract class State<S extends Summary> extends AbstractAggregationBuffer {
 
   private int nominalNumEntries_;
-  private int numValues_;
 
-  void init(final int numNominalEntries, final int numValues) {
-    nominalNumEntries_ = numNominalEntries;
-    numValues_ = numValues;
+  void init(final int nominalNumEntries) {
+    nominalNumEntries_ = nominalNumEntries;
   }
 
   int getNominalNumEntries() {
     return nominalNumEntries_;
   }
 
-  int getNumValues() {
-    return numValues_;
-  }
-
-  abstract ArrayOfDoublesSketch getResult();
+  abstract Sketch<S> getResult();
 
   abstract void reset();
 

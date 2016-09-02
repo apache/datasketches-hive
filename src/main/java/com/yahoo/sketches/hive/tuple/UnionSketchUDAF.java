@@ -9,9 +9,7 @@ import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
 
 import java.util.Arrays;
 
-import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
-import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
@@ -26,19 +24,13 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
 import com.yahoo.sketches.memory.NativeMemory;
-import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
+import com.yahoo.sketches.tuple.Sketches;
+import com.yahoo.sketches.tuple.Summary;
 
-@Description(
-  name = "UnionArrayOfDoublesSketch",
-  value = "_FUNC_(sketch, nominal number of entries, number of values)",
-  extended = "Returns an ArrayOfDoublesSketch as a binary blob that can be operated on by other"
-    + " ArrayOfDoublesSketch related functions. The nominal number of entries is optional, must be a power of 2,"
-    + " does not have to match the input sketches, and controls the relative error expected"
-    + " from the sketch. A number of 16384 can be expected to yield errors of roughly +-1.5% in"
-    + " the estimation of uniques. The default number is defined in the sketches-core library,"
-    + " and at the time of this writing was 4096 (about 3% error)."
-    + " The number of values is optional and must match all input sketches (defaults to 1)")
-public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
+/**
+ * Generic implementation to be sub-classed with a particular type of Summary
+ */
+public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
@@ -47,10 +39,6 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     if (inspectors.length < 1) {
       throw new UDFArgumentException("Expected at least 1 argument");
     }
-    if (inspectors.length > 3) {
-      throw new UDFArgumentTypeException(inspectors.length - 1, "Expected no more than 3 arguments");
-    }
-
     ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, PrimitiveCategory.BINARY);
 
     // nominal number of entries
@@ -58,20 +46,31 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
       ObjectInspectorValidator.validateIntegralParameter(inspectors[1], 1);
     }
 
-    // number of double values per key
-    if (inspectors.length > 2) {
-      ObjectInspectorValidator.validateIntegralParameter(inspectors[2], 2);
-    }
+    checkExtraArguments(inspectors);
 
-    return new UnionArrayOfDoublesSketchEvaluator();
+    return createEvaluator();
   }
 
-  public static class UnionArrayOfDoublesSketchEvaluator extends ArrayOfDoublesSketchEvaluator {
+  /**
+   * Override this if your UDF has more arguments
+   * @param inspectors array of inspectors
+   * @throws SemanticException if anything is wrong
+   */
+  protected void checkExtraArguments(final ObjectInspector[] inspectors) throws SemanticException {
+    if (inspectors.length > 2) {
+      throw new UDFArgumentException("Expected no more than 2 arguments");
+    }
+  }
 
-    private static final int DEFAULT_NUM_VALUES = 1;
+  /**
+   * This is needed because a concrete UDAF is going to have its own concrete evaluator static inner class.
+   * @return an instance of evaluator
+   */
+  public abstract GenericUDAFEvaluator createEvaluator();
+
+  public static abstract class UnionSketchEvaluator<S extends Summary> extends SketchEvaluator<S> {
 
     private PrimitiveObjectInspector sketchInspector_;
-    private PrimitiveObjectInspector numValuesInspector_;
 
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
@@ -82,20 +81,16 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
         if (inspectors.length > 1) {
           nominalNumEntriesInspector_ = (PrimitiveObjectInspector) inspectors[1];
         }
-        if (inspectors.length > 2) {
-          numValuesInspector_ = (PrimitiveObjectInspector) inspectors[2];
-        }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
         intermediateInspector_ = (StructObjectInspector) inspectors[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
-        // intermediate results need to include the the nominal number of entries and number of values
+        // intermediate results need to include the the nominal number of entries
         return ObjectInspectorFactory.getStandardStructObjectInspector(
-          Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, NUM_VALUES_FIELD, SKETCH_FIELD),
+          Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SKETCH_FIELD),
           Arrays.asList(
-            PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
@@ -109,31 +104,28 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data) throws HiveException {
       if (data[0] == null) return;
-      final ArrayOfDoublesUnionState state = (ArrayOfDoublesUnionState) buf;
+      @SuppressWarnings("unchecked")
+      final UnionState<S> state = (UnionState<S>) buf;
       if (!state.isInitialized()) {
         initializeState(state, data);
       }
       final byte[] serializedSketch = (byte[]) sketchInspector_.getPrimitiveJavaObject(data[0]);
       if (serializedSketch == null) return;
-      state.update(ArrayOfDoublesSketches.wrapSketch(new NativeMemory(serializedSketch)));
+      state.update(Sketches.heapifySketch(new NativeMemory(serializedSketch)));
     }
 
-    private void initializeState(final ArrayOfDoublesUnionState state, final Object[] data) {
+    protected void initializeState(final UnionState<S> state, final Object[] data) {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
       if (nominalNumEntriesInspector_ != null) {
         nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[1], nominalNumEntriesInspector_);
       } 
-      int numValues = DEFAULT_NUM_VALUES;
-      if (numValuesInspector_ != null) {
-        numValues = PrimitiveObjectInspectorUtils.getInt(data[2], numValuesInspector_);
-      }
-      state.init(nominalNumEntries, numValues);
+      state.init(nominalNumEntries, getSummaryFactoryForIterate(data));
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      return new ArrayOfDoublesUnionState();
+      return new UnionState<S>();
     }
 
   }

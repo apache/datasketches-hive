@@ -28,12 +28,14 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.yahoo.sketches.memory.NativeMemory;
-import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
-import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
-import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketch;
-import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
+import com.yahoo.sketches.tuple.DoubleSummary;
+import com.yahoo.sketches.tuple.DoubleSummaryFactory;
+import com.yahoo.sketches.tuple.Sketch;
+import com.yahoo.sketches.tuple.Sketches;
+import com.yahoo.sketches.tuple.UpdatableSketch;
+import com.yahoo.sketches.tuple.UpdatableSketchBuilder;
 
-public class UnionArrayOfDoublesSketchUDAFTest {
+public class UnionDoubleSummarySketchUDAFTest {
 
   private static final ObjectInspector intInspector =
       PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
@@ -45,64 +47,50 @@ public class UnionArrayOfDoublesSketchUDAFTest {
       PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
 
   private static final ObjectInspector structInspector = ObjectInspectorFactory.getStandardStructObjectInspector(
-      Arrays.asList("nominalEntries", "numValues", "sketch"),
-      Arrays.asList(intInspector, intInspector, binaryInspector)
+      Arrays.asList("nominalEntries", "sketch"),
+      Arrays.asList(intInspector, binaryInspector)
     );
 
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void tooFewArguments() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
+    new UnionDoubleSummarySketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void tooManyArguments() throws SemanticException {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, intInspector, intInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, intInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
+    new UnionDoubleSummarySketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidCategoryArg1() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
+    new UnionDoubleSummarySketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidTypeArg1() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
+    new UnionDoubleSummarySketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidCategoryArg2() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, structInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
+    new UnionDoubleSummarySketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidTypeArg2() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, floatInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
-  }
-
-  @Test(expectedExceptions = { UDFArgumentTypeException.class })
-  public void invalidCategorysArg3() throws SemanticException {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector,  structInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
-  }
-
-  @Test(expectedExceptions = { UDFArgumentTypeException.class })
-  public void invalidTypeArg3() throws SemanticException {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector,  floatInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    new UnionArrayOfDoublesSketchUDAF().getEvaluator(params);
+    new UnionDoubleSummarySketchUDAF().getEvaluator(params);
   }
 
   // PARTIAL1 mode (Map phase in Map-Reduce): iterate + terminatePartial
@@ -110,28 +98,28 @@ public class UnionArrayOfDoublesSketchUDAFTest {
   public void partial1ModeDefaultParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info);
+    GenericUDAFEvaluator eval = new UnionDoubleSummarySketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    DataToArrayOfDoublesSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
+    DataToDoubleSummarySketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
-    ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
+    @SuppressWarnings("unchecked")
+    State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-    ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch1.update(1, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch1.update(1, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
 
-    ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch2.update(2, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch2.update(2, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
 
     Object result = eval.terminatePartial(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof List);
     List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 3);
+    Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-    Assert.assertEquals(((IntWritable) (r.get(1))).get(), 1);
-    ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -139,36 +127,35 @@ public class UnionArrayOfDoublesSketchUDAFTest {
 
   @Test
   public void partial1ModeExplicitParams() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, intInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info);
+    GenericUDAFEvaluator eval = new UnionDoubleSummarySketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    DataToArrayOfDoublesSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
+    DataToDoubleSummarySketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
     final int nomNumEntries = 8;
-    final int numValues = 2;
-    ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
+    @SuppressWarnings("unchecked")
+    State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-    ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder()
-        .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
-    sketch1.update(1, new double[] {1, 2});
+    UpdatableSketch<Double, DoubleSummary> sketch1 =
+        new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+    sketch1.update(1, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray()),
-        new IntWritable(nomNumEntries), new IntWritable(numValues)});
+        new IntWritable(nomNumEntries)});
 
-    ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder()
-        .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
-    sketch2.update(2, new double[] {1, 2});
+    UpdatableSketch<Double, DoubleSummary> sketch2 =
+        new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+    sketch2.update(2, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray()),
-        new IntWritable(nomNumEntries), new IntWritable(numValues)});
+        new IntWritable(nomNumEntries)});
 
     Object result = eval.terminatePartial(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof List);
     List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 3);
+    Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), nomNumEntries);
-    Assert.assertEquals(((IntWritable) (r.get(1))).get(), numValues);
-    ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -179,25 +166,24 @@ public class UnionArrayOfDoublesSketchUDAFTest {
   public void partial2Mode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info);
+    GenericUDAFEvaluator eval = new UnionDoubleSummarySketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
-    DataToArrayOfDoublesSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
+    DataToDoubleSummarySketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
-    ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
+    @SuppressWarnings("unchecked")
+    State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-    ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch1.update(1, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch1.update(1, 1.0);
     eval.merge(state, Arrays.asList(
       new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new IntWritable(1),
       new BytesWritable(sketch1.compact().toByteArray()))
     );
 
-    ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch2.update(2, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch2.update(2, 1.0);
     eval.merge(state, Arrays.asList(
       new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new IntWritable(1),
       new BytesWritable(sketch2.compact().toByteArray()))
     );
 
@@ -205,10 +191,9 @@ public class UnionArrayOfDoublesSketchUDAFTest {
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof List);
     List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 3);
+    Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-    Assert.assertEquals(((IntWritable) (r.get(1))).get(), 1);
-    ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.reset(state);
@@ -223,32 +208,31 @@ public class UnionArrayOfDoublesSketchUDAFTest {
   public void finalMode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info);
+    GenericUDAFEvaluator eval = new UnionDoubleSummarySketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
-    DataToArrayOfDoublesSketchUDAFTest.checkFinalResultInspector(resultInspector);
+    DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);
 
-    ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
+    @SuppressWarnings("unchecked")
+    State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-    ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch1.update(1, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch1.update(1, 1.0);
     eval.merge(state, Arrays.asList(
       new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new IntWritable(1),
       new BytesWritable(sketch1.compact().toByteArray()))
     );
 
-    ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch2.update(2, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch2.update(2, 1.0);
     eval.merge(state, Arrays.asList(
       new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new IntWritable(1),
       new BytesWritable(sketch2.compact().toByteArray()))
     );
 
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -259,24 +243,25 @@ public class UnionArrayOfDoublesSketchUDAFTest {
   public void completeModeDefaultParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info);
+    GenericUDAFEvaluator eval = new UnionDoubleSummarySketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
-    DataToArrayOfDoublesSketchUDAFTest.checkFinalResultInspector(resultInspector);
+    DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);
 
-    ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
+    @SuppressWarnings("unchecked")
+    State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-    ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch1.update(1, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch1.update(1, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
 
-    ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
-    sketch2.update(2, new double[] {1});
+    UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    sketch2.update(2, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
 
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.reset(state);
@@ -288,33 +273,33 @@ public class UnionArrayOfDoublesSketchUDAFTest {
 
   @Test
   public void completeModeExplicitParams() throws Exception {
-    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, intInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector };
     GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info);
+    GenericUDAFEvaluator eval = new UnionDoubleSummarySketchUDAF().getEvaluator(info);
     ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
-    DataToArrayOfDoublesSketchUDAFTest.checkFinalResultInspector(resultInspector);
+    DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);
 
     final int nomNumEntries = 8;
-    final int numValues = 2;
-    ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
+    @SuppressWarnings("unchecked")
+    State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-    ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder()
-        .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
-    sketch1.update(1, new double[] {1, 2});
+    UpdatableSketch<Double, DoubleSummary> sketch1 =
+        new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+    sketch1.update(1, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray()),
-        new IntWritable(nomNumEntries), new IntWritable(numValues)});
+        new IntWritable(nomNumEntries)});
 
-    ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder()
-        .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
-    sketch2.update(2, new double[] {1, 2});
+    UpdatableSketch<Double, DoubleSummary> sketch2 =
+        new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+    sketch2.update(2, 1.0);
     eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray()),
-        new IntWritable(nomNumEntries), new IntWritable(numValues)});
+        new IntWritable(nomNumEntries)});
 
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
 
     eval.reset(state);
     result = eval.terminate(state);
