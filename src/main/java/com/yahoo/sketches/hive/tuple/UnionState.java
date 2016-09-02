@@ -18,10 +18,9 @@ class UnionState<S extends Summary> extends State<S> {
     return union_ != null;
   }
 
-  @Override
-  void init(final int numNominalEntries, final SummaryFactory<S> summaryFactory) {
-    super.init(numNominalEntries, summaryFactory);
-    union_ = new Union<S>(numNominalEntries, summaryFactory);
+  void init(final int nominalNumEntries, final SummaryFactory<S> summaryFactory) {
+    super.init(nominalNumEntries);
+    union_ = new Union<S>(nominalNumEntries, summaryFactory);
   }
 
   void update(final Sketch<S> sketch) {

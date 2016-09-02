@@ -11,16 +11,16 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
 
 abstract class ArrayOfDoublesState extends AbstractAggregationBuffer {
 
-  private int numNominalEntries_;
+  private int nominalNumEntries_;
   private int numValues_;
 
   void init(final int numNominalEntries, final int numValues) {
-    numNominalEntries_ = numNominalEntries;
+    nominalNumEntries_ = numNominalEntries;
     numValues_ = numValues;
   }
 
-  int getNumNominalEntries() {
-    return numNominalEntries_;
+  int getNominalNumEntries() {
+    return nominalNumEntries_;
   }
 
   int getNumValues() {

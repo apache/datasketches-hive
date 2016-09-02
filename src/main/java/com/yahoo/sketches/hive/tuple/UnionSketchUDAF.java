@@ -10,7 +10,6 @@ import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import java.util.Arrays;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
-import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
@@ -27,7 +26,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.tuple.Sketches;
 import com.yahoo.sketches.tuple.Summary;
-import com.yahoo.sketches.tuple.SummaryFactory;
 
 /**
  * Generic implementation to be sub-classed with a particular type of Summary
@@ -41,18 +39,27 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     if (inspectors.length < 1) {
       throw new UDFArgumentException("Expected at least 1 argument");
     }
-    if (inspectors.length > 2) {
-      throw new UDFArgumentTypeException(inspectors.length - 1, "Expected no more than 2 arguments");
-    }
-
     ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, PrimitiveCategory.BINARY);
 
-    // number of nominal entries
+    // nominal number of entries
     if (inspectors.length > 1) {
       ObjectInspectorValidator.validateIntegralParameter(inspectors[1], 1);
     }
 
+    checkExtraArguments(inspectors);
+
     return createEvaluator();
+  }
+
+  /**
+   * Override this if your UDF has more arguments
+   * @param inspectors array of inspectors
+   * @throws SemanticException if anything is wrong
+   */
+  protected void checkExtraArguments(final ObjectInspector[] inspectors) throws SemanticException {
+    if (inspectors.length > 2) {
+      throw new UDFArgumentException("Expected no more than 2 arguments");
+    }
   }
 
   /**
@@ -65,10 +72,6 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
     private PrimitiveObjectInspector sketchInspector_;
 
-    public UnionSketchEvaluator(final SummaryFactory<S> summaryFactory) {
-      super(summaryFactory);
-    }
-
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       super.init(mode, inspectors);
@@ -76,7 +79,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
         // input is original data
         sketchInspector_ = (PrimitiveObjectInspector) inspectors[0];
         if (inspectors.length > 1) {
-          numNominalEntriesInspector_ = (PrimitiveObjectInspector) inspectors[1];
+          nominalNumEntriesInspector_ = (PrimitiveObjectInspector) inspectors[1];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
@@ -86,7 +89,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the the nominal number of entries
         return ObjectInspectorFactory.getStandardStructObjectInspector(
-          Arrays.asList(NUM_NOMINAL_ENTRIES_FIELD, SKETCH_FIELD),
+          Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SKETCH_FIELD),
           Arrays.asList(
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
@@ -111,12 +114,12 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       state.update(Sketches.heapifySketch(new NativeMemory(serializedSketch)));
     }
 
-    private void initializeState(final UnionState<S> state, final Object[] data) {
-      int numNominalEntries = DEFAULT_NOMINAL_ENTRIES;
-      if (numNominalEntriesInspector_ != null) {
-        numNominalEntries = PrimitiveObjectInspectorUtils.getInt(data[1], numNominalEntriesInspector_);
+    protected void initializeState(final UnionState<S> state, final Object[] data) {
+      int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
+      if (nominalNumEntriesInspector_ != null) {
+        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[1], nominalNumEntriesInspector_);
       } 
-      state.init(numNominalEntries, summaryFactory_);
+      state.init(nominalNumEntries, getSummaryFactoryForIterate(data));
     }
 
     @SuppressWarnings("deprecation")

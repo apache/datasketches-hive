@@ -10,6 +10,7 @@ import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import java.util.Arrays;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
@@ -23,7 +24,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
-import com.yahoo.sketches.tuple.SummaryFactory;
 import com.yahoo.sketches.tuple.UpdatableSummary;
 
 public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
@@ -35,25 +35,41 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     if (inspectors.length < 2) {
       throw new UDFArgumentException("Expected at least 2 arguments");
     }
-    if (inspectors.length > 4) {
-      throw new UDFArgumentException("Expected at most 4 arguments");
-    }
     ObjectInspectorValidator.validateCategoryPrimitive(inspectors[0], 0);
 
     // No validation of the value inspector since it can be anything.
     // Override this method to validate if needed.
 
-    // number of nominal entries
+    // nominal number of entries
     if (inspectors.length > 2) {
       ObjectInspectorValidator.validateIntegralParameter(inspectors[2], 2);
     }
 
     // sampling probability
     if (inspectors.length > 3) {
-      ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[3], 3, PrimitiveCategory.FLOAT);
+      ObjectInspectorValidator.validateCategoryPrimitive(inspectors[3], 3);
+      final PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspectors[3];
+      if (primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.FLOAT
+          && primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.DOUBLE) {
+        throw new UDFArgumentTypeException(3, "float or double value expected as parameter 4 but "
+            + primitiveInspector.getPrimitiveCategory().name() + " was received");
+      }
     }
 
+    checkExtraArguments(inspectors);
+
     return createEvaluator();
+  }
+
+  /**
+   * Override this if your UDF has more arguments
+   * @param inspectors array of inspectors
+   * @throws SemanticException if anything is wrong
+   */
+  protected void checkExtraArguments(final ObjectInspector[] inspectors) throws SemanticException {
+    if (inspectors.length > 4) {
+      throw new UDFArgumentException("Expected no more than 4 arguments");
+    }
   }
 
   /**
@@ -72,10 +88,6 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
     private Mode mode_;
 
-    public DataToSketchEvaluator(SummaryFactory<S> summaryFactory) {
-      super(summaryFactory);
-    }
-
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       super.init(mode, inspectors);
@@ -85,7 +97,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         keyInspector_ = (PrimitiveObjectInspector) inspectors[0];
         valueInspector_ = (PrimitiveObjectInspector) inspectors[1];
         if (inspectors.length > 2) {
-          numNominalEntriesInspector_ = (PrimitiveObjectInspector) inspectors[2];
+          nominalNumEntriesInspector_ = (PrimitiveObjectInspector) inspectors[2];
         }
         if (inspectors.length > 3) {
           samplingProbabilityInspector_ = (PrimitiveObjectInspector) inspectors[3];
@@ -98,7 +110,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the the nominal number of entries
         return ObjectInspectorFactory.getStandardStructObjectInspector(
-          Arrays.asList(NUM_NOMINAL_ENTRIES_FIELD, SKETCH_FIELD),
+          Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SKETCH_FIELD),
           Arrays.asList(
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT),
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
@@ -122,16 +134,16 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     private void initializeState(final SketchState<U, S> state, final Object[] data) {
-      int numNominalEntries = DEFAULT_NOMINAL_ENTRIES;
-      if (numNominalEntriesInspector_ != null) {
-        numNominalEntries = PrimitiveObjectInspectorUtils.getInt(data[2], numNominalEntriesInspector_);
+      int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
+      if (nominalNumEntriesInspector_ != null) {
+        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[2], nominalNumEntriesInspector_);
       } 
       float samplingProbability = DEFAULT_SAMPLING_PROBABILITY;
       if (samplingProbabilityInspector_ != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[3],
             samplingProbabilityInspector_);
       }
-      state.init(numNominalEntries, samplingProbability, summaryFactory_);
+      state.init(nominalNumEntries, samplingProbability, getSummaryFactoryForIterate(data));
     }
 
     @SuppressWarnings("deprecation")

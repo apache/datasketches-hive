@@ -20,11 +20,11 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
 
 abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
 
-  protected static final String NUM_NOMINAL_ENTRIES_FIELD = "nominalEntries";
+  protected static final String NOMINAL_NUM_ENTRIES_FIELD = "nominalEntries";
   protected static final String NUM_VALUES_FIELD = "numValues";
   protected static final String SKETCH_FIELD = "sketch";
 
-  protected PrimitiveObjectInspector numNominalEntriesInspector_;
+  protected PrimitiveObjectInspector nominalNumEntriesInspector_;
   protected StructObjectInspector intermediateInspector_;
 
   @Override
@@ -34,7 +34,7 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
     if (intermediate == null) return null;
     final byte[] bytes = intermediate.toByteArray();
     return Arrays.asList(
-      new IntWritable(state.getNumNominalEntries()),
+      new IntWritable(state.getNominalNumEntries()),
       new IntWritable(state.getNumValues()),
       new BytesWritable(bytes)
     );
@@ -54,11 +54,11 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
   }
 
   private void initializeState(final ArrayOfDoublesUnionState state, final Object data) {
-    final int nominalEntries = ((IntWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(NUM_NOMINAL_ENTRIES_FIELD))).get();
+    final int nominalNumEntries = ((IntWritable) intermediateInspector_.getStructFieldData(
+        data, intermediateInspector_.getStructFieldRef(NOMINAL_NUM_ENTRIES_FIELD))).get();
     final int numValues = ((IntWritable) intermediateInspector_.getStructFieldData(
         data, intermediateInspector_.getStructFieldRef(NUM_VALUES_FIELD))).get();
-    state.init(nominalEntries, numValues);
+    state.init(nominalNumEntries, numValues);
   }
 
   @Override

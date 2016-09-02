@@ -9,24 +9,17 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggreg
 
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.Summary;
-import com.yahoo.sketches.tuple.SummaryFactory;
 
 abstract class State<S extends Summary> extends AbstractAggregationBuffer {
 
-  private int numNominalEntries_;
-  private SummaryFactory<S> summaryFactory_;
+  private int nominalNumEntries_;
 
-  void init(final int numNominalEntries, final SummaryFactory<S> summaryFactory) {
-    numNominalEntries_ = numNominalEntries;
-    summaryFactory_ = summaryFactory;
+  void init(final int nominalNumEntries) {
+    nominalNumEntries_ = nominalNumEntries;
   }
 
-  int getNumNominalEntries() {
-    return numNominalEntries_;
-  }
-
-  SummaryFactory<S> getSummaryFactory() {
-    return summaryFactory_;
+  int getNominalNumEntries() {
+    return nominalNumEntries_;
   }
 
   abstract Sketch<S> getResult();

@@ -21,15 +21,16 @@ import com.yahoo.sketches.tuple.Sketches;
 @Description(
     name = "DoubleSummarySketchToEstimates",
     value = "_FUNC_(sketch)",
-    extended = "Returns a list of estimates from a given DoubleSummarySketch."
+    extended = "Returns a list of estimates from a given Sketch<DoubleSummary>."
     + " The result will be two double values."
     + " The first estimate is the estimate of the number of unique keys in the"
     + " original population. Next there is an estimate of the sum of the parameter in the"
-    + " original population (sum of the values in the sketch scaled to the original population)")
+    + " original population (sum of the values in the sketch scaled to the original population."
+    + " This estimate assumes that the DoubleSummary was used in the Sum mode.)")
 public class DoubleSummarySketchToEstimatesUDF extends UDF {
 
   /**
-   * Get estimates from a given DoubleSummarySketch
+   * Get estimates from a given Sketch&lt;DoubleSummary&gt;
    * @param serializedSketch DoubleSummarySketch in as serialized binary
    * @return list of estimates
    */

@@ -22,16 +22,19 @@ import com.yahoo.sketches.tuple.SummaryFactory;
 
 abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
 
-  protected static final String NUM_NOMINAL_ENTRIES_FIELD = "nominalEntries";
+  protected static final String NOMINAL_NUM_ENTRIES_FIELD = "nominalEntries";
   protected static final String SKETCH_FIELD = "sketch";
 
-  protected final SummaryFactory<S> summaryFactory_;
-  protected PrimitiveObjectInspector numNominalEntriesInspector_;
+  protected PrimitiveObjectInspector nominalNumEntriesInspector_;
   protected StructObjectInspector intermediateInspector_;
 
-  public SketchEvaluator(final SummaryFactory<S> summaryFactory) {
-    summaryFactory_ = summaryFactory;
-  }
+  /**
+   * Get an instance of SummaryFactory possibly parameterized based on the original input array of objects.
+   * Called once during the first call to iterate.
+   * @param data original input array of objects
+   * @return an instance of SummaryFactory
+   */
+  protected abstract SummaryFactory<S> getSummaryFactoryForIterate(Object[] data);
 
   @Override
   public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
@@ -41,7 +44,7 @@ abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
     if (intermediate == null) return null;
     final byte[] bytes = intermediate.toByteArray();
     return Arrays.asList(
-      new IntWritable(state.getNumNominalEntries()),
+      new IntWritable(state.getNominalNumEntries()),
       new BytesWritable(bytes)
     );
   }
@@ -60,11 +63,19 @@ abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
     state.update(Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes())));
   }
 
-  private void initializeState(final UnionState<S> state, final Object data) {
-    final int nominalEntries = ((IntWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(NUM_NOMINAL_ENTRIES_FIELD))).get();
-    state.init(nominalEntries, summaryFactory_);
+  protected void initializeState(final UnionState<S> state, final Object data) {
+    final int nominalNumEntries = ((IntWritable) intermediateInspector_.getStructFieldData(
+        data, intermediateInspector_.getStructFieldRef(NOMINAL_NUM_ENTRIES_FIELD))).get();
+    state.init(nominalNumEntries, getSummaryFactoryForMerge(data));
   }
+
+  /**
+   * Get an instance of SummaryFactory possibly parameterized based on the intermediate data object.
+   * Called once during the first call to merge.
+   * @param data intermediate data object
+   * @return an instance of SummaryFactory
+   */
+  protected abstract SummaryFactory<S> getSummaryFactoryForMerge(Object data);
 
   @Override
   public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {

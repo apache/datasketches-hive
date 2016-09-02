@@ -22,9 +22,9 @@ class SketchState<U, S extends UpdatableSummary<U>> extends State<S> {
     return sketch_ != null;
   }
 
-  void init(int numNominalEntries, float samplingProbability, final SummaryFactory<S> summaryFactory) {
-    super.init(numNominalEntries, summaryFactory);
-    sketch_ = new UpdatableSketchBuilder<U, S>(summaryFactory).setNominalEntries(numNominalEntries)
+  void init(int nominalNumEntries, float samplingProbability, final SummaryFactory<S> summaryFactory) {
+    super.init(nominalNumEntries);
+    sketch_ = new UpdatableSketchBuilder<U, S>(summaryFactory).setNominalEntries(nominalNumEntries)
         .setSamplingProbability(samplingProbability).build();
   }
 
@@ -60,6 +60,8 @@ class SketchState<U, S extends UpdatableSummary<U>> extends State<S> {
   @Override
   Sketch<S> getResult() {
     if (sketch_ == null) return null;
+    // assumes that it is called once at the end of processing since trimming to nominal number of entries is expensive
+    sketch_.trim();
     return sketch_.compact();
   }
 

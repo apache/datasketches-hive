@@ -18,9 +18,9 @@ class ArrayOfDoublesUnionState extends ArrayOfDoublesState {
   }
 
   @Override
-  void init(final int numNominalEntries, final int numValues) {
-    super.init(numNominalEntries, numValues);
-    union_ = new ArrayOfDoublesSetOperationBuilder().setNominalEntries(numNominalEntries).setNumberOfValues(numValues).buildUnion();
+  void init(final int nominalNumEntries, final int numValues) {
+    super.init(nominalNumEntries, numValues);
+    union_ = new ArrayOfDoublesSetOperationBuilder().setNominalEntries(nominalNumEntries).setNumberOfValues(numValues).buildUnion();
   }
 
   void update(final ArrayOfDoublesSketch sketch) {

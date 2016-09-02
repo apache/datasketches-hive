@@ -77,35 +77,63 @@ public class DataToArrayOfDoublesSketchUDAFTest {
 
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void invalidCategoryArg2() throws SemanticException {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, structInspector };
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
+  }
+
+  @Test(expectedExceptions = { UDFArgumentException.class })
+  public void invalidTypeArg2() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, intInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
-  public void invalidCategoryNumNominalEntriesArg3() throws SemanticException {
-    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector,  floatInspector };
+  public void invalidCategoryNominalNumEntriesArg3() throws SemanticException {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector, structInspector };
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
+  }
+
+  @Test(expectedExceptions = { UDFArgumentTypeException.class })
+  public void invalidTypeNominalNumEntriesArg3() throws SemanticException {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector, floatInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidCategoryNumNominalEntriesArg4() throws SemanticException {
-    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector,  doubleInspector, floatInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector, doubleInspector, structInspector };
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
+  }
+
+  @Test(expectedExceptions = { UDFArgumentTypeException.class })
+  public void invalidTypeNumNominalEntriesArg4() throws SemanticException {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector, doubleInspector, floatInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidCategorySamplingProbability() throws SemanticException {
-    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector,  intInspector, intInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector, intInspector, structInspector };
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
+  }
+
+  @Test(expectedExceptions = { UDFArgumentTypeException.class })
+  public void invalidTypeSamplingProbability() throws SemanticException {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector, intInspector, intInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void extraParameter() throws SemanticException {
-    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector,  intInspector, floatInspector, intInspector };
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector, intInspector, floatInspector, intInspector };
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
     new DataToArrayOfDoublesSketchUDAF().getEvaluator(params);
   }
@@ -270,7 +298,6 @@ public class DataToArrayOfDoublesSketchUDAFTest {
     eval.close();
   }
 
-  // COMPLETE mode (single mode, alternative to MapReduce): iterate + terminate
   @Test
   public void completeModeDoubleKeysExplicitParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, doubleInspector, doubleInspector, intInspector, floatInspector };
@@ -290,6 +317,33 @@ public class DataToArrayOfDoublesSketchUDAFTest {
     // because of sampling probability < 1
     Assert.assertTrue(resultSketch.isEstimationMode());
     Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
+
+    eval.reset(state);
+    result = eval.terminate(state);
+    Assert.assertNull(result);
+
+    eval.close();
+  }
+
+  @Test
+  public void completeModeCheckTrimmingToNominal() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector, doubleInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToArrayOfDoublesSketchUDAF().getEvaluator(info);
+    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+    checkFinalResultInspector(resultInspector);
+
+    ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
+    for (int i = 0; i < 10000; i++) {
+      eval.iterate(state, new Object[] {new IntWritable(i), new DoubleWritable(1)});
+    }
+
+    Object result = eval.terminate(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof BytesWritable);
+    ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Assert.assertEquals(resultSketch.getEstimate(), 10000.0, 10000 * 0.03);
+    Assert.assertTrue(resultSketch.getRetainedEntries() <= 4096, "retained entries: " + resultSketch.getRetainedEntries());
 
     eval.reset(state);
     result = eval.terminate(state);
