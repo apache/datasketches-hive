@@ -18,7 +18,7 @@ import com.yahoo.sketches.ArrayOfStringsSerDe;
 public class UnionStringsSketchUDAF extends UnionItemsSketchUDAF<String> {
 
   @Override
-  GenericUDAFEvaluator createEvaluator() {
+  public GenericUDAFEvaluator createEvaluator() {
     return new UnionStringsSketchEvaluator();
   }
 
