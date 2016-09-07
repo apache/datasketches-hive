@@ -36,7 +36,7 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
     return createEvaluator();
   }
 
-  abstract GenericUDAFEvaluator createEvaluator();
+  public abstract GenericUDAFEvaluator createEvaluator();
 
   public static abstract class DataToSketchEvaluator<T> extends ItemsEvaluator<T> {
 
@@ -57,7 +57,7 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       state.update(extractValue(data[0], inputObjectInspector));
     }
 
-    abstract T extractValue(final Object data, final ObjectInspector objectInspector) throws HiveException;
+    public abstract T extractValue(final Object data, final ObjectInspector objectInspector) throws HiveException;
 
   }
 

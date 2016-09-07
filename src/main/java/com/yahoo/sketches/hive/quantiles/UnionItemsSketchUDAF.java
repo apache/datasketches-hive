@@ -36,7 +36,7 @@ public abstract class UnionItemsSketchUDAF<T> extends AbstractGenericUDAFResolve
    return createEvaluator();
   }
 
-  abstract GenericUDAFEvaluator createEvaluator();
+  public abstract GenericUDAFEvaluator createEvaluator();
 
   public static class UnionEvaluator<T> extends ItemsEvaluator<T> {
 

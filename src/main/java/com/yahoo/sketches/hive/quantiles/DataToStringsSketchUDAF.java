@@ -25,7 +25,7 @@ import com.yahoo.sketches.ArrayOfStringsSerDe;
 public class DataToStringsSketchUDAF extends DataToItemsSketchUDAF<String> {
 
   @Override
-  GenericUDAFEvaluator createEvaluator() {
+  public GenericUDAFEvaluator createEvaluator() {
     return new DataToStringsSketchEvaluator();
   }
 
@@ -36,7 +36,7 @@ public class DataToStringsSketchUDAF extends DataToItemsSketchUDAF<String> {
     }
 
     @Override
-    String extractValue(Object data, ObjectInspector objectInspector) throws HiveException {
+    public String extractValue(Object data, ObjectInspector objectInspector) throws HiveException {
       Object value = inputObjectInspector.getPrimitiveJavaObject(data);
       if (value instanceof String) {
         return (String) value;
