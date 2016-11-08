@@ -26,7 +26,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspect
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 
 /**
  * Hive Generic UDAF Resolver Class for MergeSketchUDAF.

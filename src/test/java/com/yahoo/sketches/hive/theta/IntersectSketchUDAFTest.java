@@ -23,7 +23,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.UpdateSketch;

@@ -27,7 +27,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketch;

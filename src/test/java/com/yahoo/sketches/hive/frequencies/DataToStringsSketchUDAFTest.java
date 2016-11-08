@@ -21,7 +21,7 @@ import org.apache.hadoop.io.IntWritable;
 
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.frequencies.ItemsSketch;
 
 import org.testng.annotations.Test;

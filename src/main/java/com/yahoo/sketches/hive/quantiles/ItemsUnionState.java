@@ -9,8 +9,8 @@ import java.util.Comparator;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.ArrayOfItemsSerDe;
-import com.yahoo.sketches.memory.NativeMemory;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 import com.yahoo.sketches.quantiles.ItemsUnion;
 
