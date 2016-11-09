@@ -9,7 +9,7 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 
 @Description(name = "GetK", value = "_FUNC_(sketch)",

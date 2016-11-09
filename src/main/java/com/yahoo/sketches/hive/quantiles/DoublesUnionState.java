@@ -7,7 +7,7 @@ package com.yahoo.sketches.hive.quantiles;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.DoublesUnion;
 import com.yahoo.sketches.quantiles.DoublesUnionBuilder;
@@ -35,7 +35,8 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   void update(final byte[] serializedSketch) {
     final DoublesSketch incomingSketch = DoublesSketch.heapify(new NativeMemory(serializedSketch));
     if (union == null) {
-      union = DoublesUnion.builder().build(incomingSketch);
+      DoublesUnion.builder();
+      union = DoublesUnionBuilder.build(incomingSketch);
     } else {
       union.update(incomingSketch);
     }

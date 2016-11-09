@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.UpdateSketch;
 import com.yahoo.sketches.theta.Sketches;

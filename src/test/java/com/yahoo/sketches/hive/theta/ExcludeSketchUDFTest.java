@@ -11,8 +11,8 @@ import org.testng.annotations.Test;
 
 import com.yahoo.sketches.hive.theta.ExcludeSketchUDF;
 
-import com.yahoo.sketches.memory.Memory;
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.Memory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.UpdateSketch;

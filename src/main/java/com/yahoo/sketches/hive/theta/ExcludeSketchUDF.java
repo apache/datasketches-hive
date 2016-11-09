@@ -10,7 +10,7 @@ import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.AnotB;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;

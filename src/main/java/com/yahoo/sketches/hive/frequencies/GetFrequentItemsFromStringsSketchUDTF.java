@@ -19,10 +19,10 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.frequencies.ErrorType;
 import com.yahoo.sketches.frequencies.ItemsSketch;
-import com.yahoo.sketches.memory.NativeMemory;
 
 @Description(name = "GetFrequentItems", value = "_FUNC_(sketch, errorType) - "
     + "Returns a list of frequent items in descending order by estimated frequency."
