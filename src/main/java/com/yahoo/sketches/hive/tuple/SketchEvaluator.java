@@ -14,7 +14,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.sketches.memory.NativeMemory;
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.Sketches;
 import com.yahoo.sketches.tuple.Summary;

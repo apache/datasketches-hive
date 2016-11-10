@@ -7,9 +7,9 @@ package com.yahoo.sketches.hive.frequencies;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
+import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.frequencies.ItemsSketch;
-import com.yahoo.sketches.memory.NativeMemory;
 
 class ItemsState<T> extends AbstractAggregationBuffer {
 

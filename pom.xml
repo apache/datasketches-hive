@@ -152,7 +152,13 @@
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
-      <version>0.7.0</version>
+      <version>0.8.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yahoo.datasketches</groupId>
+      <artifactId>memory</artifactId>
+      <version>0.8.1</version>
     </dependency>
 
     <!-- Hive Dependencies (provided scope) -->
@@ -204,6 +210,7 @@
               <artifactSet>
                 <includes>
                   <include>com.yahoo.datasketches:sketches-core</include>
+                  <include>com.yahoo.datasketches:memory</include>
                 </includes>
               </artifactSet>
               <relocations>
@@ -213,6 +220,10 @@
                   <excludes>
                     <exclude>com.yahoo.sketches.hive.**</exclude>
                   </excludes>
+                </relocation>
+                <relocation>
+                  <pattern>com.yahoo.memory</pattern>
+                  <shadedPattern>shaded.com.yahoo.memory</shadedPattern>
                 </relocation>
               </relocations>
               <shadedArtifactAttached>true</shadedArtifactAttached>
