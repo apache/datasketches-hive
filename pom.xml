@@ -152,13 +152,13 @@
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
-      <version>0.8.1</version>
+      <version>0.8.2</version>
     </dependency>
 
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>memory</artifactId>
-      <version>0.8.1</version>
+      <version>0.8.2</version>
     </dependency>
 
     <!-- Hive Dependencies (provided scope) -->
@@ -435,7 +435,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.6</version>
+          <version>3.0.0</version>
         </plugin>
 
         <plugin>
