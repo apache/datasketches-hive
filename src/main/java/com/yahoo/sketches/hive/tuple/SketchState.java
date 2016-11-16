@@ -53,21 +53,23 @@ class SketchState<U, S extends UpdatableSummary<U>> extends State<S> {
       return;
     default:
       throw new IllegalArgumentException(
-          "Unrecongnized input data type, please use data of type binary, byte, double, float, int, long, or string only.");
+          "Unrecongnized input data type, please use data of type: "
+      + "byte, double, float, int, long, or string only.");
     }
   }
 
   @Override
   Sketch<S> getResult() {
-    if (sketch_ == null) return null;
-    // assumes that it is called once at the end of processing since trimming to nominal number of entries is expensive
+    if (sketch_ == null) { return null; }
+    // assumes that it is called once at the end of processing
+    // since trimming to nominal number of entries is expensive
     sketch_.trim();
     return sketch_.compact();
   }
 
   @Override
   void reset() {
-    sketch_ = null;    
+    sketch_ = null;
   }
 
 }

@@ -78,7 +78,8 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
    */
   public abstract GenericUDAFEvaluator createEvaluator();
 
-  public static abstract class DataToSketchEvaluator<U, S extends UpdatableSummary<U>> extends SketchEvaluator<S> {
+  public static abstract class DataToSketchEvaluator<U, S extends UpdatableSummary<U>>
+      extends SketchEvaluator<S> {
 
     private static final float DEFAULT_SAMPLING_PROBABILITY = 1f;
 
@@ -123,8 +124,9 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data) throws HiveException {
-      if (data[0] == null) return;
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data)
+        throws HiveException {
+      if (data[0] == null) { return; }
       @SuppressWarnings("unchecked")
       final SketchState<U, S> state = (SketchState<U, S>) buf;
       if (!state.isInitialized()) {
@@ -137,7 +139,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
       if (nominalNumEntriesInspector_ != null) {
         nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[2], nominalNumEntriesInspector_);
-      } 
+      }
       float samplingProbability = DEFAULT_SAMPLING_PROBABILITY;
       if (samplingProbabilityInspector_ != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[3],
@@ -162,7 +164,8 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * @return extracted value
      * @throws HiveException if anything goes wrong
      */
-    public U extractValue(final Object data, final PrimitiveObjectInspector valueInspector) throws HiveException {
+    public U extractValue(final Object data, final PrimitiveObjectInspector valueInspector)
+        throws HiveException {
       @SuppressWarnings("unchecked")
       final U value = (U) valueInspector.getPrimitiveJavaObject(data);
       return value;

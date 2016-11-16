@@ -34,7 +34,7 @@ public class GetPmfFromDoublesSketchUDF extends UDF {
    * @return list of fractions from 0 to 1
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... splitPoints) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
     return Util.primitivesToList(sketch.getPMF(Util.objectsToPrimitives(splitPoints)));
   }

@@ -19,7 +19,7 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   // initializing is needed only in the first phase (iterate)
   void init(final int k) {
     final DoublesUnionBuilder unionBuilder = DoublesUnion.builder();
-    if (k > 0) unionBuilder.setK(k);
+    if (k > 0) { unionBuilder.setK(k); }
     union = unionBuilder.build();
   }
 
@@ -28,7 +28,9 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   }
 
   void update(final double value) {
-    if (union == null) union = DoublesUnion.builder().build();
+    if (union == null) {
+      union = DoublesUnion.builder().build();
+    }
     union.update(value);
   }
 
@@ -43,7 +45,7 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   }
 
   public DoublesSketch getResult() {
-    if (union == null) return null;
+    if (union == null) { return null; }
     return union.getResultAndReset();
   }
 

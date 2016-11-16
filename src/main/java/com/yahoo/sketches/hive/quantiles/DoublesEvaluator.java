@@ -29,7 +29,9 @@ abstract class DoublesEvaluator extends GenericUDAFEvaluator {
     // In PARTIAL1 and COMPLETE mode, the parameters are original data.
     // In PARTIAL2 and FINAL mode, the parameters are partial aggregations.
     if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
-      if (parameters.length > 1) kObjectInspector = (PrimitiveObjectInspector) parameters[1];
+      if (parameters.length > 1) {
+        kObjectInspector = (PrimitiveObjectInspector) parameters[1];
+      }
     }
 
     return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
@@ -47,13 +49,14 @@ abstract class DoublesEvaluator extends GenericUDAFEvaluator {
   public Object terminatePartial(final AggregationBuffer buf) throws HiveException {
     return terminate(buf);
   }
-  
+
   @SuppressWarnings("deprecation")
   @Override
   public void merge(final AggregationBuffer buf, Object data) throws HiveException {
-    if (data == null) return;
+    if (data == null) { return; }
     final DoublesUnionState state = (DoublesUnionState) buf;
-    final BytesWritable serializedSketch = (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
+    final BytesWritable serializedSketch =
+        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
     state.update(serializedSketch.getBytes());
   }
 
@@ -62,7 +65,7 @@ abstract class DoublesEvaluator extends GenericUDAFEvaluator {
   public Object terminate(final AggregationBuffer buf) throws HiveException {
     final DoublesUnionState state = (DoublesUnionState) buf;
     final DoublesSketch resultSketch = state.getResult();
-    if (resultSketch == null) return null;
+    if (resultSketch == null) { return null; }
     return new BytesWritable(resultSketch.toByteArray());
   }
 

@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright 2015, Yahoo Inc.
+/*
+ * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- *******************************************************************************/
+ */
 
 package com.yahoo.sketches.hive.theta;
 
@@ -25,7 +25,7 @@ public class UnionSketchUDF extends UDF {
   /**
    * Main logic called by hive if sketchSize is also passed in. Union two
    * sketches of same or different column.
-   * 
+   *
    * @param firstSketch
    *          first sketch to be unioned.
    * @param secondSketch
@@ -36,7 +36,7 @@ public class UnionSketchUDF extends UDF {
    * @param seed using the seed is not recommended unless you really know why you need it.
    * @return resulting sketch of union.
    */
-  public BytesWritable evaluate(final BytesWritable firstSketch, final BytesWritable secondSketch, 
+  public BytesWritable evaluate(final BytesWritable firstSketch, final BytesWritable secondSketch,
       final int sketchSize, final long seed) {
 
     final Union union = SetOperation.builder().setSeed(seed).buildUnion(sketchSize);
@@ -55,7 +55,7 @@ public class UnionSketchUDF extends UDF {
   /**
    * Main logic called by hive if sketchSize is also passed in. Union two
    * sketches of same or different column.
-   * 
+   *
    * @param firstSketch
    *          first sketch to be unioned.
    * @param secondSketch
@@ -65,7 +65,7 @@ public class UnionSketchUDF extends UDF {
    *          This must be a power of 2 and larger than 16.
    * @return resulting sketch of union.
    */
-  public BytesWritable evaluate(final BytesWritable firstSketch, final BytesWritable secondSketch, 
+  public BytesWritable evaluate(final BytesWritable firstSketch, final BytesWritable secondSketch,
       final int sketchSize) {
     return evaluate(firstSketch, secondSketch, sketchSize, DEFAULT_UPDATE_SEED);
   }
@@ -73,7 +73,7 @@ public class UnionSketchUDF extends UDF {
   /**
    * Main logic called by hive if sketchSize is not passed in. Union two
    * sketches of same or different column.
-   * 
+   *
    * @param firstSketch
    *          first sketch to be unioned.
    * @param secondSketch

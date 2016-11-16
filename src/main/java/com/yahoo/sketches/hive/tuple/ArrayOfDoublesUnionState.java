@@ -20,7 +20,8 @@ class ArrayOfDoublesUnionState extends ArrayOfDoublesState {
   @Override
   void init(final int nominalNumEntries, final int numValues) {
     super.init(nominalNumEntries, numValues);
-    union_ = new ArrayOfDoublesSetOperationBuilder().setNominalEntries(nominalNumEntries).setNumberOfValues(numValues).buildUnion();
+    union_ = new ArrayOfDoublesSetOperationBuilder()
+        .setNominalEntries(nominalNumEntries).setNumberOfValues(numValues).buildUnion();
   }
 
   void update(final ArrayOfDoublesSketch sketch) {
@@ -29,13 +30,13 @@ class ArrayOfDoublesUnionState extends ArrayOfDoublesState {
 
   @Override
   ArrayOfDoublesSketch getResult() {
-    if (union_ == null) return null;
+    if (union_ == null) { return null; }
     return union_.getResult();
   }
 
   @Override
   void reset() {
-    union_ = null;    
+    union_ = null;
   }
 
 }

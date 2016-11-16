@@ -25,7 +25,7 @@ public class GetKFromStringsSketchUDF extends UDF {
    * @return parameter K
    */
   public Integer evaluate(final BytesWritable serializedSketch) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
       new NativeMemory(serializedSketch.getBytes()),
       Comparator.naturalOrder(),

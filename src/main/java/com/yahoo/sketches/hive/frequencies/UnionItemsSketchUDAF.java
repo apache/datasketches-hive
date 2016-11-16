@@ -26,7 +26,9 @@ public abstract class UnionItemsSketchUDAF<T> extends AbstractGenericUDAFResolve
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
-    if (inspectors.length != 1) throw new UDFArgumentException("One argument expected");
+    if (inspectors.length != 1) {
+      throw new UDFArgumentException("One argument expected");
+    }
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
           + inspectors[0].getTypeName() + " was recieved");

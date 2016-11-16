@@ -35,8 +35,9 @@ public class DoubleSummarySketchToEstimatesUDF extends UDF {
    * @return list of estimates
    */
   public List<Double> evaluate(final BytesWritable serializedSketch) {
-    if (serializedSketch == null) return null;
-    final Sketch<DoubleSummary> sketch = Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes()));
+    if (serializedSketch == null) { return null; }
+    final Sketch<DoubleSummary> sketch =
+        Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes()));
     double sum = 0;
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {

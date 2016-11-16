@@ -102,15 +102,16 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data) throws HiveException {
-      if (data[0] == null) return;
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data)
+        throws HiveException {
+      if (data[0] == null) { return; }
       @SuppressWarnings("unchecked")
       final UnionState<S> state = (UnionState<S>) buf;
       if (!state.isInitialized()) {
         initializeState(state, data);
       }
       final byte[] serializedSketch = (byte[]) sketchInspector_.getPrimitiveJavaObject(data[0]);
-      if (serializedSketch == null) return;
+      if (serializedSketch == null) { return; }
       state.update(Sketches.heapifySketch(new NativeMemory(serializedSketch)));
     }
 
@@ -118,7 +119,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
       if (nominalNumEntriesInspector_ != null) {
         nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[1], nominalNumEntriesInspector_);
-      } 
+      }
       state.init(nominalNumEntries, getSummaryFactoryForIterate(data));
     }
 

@@ -72,7 +72,8 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
 
   }
 
-  static class DataToDoubleSummaryWithModeSketchEvaluator extends DataToSketchEvaluator<Double, DoubleSummary> {
+  static class DataToDoubleSummaryWithModeSketchEvaluator
+      extends DataToSketchEvaluator<Double, DoubleSummary> {
 
     private static final String SUMMARY_MODE_FIELD = "summaryMode";
     private PrimitiveObjectInspector summaryModeInspector_;
@@ -119,11 +120,12 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
 
     // need to add summary mode
     @Override
-    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+        throws HiveException {
       @SuppressWarnings("unchecked")
       final State<DoubleSummary> state = (State<DoubleSummary>) buf;
       final Sketch<DoubleSummary> intermediate = state.getResult();
-      if (intermediate == null) return null;
+      if (intermediate == null) { return null; }
       final byte[] bytes = intermediate.toByteArray();
       return Arrays.asList(
         new IntWritable(state.getNominalNumEntries()),

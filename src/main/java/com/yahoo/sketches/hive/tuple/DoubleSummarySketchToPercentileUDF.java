@@ -37,9 +37,12 @@ public class DoubleSummarySketchToPercentileUDF extends UDF {
    * @return percentile value
    */
   public Double evaluate(final BytesWritable serializedSketch, final double percentile) {
-    if (serializedSketch == null) return null;
-    if (percentile < 0 || percentile > 100) throw new IllegalArgumentException("percentile must be between 0 and 100");
-    final Sketch<DoubleSummary> sketch = Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes()));
+    if (serializedSketch == null) { return null; }
+    if (percentile < 0 || percentile > 100) {
+      throw new IllegalArgumentException("percentile must be between 0 and 100");
+    }
+    final Sketch<DoubleSummary> sketch =
+        Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes()));
     final DoublesSketch qs = new DoublesSketchBuilder().build(QUANTILES_SKETCH_SIZE);
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {

@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright 2016, Yahoo Inc.
+/*
+ * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- *******************************************************************************/
+ */
 
 package com.yahoo.sketches.hive.theta;
 
@@ -37,7 +37,7 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#terminatePartial
    * (
@@ -49,7 +49,7 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
       throws HiveException {
     final UnionState state = (UnionState) agg;
     final Sketch intermediate = state.getResult();
-    if (intermediate == null) return null;
+    if (intermediate == null) { return null; }
     final byte[] bytes = intermediate.toByteArray();
     // sampling probability is not relevant for merging
     return Arrays.asList(
@@ -61,21 +61,21 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#merge(org.
    * apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer,
    * java.lang.Object)
    */
   @Override
-  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg, 
+  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer agg,
       final Object partial) throws HiveException {
-    if (partial == null) return;
+    if (partial == null) { return; }
     final UnionState state = (UnionState) agg;
     if (!state.isInitialized()) {
       initializeState(state, partial);
     }
-    final BytesWritable serializedSketch = 
+    final BytesWritable serializedSketch =
         (BytesWritable) intermediateObjectInspector.getStructFieldData(
             partial, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD));
     state.update(new NativeMemory(serializedSketch.getBytes()));
@@ -91,37 +91,37 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#terminate(
    * org.apache
    * .hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
    */
   @Override
-  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg) 
+  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg)
       throws HiveException {
     final UnionState state = (UnionState) agg;
     Sketch result = state.getResult();
-    if (result == null) return null;
+    if (result == null) { return null; }
     return new BytesWritable(result.toByteArray());
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator
    * #reset(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer)
    */
   @Override
-  public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg) 
+  public void reset(final @SuppressWarnings("deprecation") AggregationBuffer agg)
       throws HiveException {
     final UnionState state = (UnionState) agg;
     state.reset();
   }
 
   /**
-   * 
+   *
    * @see org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#getNewAggregationBuffer()
    */
   @SuppressWarnings("deprecation")

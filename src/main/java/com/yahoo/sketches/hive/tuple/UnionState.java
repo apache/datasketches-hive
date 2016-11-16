@@ -29,13 +29,13 @@ class UnionState<S extends Summary> extends State<S> {
 
   @Override
   Sketch<S> getResult() {
-    if (union_ == null) return null;
+    if (union_ == null) { return null; }
     return union_.getResult();
   }
 
   @Override
   void reset() {
-    union_ = null;    
+    union_ = null;
   }
 
 }

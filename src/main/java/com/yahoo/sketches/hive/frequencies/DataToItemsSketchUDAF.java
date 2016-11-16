@@ -27,7 +27,9 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
-    if (inspectors.length != 2) throw new UDFArgumentException("Two arguments expected");
+    if (inspectors.length != 2) {
+      throw new UDFArgumentException("Two arguments expected");
+    }
 
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
@@ -65,7 +67,9 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       // In PARTIAL1 and COMPLETE mode, the parameters are original data.
       // In PARTIAL2 and FINAL mode, the parameters are just partial aggregations.
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
-        if (parameters.length > 1) maxMapSizeObjectInspector = (PrimitiveObjectInspector) parameters[1];
+        if (parameters.length > 1) {
+          maxMapSizeObjectInspector = (PrimitiveObjectInspector) parameters[1];
+        }
       }
 
       return result;
@@ -74,7 +78,7 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
     @SuppressWarnings("deprecation")
     @Override
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
-      if (data[0] == null) return;
+      if (data[0] == null) { return; }
       @SuppressWarnings("unchecked")
       final ItemsState<T> state = (ItemsState<T>) buf;
       if (!state.isInitialized()) {
@@ -84,7 +88,8 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       state.update(extractValue(data[0], inputObjectInspector));
     }
 
-    public abstract T extractValue(final Object data, final ObjectInspector objectInspector) throws HiveException;
+    public abstract T extractValue(final Object data, final ObjectInspector objectInspector)
+        throws HiveException;
 
   }
 

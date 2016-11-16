@@ -22,7 +22,7 @@ public class GetKFromDoublesSketchUDF extends UDF {
    * @return parameter K
    */
   public Integer evaluate(final BytesWritable serializedSketch) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
     return sketch.getK();
   }

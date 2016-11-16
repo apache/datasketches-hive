@@ -7,7 +7,8 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 
 final class ObjectInspectorValidator {
 
-  static void validateCategoryPrimitive(final ObjectInspector inspector, final int index) throws SemanticException {
+  static void validateCategoryPrimitive(
+      final ObjectInspector inspector, final int index) throws SemanticException {
     if (inspector.getCategory() != ObjectInspector.Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(index, "Primitive argument expected, but "
           + inspector.getCategory().name() + " was recieved");

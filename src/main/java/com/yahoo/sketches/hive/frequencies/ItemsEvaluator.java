@@ -49,10 +49,11 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
   @SuppressWarnings("deprecation")
   @Override
   public void merge(final AggregationBuffer buf, Object data) throws HiveException {
-    if (data == null) return;
+    if (data == null) { return; }
     @SuppressWarnings("unchecked")
     final ItemsState<T> state = (ItemsState<T>) buf;
-    final BytesWritable serializedSketch = (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
+    final BytesWritable serializedSketch =
+        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
     state.update(serializedSketch.getBytes());
   }
 
@@ -62,7 +63,7 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     @SuppressWarnings("unchecked")
     final ItemsState<T> state = (ItemsState<T>) buf;
     final ItemsSketch<T> resultSketch = state.getResult();
-    if (resultSketch == null) return null;
+    if (resultSketch == null) { return null; }
     return new BytesWritable(resultSketch.toByteArray(serDe_));
   }
 

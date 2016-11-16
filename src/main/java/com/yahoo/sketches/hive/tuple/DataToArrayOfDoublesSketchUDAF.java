@@ -28,7 +28,8 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
   name = "DataToArrayOfDoublesSketch",
   value = "_FUNC_(key, double param 1, ..., double param N, nominal number of entries, sampling probability)",
   extended = "Returns an ArrayOfDoublesSketch as a binary blob that can be operated on by other"
-    + " ArrayOfDoublesSketch related functions. The nominal number of entries is optional, must be a power of 2,"
+    + " ArrayOfDoublesSketch related functions. "
+    + "The nominal number of entries is optional, must be a power of 2,"
     + " and controls the relative error expected from the sketch."
     + " A number of 16384 can be expected to yield errors of roughly +-1.5% in the estimation of"
     + " uniques. The default number is defined in the sketches-core library, and at the time of this"
@@ -49,7 +50,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     while (numValues + 1 < inspectors.length) {
       ObjectInspectorValidator.validateCategoryPrimitive(inspectors[numValues + 1], numValues + 1);
       PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspectors[numValues + 1];
-      if (primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.DOUBLE) break;
+      if (primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.DOUBLE) { break; }
       numValues++;
     }
     if (numValues == 0) {
@@ -76,7 +77,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
   }
 
   public static class DataToArrayOfDoublesSketchEvaluator extends ArrayOfDoublesSketchEvaluator {
-    
+
     private static final float DEFAULT_SAMPLING_PROBABILITY = 1f;
 
     private PrimitiveObjectInspector keyInspector_;
@@ -95,7 +96,8 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
         keyInspector_ = (PrimitiveObjectInspector) parameters[0];
         numValues_ = 0;
         while (numValues_ + 1 < parameters.length) {
-          if (((PrimitiveObjectInspector) parameters[numValues_ + 1]).getPrimitiveCategory() != PrimitiveCategory.DOUBLE) {
+          if (((PrimitiveObjectInspector) parameters[numValues_ + 1]).getPrimitiveCategory()
+              != PrimitiveCategory.DOUBLE) {
             break;
           }
           numValues_++;
@@ -132,8 +134,9 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data) throws HiveException {
-      if (data[0] == null) return;
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf,
+        final Object[] data) throws HiveException {
+      if (data[0] == null) { return; }
       final ArrayOfDoublesSketchState state = (ArrayOfDoublesSketchState) buf;
       if (!state.isInitialized()) {
         initializeState(state, data);
@@ -144,8 +147,9 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     private void initializeState(final ArrayOfDoublesSketchState state, final Object[] data) {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
       if (nominalNumEntriesInspector_ != null) {
-        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[numValues_ + 1], nominalNumEntriesInspector_);
-      } 
+        nominalNumEntries =
+            PrimitiveObjectInspectorUtils.getInt(data[numValues_ + 1], nominalNumEntriesInspector_);
+      }
       float samplingProbability = DEFAULT_SAMPLING_PROBABILITY;
       if (samplingProbabilityInspector_ != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[numValues_ + 2],

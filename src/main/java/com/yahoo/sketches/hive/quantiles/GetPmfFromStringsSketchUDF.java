@@ -36,7 +36,7 @@ public class GetPmfFromStringsSketchUDF extends UDF {
    * @return list of fractions from 0 to 1
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final String... splitPoints) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
       new NativeMemory(serializedSketch.getBytes()),
       Comparator.naturalOrder(),

@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright 2015, Yahoo Inc.
+/*
+ * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- *******************************************************************************/
+ */
 
 package com.yahoo.sketches.hive.theta;
 
@@ -28,37 +28,40 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
 @Description(
-    name = "dataToSketch", 
-    value = "_FUNC_(expr, size, prob, seed) - Compute a sketch of given size, sampling probability and seed on data 'expr'", 
+    name = "dataToSketch",
+    value = "_FUNC_(expr, size, prob, seed) - "
+        + "Compute a sketch of given size, sampling probability and seed on data 'expr'",
     extended = "Example:\n"
     + "> SELECT dataToSketch(val, 16384) FROM src;\n"
     + "The return value is a binary blob that can be operated on by other sketch related functions."
-    + " The sketch size is optional, must be a power of 2 and controls the relative error expected from the sketch."
+    + " The sketch size is optional, must be a power of 2 and "
+    + "controls the relative error expected from the sketch."
     + " A size of 16384 can be expected to yield errors of roughly +-1.5% in the estimation of uniques."
-    + " The default size is defined in the sketches-core library and at the time of this writing was 4096 (about 3% error)."
+    + " The default size is defined in the sketches-core library "
+    + "and at the time of this writing was 4096 (about 3% error)."
     + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)"
     + " The seed is optional, and using it is not recommended unless you really know why you need it")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
    * Performs argument number and type validation. DataToSketch expects
-   * to receive between one and four arguments. 
+   * to receive between one and four arguments.
    * <ul>
    * <li>The first (required) is the value to add to the sketch and must be a primitive.</li>
-   * 
+   *
    * <li>The second (optional) is the sketch size to use. This must be an integral value
    * and must be constant.</li>
-   * 
-   * <li>The third (optional) is the sampling probability and is a floating point value between 
+   *
+   * <li>The third (optional) is the sampling probability and is a floating point value between
    * 0.0 and 1.0. It must be a constant</li>
-   *  
-   * <li>The fourth (optional) is an update seed. 
+   *
+   * <li>The fourth (optional) is an update seed.
    * It must be an integral value and must be constant.</li>
    * </ul>
    *
    * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver
    * #getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
-   * 
+   *
    * @param info Parameter info to validate
    * @return The GenericUDAFEvaluator that should be used to calculate the function.
    */
@@ -113,7 +116,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#init(org.apache
      * .hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode,
@@ -158,7 +161,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator#iterate(org
      * .apache
@@ -168,7 +171,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
-      if (parameters[0] == null) return;
+      if (parameters[0] == null) { return; }
       final UnionState state = (UnionState) agg;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
@@ -180,7 +183,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       int sketchSize = DEFAULT_NOMINAL_ENTRIES;
       if (nominalEntriesObjectInspector != null) {
         sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);
-      } 
+      }
       float samplingProbability = UnionState.DEFAULT_SAMPLING_PROBABILITY;
       if (samplingProbabilityObjectInspector != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(parameters[2],

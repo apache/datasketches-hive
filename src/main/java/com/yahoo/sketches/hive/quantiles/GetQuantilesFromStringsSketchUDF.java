@@ -39,7 +39,7 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
    * @return list of quantile values
    */
   public List<String> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
       new NativeMemory(serializedSketch.getBytes()),
       Comparator.naturalOrder(),
@@ -55,7 +55,7 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
    * @return list of quantile values
    */
   public List<String> evaluate(final BytesWritable serializedSketch, final int number) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
       new NativeMemory(serializedSketch.getBytes()),
       Comparator.naturalOrder(),

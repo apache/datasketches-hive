@@ -36,7 +36,7 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
    * @return list of quantile values
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
     return Util.primitivesToList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
   }
@@ -48,7 +48,7 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
    * @return list of quantile values
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final int number) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
     return Util.primitivesToList(sketch.getQuantiles(number));
   }

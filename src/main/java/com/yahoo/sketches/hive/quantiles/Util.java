@@ -20,7 +20,7 @@ final class Util {
 
   static List<Double> primitivesToList(final double[] array) {
     final List<Double> result = new ArrayList<Double>(array.length);
-    for (double item: array) result.add(item);
+    for (double item: array) { result.add(item); }
     return result;
   }
 

@@ -32,7 +32,8 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
   name = "UnionArrayOfDoublesSketch",
   value = "_FUNC_(sketch, nominal number of entries, number of values)",
   extended = "Returns an ArrayOfDoublesSketch as a binary blob that can be operated on by other"
-    + " ArrayOfDoublesSketch related functions. The nominal number of entries is optional, must be a power of 2,"
+    + " ArrayOfDoublesSketch related functions. "
+    + "The nominal number of entries is optional, must be a power of 2,"
     + " does not have to match the input sketches, and controls the relative error expected"
     + " from the sketch. A number of 16384 can be expected to yield errors of roughly +-1.5% in"
     + " the estimation of uniques. The default number is defined in the sketches-core library,"
@@ -107,14 +108,15 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data) throws HiveException {
-      if (data[0] == null) return;
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data)
+        throws HiveException {
+      if (data[0] == null) { return; }
       final ArrayOfDoublesUnionState state = (ArrayOfDoublesUnionState) buf;
       if (!state.isInitialized()) {
         initializeState(state, data);
       }
       final byte[] serializedSketch = (byte[]) sketchInspector_.getPrimitiveJavaObject(data[0]);
-      if (serializedSketch == null) return;
+      if (serializedSketch == null) { return; }
       state.update(ArrayOfDoublesSketches.wrapSketch(new NativeMemory(serializedSketch)));
     }
 
@@ -122,7 +124,7 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
       if (nominalNumEntriesInspector_ != null) {
         nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[1], nominalNumEntriesInspector_);
-      } 
+      }
       int numValues = DEFAULT_NUM_VALUES;
       if (numValuesInspector_ != null) {
         numValues = PrimitiveObjectInspectorUtils.getInt(data[2], numValuesInspector_);

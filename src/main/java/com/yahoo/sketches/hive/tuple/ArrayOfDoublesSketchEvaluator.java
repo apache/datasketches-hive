@@ -28,10 +28,11 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
   protected StructObjectInspector intermediateInspector_;
 
   @Override
-  public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+  public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+      throws HiveException {
     final ArrayOfDoublesState state = (ArrayOfDoublesState) buf;
     final ArrayOfDoublesSketch intermediate = state.getResult();
-    if (intermediate == null) return null;
+    if (intermediate == null) { return null; }
     final byte[] bytes = intermediate.toByteArray();
     return Arrays.asList(
       new IntWritable(state.getNominalNumEntries()),
@@ -41,13 +42,14 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
   }
 
   @Override
-  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object data) throws HiveException {
-    if (data == null) return;
+  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object data)
+      throws HiveException {
+    if (data == null) { return; }
     final ArrayOfDoublesUnionState state = (ArrayOfDoublesUnionState) buf;
     if (!state.isInitialized()) {
       initializeState(state, data);
     }
-    final BytesWritable serializedSketch = 
+    final BytesWritable serializedSketch =
         (BytesWritable) intermediateInspector_.getStructFieldData(
             data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
     state.update(ArrayOfDoublesSketches.wrapSketch(new NativeMemory(serializedSketch.getBytes())));
@@ -64,9 +66,9 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
   @Override
   public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
     final ArrayOfDoublesState state = (ArrayOfDoublesState) buf;
-    if (state == null) return null;
+    if (state == null) { return null; }
     ArrayOfDoublesSketch result = state.getResult();
-    if (result == null) return null;
+    if (result == null) { return null; }
     return new BytesWritable(result.toByteArray());
   }
 

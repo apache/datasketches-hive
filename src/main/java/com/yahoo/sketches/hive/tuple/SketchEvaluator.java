@@ -37,11 +37,12 @@ abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
   protected abstract SummaryFactory<S> getSummaryFactoryForIterate(Object[] data);
 
   @Override
-  public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+  public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+      throws HiveException {
     @SuppressWarnings("unchecked")
     final State<S> state = (State<S>) buf;
     final Sketch<S> intermediate = state.getResult();
-    if (intermediate == null) return null;
+    if (intermediate == null) { return null; }
     final byte[] bytes = intermediate.toByteArray();
     return Arrays.asList(
       new IntWritable(state.getNominalNumEntries()),
@@ -50,14 +51,15 @@ abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
   }
 
   @Override
-  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object data) throws HiveException {
-    if (data == null) return;
+  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object data)
+      throws HiveException {
+    if (data == null) { return; }
     @SuppressWarnings("unchecked")
     final UnionState<S> state = (UnionState<S>) buf;
     if (!state.isInitialized()) {
       initializeState(state, data);
     }
-    final BytesWritable serializedSketch = 
+    final BytesWritable serializedSketch =
         (BytesWritable) intermediateInspector_.getStructFieldData(
             data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
     state.update(Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes())));
@@ -81,9 +83,9 @@ abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
   public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
     @SuppressWarnings("unchecked")
     final State<S> state = (State<S>) buf;
-    if (state == null) return null;
+    if (state == null) { return null; }
     Sketch<S> result = state.getResult();
-    if (result == null) return null;
+    if (result == null) { return null; }
     return new BytesWritable(result.toByteArray());
   }
 

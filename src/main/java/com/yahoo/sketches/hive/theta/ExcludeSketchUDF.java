@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright 2015, Yahoo Inc.
+/*
+ * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- *******************************************************************************/
+ */
 
 package com.yahoo.sketches.hive.theta;
 
@@ -25,7 +25,7 @@ public class ExcludeSketchUDF extends UDF {
    * Main logic called by hive if sketchSize is also passed in. Computes the
    * hash in first sketch excluding the hash in second sketch of two sketches of
    * same or different column.
-   * 
+   *
    * @param firstSketchBytes
    *          first sketch to be included.
    * @param secondSketchBytes
@@ -34,7 +34,8 @@ public class ExcludeSketchUDF extends UDF {
    *          Only required if input sketches were constructed using an update seed that was not the default.
    * @return resulting sketch of exclusion.
    */
-  public BytesWritable evaluate(final BytesWritable firstSketchBytes, final BytesWritable secondSketchBytes, final long hashSeed) {
+  public BytesWritable evaluate(final BytesWritable firstSketchBytes,
+      final BytesWritable secondSketchBytes, final long hashSeed) {
 
     Sketch firstSketch = null;
     if (firstSketchBytes != null && firstSketchBytes.getLength() > 0) {
@@ -58,7 +59,7 @@ public class ExcludeSketchUDF extends UDF {
    * Main logic called by hive if hashUpdateSeed is not passed in. Computes the hash
    * in first sketch excluding the hash in second sketch of two sketches of same
    * or different column.
-   * 
+   *
    * @param firstSketchBytes
    *          first sketch to be included.
    * @param secondSketchBytes

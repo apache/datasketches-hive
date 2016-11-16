@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright 2015, Yahoo Inc.
+/*
+ * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- *******************************************************************************/
+ */
 
 package com.yahoo.sketches.hive.theta;
 
@@ -23,7 +23,7 @@ public class EstimateSketchUDF extends UDF {
 
   /**
    * Returns the estimate unique count of sketch.
-   * 
+   *
    * @param binarySketch sketch to be estimated passed in as bytes writable.
    * @return the estimate of unique count from given sketch.
    */
@@ -33,9 +33,9 @@ public class EstimateSketchUDF extends UDF {
 
   /**
    * Returns the estimate unique count of sketch.
-   * 
+   *
    * @param binarySketch sketch to be estimated passed in as bytes writable.
-   * @param seed value used to build the sketch if different from the default 
+   * @param seed value used to build the sketch if different from the default
    * @return the estimate of unique count from given sketch.
    */
   public Double evaluate(final BytesWritable binarySketch, final long seed) {

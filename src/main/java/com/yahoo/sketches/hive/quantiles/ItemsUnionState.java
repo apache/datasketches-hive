@@ -39,12 +39,15 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
   }
 
   void update(final T value) {
-    if (union == null) union = ItemsUnion.getInstance(comparator_);
+    if (union == null) {
+      union = ItemsUnion.getInstance(comparator_);
+    }
     union.update(value);
   }
 
   void update(final byte[] serializedSketch) {
-    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(new NativeMemory(serializedSketch), comparator_, serDe_);
+    final ItemsSketch<T> incomingSketch =
+        ItemsSketch.getInstance(new NativeMemory(serializedSketch), comparator_, serDe_);
     if (union == null) {
       union = ItemsUnion.getInstance(incomingSketch);
     } else {
@@ -53,7 +56,7 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
   }
 
   public ItemsSketch<T> getResult() {
-    if (union == null) return null;
+    if (union == null) { return null; }
     return union.getResultAndReset();
   }
 

@@ -28,7 +28,7 @@ public class GetQuantileFromDoublesSketchUDF extends UDF {
    * @return quantile value
    */
   public Double evaluate(final BytesWritable serializedSketch, final double fraction) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
     return sketch.getQuantile(fraction);
   }

@@ -26,7 +26,8 @@ import com.yahoo.sketches.frequencies.ItemsSketch;
 
 @Description(name = "GetFrequentItems", value = "_FUNC_(sketch, errorType) - "
     + "Returns a list of frequent items in descending order by estimated frequency."
-    + " Error type is optional and must be one of the following: NO_FALSE_POSITIVES (default) or NO_FALSE_NEGATIVES.")
+    + " Error type is optional and must be one of the following: "
+    + "NO_FALSE_POSITIVES (default) or NO_FALSE_NEGATIVES.")
 public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
 
   PrimitiveObjectInspector inputObjectInspector;
@@ -34,7 +35,9 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
 
   @Override
   public StructObjectInspector initialize(final ObjectInspector[] inspectors) throws UDFArgumentException {
-    if (inspectors.length != 1 && inspectors.length != 2) throw new UDFArgumentException("One or two arguments expected");
+    if (inspectors.length != 1 && inspectors.length != 2) {
+      throw new UDFArgumentException("One or two arguments expected");
+    }
 
     if (inspectors[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
@@ -52,7 +55,8 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
             + inspectors[1].getCategory().name() + " was recieved");
       }
       errorTypeObjectInspector = (PrimitiveObjectInspector) inspectors[1];
-      if (errorTypeObjectInspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.STRING) {
+      if (errorTypeObjectInspector.getPrimitiveCategory()
+          != PrimitiveObjectInspector.PrimitiveCategory.STRING) {
         throw new UDFArgumentTypeException(1, "String value expected as the first argument, but "
             + errorTypeObjectInspector.getPrimitiveCategory().name() + " was recieved");
       }
@@ -71,9 +75,11 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
 
   @Override
   public void process(final Object[] data) throws HiveException {
-    if (data == null || data[0] == null) return;
-    final BytesWritable serializedSketch = (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
-    final ItemsSketch<String> sketch = ItemsSketch.getInstance(new NativeMemory(serializedSketch.getBytes()), new ArrayOfStringsSerDe());
+    if (data == null || data[0] == null) { return; }
+    final BytesWritable serializedSketch =
+        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
+    final ItemsSketch<String> sketch = ItemsSketch.getInstance(
+        new NativeMemory(serializedSketch.getBytes()), new ArrayOfStringsSerDe());
     ErrorType errorType = ErrorType.NO_FALSE_POSITIVES;
     if (data.length > 1) {
       errorType = ErrorType.valueOf((String) errorTypeObjectInspector.getPrimitiveJavaObject(data[1]));

@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright 2016, Yahoo Inc.
+/*
+ * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- *******************************************************************************/
+ */
 
 package com.yahoo.sketches.hive.theta;
 
@@ -75,12 +75,13 @@ class UnionState extends AbstractAggregationBuffer {
       return;
     default:
       throw new IllegalArgumentException(
-          "Unrecongnized input data type, please use data of type binary, byte, double, float, int, long, or string only.");
+          "Unrecongnized input data type. Please use data of type: "
+      + "byte, double, float, int, long, or string only.");
     }
   }
 
   public Sketch getResult() {
-    if (union_ == null) return null;
+    if (union_ == null) { return null; }
     return union_.getResult();
   }
 

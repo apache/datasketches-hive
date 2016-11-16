@@ -26,7 +26,8 @@ class ArrayOfDoublesSketchState extends ArrayOfDoublesState {
         .setSamplingProbability(samplingProbability).setNumberOfValues(numValues).build();
   }
 
-  void update(final Object[] data, final PrimitiveObjectInspector keyInspector, final PrimitiveObjectInspector[] valuesInspectors) {
+  void update(final Object[] data, final PrimitiveObjectInspector keyInspector,
+      final PrimitiveObjectInspector[] valuesInspectors) {
     final double[] values = new double[valuesInspectors.length];
     for (int i = 0; i < values.length; i++) {
       values[i] = PrimitiveObjectInspectorUtils.getDouble(data[i + 1], valuesInspectors[i]);
@@ -55,21 +56,23 @@ class ArrayOfDoublesSketchState extends ArrayOfDoublesState {
       return;
     default:
       throw new IllegalArgumentException(
-          "Unrecongnized input data type, please use data of type binary, byte, double, float, int, long, or string only.");
+          "Unrecongnized input data type, please use data of type: "
+      + "byte, double, float, int, long, or string only.");
     }
   }
 
   @Override
   ArrayOfDoublesSketch getResult() {
-    if (sketch_ == null) return null;
-    // assumes that it is called once at the end of processing since trimming to nominal number of entries is expensive
+    if (sketch_ == null) { return null; }
+    // assumes that it is called once at the end of processing
+    // since trimming to nominal number of entries is expensive
     sketch_.trim();
     return sketch_.compact();
   }
 
   @Override
   void reset() {
-    sketch_ = null;    
+    sketch_ = null;
   }
 
 }

@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright 2015, Yahoo Inc.
+/*
+ * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
- *******************************************************************************/
+ */
 
 package com.yahoo.sketches.hive.theta;
 
@@ -33,7 +33,7 @@ import com.yahoo.memory.NativeMemory;
  *
  */
 @Description(
-    name = "unionSketch", 
+    name = "unionSketch",
     value = "_FUNC_(sketch, size, seed) - Compute the union of sketches of given size and seed",
     extended = "Example:\n"
     + "> SELECT UnionSketch(sketch, 16384) FROM src;\n"
@@ -51,10 +51,10 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    * Perform argument count check and argument type checking, returns an
    * appropriate evaluator to perform based on input type (which should always
    * be BINARY sketch). Also check sketch size and seed params if they are passed in.
-   * 
+   *
    * @see org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver
    * #getEvaluator(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo)
-   * 
+   *
    * @param info The parameter info to validate
    * @return The GenericUDAFEvaluator to use to compute the function.
    */
@@ -84,14 +84,14 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
    * Evaluator class of Generic UDAF, main logic of our UDAF.
-   * 
+   *
    */
   public static class UnionSketchUDAFEvaluator extends UnionEvaluator {
 
     /**
      * Receives the passed in argument object inspectors and returns the desired
      * return type's object inspector to inform hive of return type of UDAF.
-     * 
+     *
      * @param mode
      *          Mode (i.e. PARTIAL 1, COMPLETE...) for determining input/output
      *          object inspector type.
@@ -135,22 +135,22 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
     /**
      * Add the incoming sketch into the internal state.
-     * 
+     *
      * @param agg
      *          aggregation buffer storing intermediate results.
      * @param parameters
      *          sketches in the form of Object passed in to be merged.
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg, final Object[] parameters)
-        throws HiveException {
-      if (parameters[0] == null) return;
+    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
+        final Object[] parameters) throws HiveException {
+      if (parameters[0] == null) { return; }
       final UnionState state = (UnionState) agg;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
       final byte[] serializedSketch = (byte[]) inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
-      if (serializedSketch == null) return;
+      if (serializedSketch == null) { return; }
       state.update(new NativeMemory(serializedSketch));
     }
 

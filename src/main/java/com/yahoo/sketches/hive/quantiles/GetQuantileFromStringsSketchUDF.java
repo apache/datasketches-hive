@@ -31,7 +31,7 @@ public class GetQuantileFromStringsSketchUDF extends UDF {
    * @return quantile value
    */
   public String evaluate(final BytesWritable serializedSketch, final double fraction) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
       new NativeMemory(serializedSketch.getBytes()),
       Comparator.naturalOrder(),

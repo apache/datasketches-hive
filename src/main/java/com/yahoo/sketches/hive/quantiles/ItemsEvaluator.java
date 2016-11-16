@@ -39,7 +39,9 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     // In PARTIAL1 and COMPLETE mode, the parameters are original data.
     // In PARTIAL2 and FINAL mode, the parameters are partial aggregations.
     if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
-      if (parameters.length > 1) kObjectInspector = (PrimitiveObjectInspector) parameters[1];
+      if (parameters.length > 1) {
+        kObjectInspector = (PrimitiveObjectInspector) parameters[1];
+      }
     }
 
     return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
@@ -62,10 +64,11 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
   @SuppressWarnings("deprecation")
   @Override
   public void merge(final AggregationBuffer buf, Object data) throws HiveException {
-    if (data == null) return;
+    if (data == null) { return; }
     @SuppressWarnings("unchecked")
     final ItemsUnionState<T> state = (ItemsUnionState<T>) buf;
-    final BytesWritable serializedSketch = (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
+    final BytesWritable serializedSketch =
+        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
     state.update(serializedSketch.getBytes());
   }
 
@@ -75,7 +78,7 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     @SuppressWarnings("unchecked")
     final ItemsUnionState<T> state = (ItemsUnionState<T>) buf;
     final ItemsSketch<T> resultSketch = state.getResult();
-    if (resultSketch == null) return null;
+    if (resultSketch == null) { return null; }
     return new BytesWritable(resultSketch.toByteArray(serDe_));
   }
 

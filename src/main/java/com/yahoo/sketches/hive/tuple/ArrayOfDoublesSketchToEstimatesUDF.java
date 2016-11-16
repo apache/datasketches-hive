@@ -33,7 +33,7 @@ public class ArrayOfDoublesSketchToEstimatesUDF extends UDF {
    * @return list of estimates
    */
   public List<Double> evaluate(final BytesWritable serializedSketch) {
-    if (serializedSketch == null) return null;
+    if (serializedSketch == null) { return null; }
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
         new NativeMemory(serializedSketch.getBytes()));
     final double[] sums = new double[sketch.getNumValues()];

@@ -109,11 +109,12 @@ public class UnionDoubleSummaryWithModeSketchUDAF extends UnionSketchUDAF {
 
     // need to add summary mode
     @Override
-    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+        throws HiveException {
       @SuppressWarnings("unchecked")
       final State<DoubleSummary> state = (State<DoubleSummary>) buf;
       final Sketch<DoubleSummary> intermediate = state.getResult();
-      if (intermediate == null) return null;
+      if (intermediate == null) { return null; }
       final byte[] bytes = intermediate.toByteArray();
       return Arrays.asList(
         new IntWritable(state.getNominalNumEntries()),

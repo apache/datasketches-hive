@@ -24,7 +24,9 @@ public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
-    if (inspectors.length != 1 && inspectors.length != 2) throw new UDFArgumentException("One or two arguments expected");
+    if (inspectors.length != 1 && inspectors.length != 2) {
+      throw new UDFArgumentException("One or two arguments expected");
+    }
     ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, PrimitiveCategory.BINARY);
     if (inspectors.length == 2) {
       ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[1], 1, PrimitiveCategory.INT);
@@ -37,7 +39,7 @@ public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
-      if (data[0] == null) return;
+      if (data[0] == null) { return; }
       final DoublesUnionState state = (DoublesUnionState) buf;
       if (!state.isInitialized()) {
         int k = 0;
