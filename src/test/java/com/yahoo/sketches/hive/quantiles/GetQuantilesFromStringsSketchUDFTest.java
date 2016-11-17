@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import org.testng.Assert;
 
 import com.yahoo.sketches.ArrayOfItemsSerDe;
+import com.yahoo.sketches.ArrayOfLongsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 
@@ -39,7 +40,7 @@ public class GetQuantilesFromStringsSketchUDFTest {
   }
 
   @Test
-  public void normalCase() {
+  public void fractionsNormalCase() {
     ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
     sketch.update("a");
     sketch.update("b");
@@ -50,6 +51,44 @@ public class GetQuantilesFromStringsSketchUDFTest {
     Assert.assertEquals(result.get(0), "a");
     Assert.assertEquals(result.get(1), "b");
     Assert.assertEquals(result.get(2), "c");
+  }
+
+  @Test
+  public void evenlySpacedNormalCase() {
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    sketch.update("a");
+    sketch.update("b");
+    sketch.update("c");
+    List<String> result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), 3);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals(result.get(0), "a");
+    Assert.assertEquals(result.get(1), "b");
+    Assert.assertEquals(result.get(2), "c");
+  }
+
+  //Note: this exception is only caught with asserts enabled.
+  //In production an out-of-bounds error will likely be thrown or a Seg Fault
+  @Test(expectedExceptions = AssertionError.class)
+  public void fractionsWrongSketchType() {
+    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    sketch.update(1L);
+    sketch.update(2L);
+    sketch.update(3L);
+    new GetQuantilesFromStringsSketchUDF() //WRONG SKETCH
+      .evaluate(new BytesWritable(sketch.toByteArray(new ArrayOfLongsSerDe())), 0.5);
+  }
+
+  //Note: this exception is only caught with asserts enabled.
+  // In production an out-of-bounds error will likely be thrown or a Seg Fault
+  @Test(expectedExceptions = AssertionError.class)
+  public void evenlySpacedWrongSketchType() {
+    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    sketch.update(1L);
+    sketch.update(2L);
+    sketch.update(3L);
+    new GetQuantilesFromStringsSketchUDF() //WRONG SKETCH
+      .evaluate(new BytesWritable(sketch.toByteArray(new ArrayOfLongsSerDe())), 1);
   }
 
 }
