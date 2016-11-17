@@ -41,7 +41,7 @@ public class GetQuantileFromStringsSketchUDFTest {
 
   //Note: this exception is only caught with asserts enabled.
   //In production an out-of-bounds error will likely be thrown or a Seg Fault
-  @Test //(expectedExceptions = AssertionError.class)
+  @Test(expectedExceptions = AssertionError.class)
   public void fractionsWrongSketchType() {
     ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
     sketch.update(1L);
