@@ -15,6 +15,7 @@ import org.testng.Assert;
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfLongsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
+import com.yahoo.sketches.SketchesArgumentException;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 
 public class GetQuantilesFromStringsSketchUDFTest {
@@ -52,6 +53,13 @@ public class GetQuantilesFromStringsSketchUDFTest {
     Assert.assertEquals(result.get(1), "b");
     Assert.assertEquals(result.get(2), "c");
   }
+
+  @Test(expectedExceptions = SketchesArgumentException.class)   
+  public void evenlySpacedZero() {   
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);    
+    new GetQuantilesFromStringsSketchUDF()   
+      .evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0);    
+  }    
 
   @Test
   public void evenlySpacedNormalCase() {
