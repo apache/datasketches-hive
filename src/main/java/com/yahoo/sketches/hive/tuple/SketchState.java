@@ -22,13 +22,14 @@ class SketchState<U, S extends UpdatableSummary<U>> extends State<S> {
     return sketch_ != null;
   }
 
-  void init(int nominalNumEntries, float samplingProbability, final SummaryFactory<S> summaryFactory) {
+  void init(final int nominalNumEntries, final float samplingProbability,
+      final SummaryFactory<S> summaryFactory) {
     super.init(nominalNumEntries);
     sketch_ = new UpdatableSketchBuilder<U, S>(summaryFactory).setNominalEntries(nominalNumEntries)
         .setSamplingProbability(samplingProbability).build();
   }
 
-  void update(Object data, PrimitiveObjectInspector keyObjectInspector, U value) {
+  void update(final Object data, final PrimitiveObjectInspector keyObjectInspector, final U value) {
     switch (keyObjectInspector.getPrimitiveCategory()) {
     case BINARY:
       sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, keyObjectInspector).getBytes(), value);

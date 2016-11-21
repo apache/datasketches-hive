@@ -101,7 +101,7 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
   public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer agg)
       throws HiveException {
     final UnionState state = (UnionState) agg;
-    Sketch result = state.getResult();
+    final Sketch result = state.getResult();
     if (result == null) { return null; }
     return new BytesWritable(result.toByteArray());
   }

@@ -48,7 +48,7 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
 
   @SuppressWarnings("deprecation")
   @Override
-  public void merge(final AggregationBuffer buf, Object data) throws HiveException {
+  public void merge(final AggregationBuffer buf, final Object data) throws HiveException {
     if (data == null) { return; }
     @SuppressWarnings("unchecked")
     final ItemsState<T> state = (ItemsState<T>) buf;

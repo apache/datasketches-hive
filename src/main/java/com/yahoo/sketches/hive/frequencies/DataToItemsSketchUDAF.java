@@ -25,7 +25,8 @@ import com.yahoo.sketches.ArrayOfItemsSerDe;
 public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolver {
 
   @Override
-  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
+  public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info)
+      throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
     if (inspectors.length != 2) {
       throw new UDFArgumentException("Two arguments expected");
@@ -60,7 +61,8 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
     }
 
     @Override
-    public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
+    public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters)
+        throws HiveException {
       final ObjectInspector result = super.init(mode, parameters);
 
       // Parameters:
@@ -82,7 +84,7 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       @SuppressWarnings("unchecked")
       final ItemsState<T> state = (ItemsState<T>) buf;
       if (!state.isInitialized()) {
-        int maxMapSize = PrimitiveObjectInspectorUtils.getInt(data[1], maxMapSizeObjectInspector);
+        final int maxMapSize = PrimitiveObjectInspectorUtils.getInt(data[1], maxMapSizeObjectInspector);
         state.init(maxMapSize);
       }
       state.update(extractValue(data[0], inputObjectInspector));

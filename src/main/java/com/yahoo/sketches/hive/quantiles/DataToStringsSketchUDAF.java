@@ -36,8 +36,9 @@ public class DataToStringsSketchUDAF extends DataToItemsSketchUDAF<String> {
     }
 
     @Override
-    public String extractValue(Object data, ObjectInspector objectInspector) throws HiveException {
-      Object value = inputObjectInspector.getPrimitiveJavaObject(data);
+    public String extractValue(final Object data, final ObjectInspector objectInspector)
+        throws HiveException {
+      final Object value = inputObjectInspector.getPrimitiveJavaObject(data);
       if (value instanceof String) {
         return (String) value;
       } else if (value instanceof HiveChar) {

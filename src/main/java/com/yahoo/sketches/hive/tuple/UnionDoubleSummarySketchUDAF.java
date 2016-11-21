@@ -43,7 +43,7 @@ public class UnionDoubleSummarySketchUDAF extends UnionSketchUDAF {
     }
 
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForMerge(Object data) {
+    protected SummaryFactory<DoubleSummary> getSummaryFactoryForMerge(final Object data) {
       return new DoubleSummaryFactory();
     }
 

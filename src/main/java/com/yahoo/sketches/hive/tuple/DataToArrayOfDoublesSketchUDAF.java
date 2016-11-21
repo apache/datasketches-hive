@@ -49,7 +49,8 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     int numValues = 0;
     while (numValues + 1 < inspectors.length) {
       ObjectInspectorValidator.validateCategoryPrimitive(inspectors[numValues + 1], numValues + 1);
-      PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspectors[numValues + 1];
+      final PrimitiveObjectInspector primitiveInspector =
+          (PrimitiveObjectInspector) inspectors[numValues + 1];
       if (primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.DOUBLE) { break; }
       numValues++;
     }

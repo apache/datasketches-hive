@@ -98,7 +98,7 @@ public class UnionDoubleSummaryWithModeSketchUDAF extends UnionSketchUDAF {
     }
 
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForIterate(Object[] data) {
+    protected SummaryFactory<DoubleSummary> getSummaryFactoryForIterate(final Object[] data) {
       if (summaryModeInspector_ != null) {
         summaryMode_ = DoubleSummary.Mode.valueOf(
           PrimitiveObjectInspectorUtils.getString(data[2], summaryModeInspector_)
@@ -124,7 +124,7 @@ public class UnionDoubleSummaryWithModeSketchUDAF extends UnionSketchUDAF {
     }
 
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForMerge(Object data) {
+    protected SummaryFactory<DoubleSummary> getSummaryFactoryForMerge(final Object data) {
       summaryMode_ = DoubleSummary.Mode.valueOf(((Text) intermediateInspector_.getStructFieldData(
           data, intermediateInspector_.getStructFieldRef(SUMMARY_MODE_FIELD))).toString());
       return new DoubleSummaryFactory(summaryMode_);

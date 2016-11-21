@@ -64,16 +64,18 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
   }
 
   @Override
-  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+      throws HiveException {
     final ArrayOfDoublesState state = (ArrayOfDoublesState) buf;
     if (state == null) { return null; }
-    ArrayOfDoublesSketch result = state.getResult();
+    final ArrayOfDoublesSketch result = state.getResult();
     if (result == null) { return null; }
     return new BytesWritable(result.toByteArray());
   }
 
   @Override
-  public void reset(@SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+  public void reset(@SuppressWarnings("deprecation") final AggregationBuffer buf)
+      throws HiveException {
     final ArrayOfDoublesState state = (ArrayOfDoublesState) buf;
     state.reset();
   }

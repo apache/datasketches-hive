@@ -33,7 +33,7 @@ class ObjectInspectorValidator {
   static void validateIntegralParameter(final ObjectInspector inspector, final int index)
       throws UDFArgumentTypeException {
     validateCategoryPrimitive(inspector, index);
-    PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspector;
+    final PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspector;
     switch (primitiveInspector.getPrimitiveCategory()) {
     case BYTE:
     case SHORT:

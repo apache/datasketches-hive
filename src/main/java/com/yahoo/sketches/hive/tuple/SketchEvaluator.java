@@ -80,17 +80,19 @@ abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
   protected abstract SummaryFactory<S> getSummaryFactoryForMerge(Object data);
 
   @Override
-  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+  public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+      throws HiveException {
     @SuppressWarnings("unchecked")
     final State<S> state = (State<S>) buf;
     if (state == null) { return null; }
-    Sketch<S> result = state.getResult();
+    final Sketch<S> result = state.getResult();
     if (result == null) { return null; }
     return new BytesWritable(result.toByteArray());
   }
 
   @Override
-  public void reset(@SuppressWarnings("deprecation") AggregationBuffer buf) throws HiveException {
+  public void reset(@SuppressWarnings("deprecation") final AggregationBuffer buf)
+      throws HiveException {
     @SuppressWarnings("unchecked")
     final State<S> state = (State<S>) buf;
     state.reset();
