@@ -39,7 +39,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
 
   @SuppressWarnings("deprecation")
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorTooFewInspectors() throws Exception {
+  public void initializeTooFewInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
     GenericUDTF func = new GetFrequentItemsFromStringsSketchUDTF();
     func.initialize(inspectors);
@@ -47,7 +47,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
 
   @SuppressWarnings("deprecation")
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorTooManyInspectors() throws Exception {
+  public void initializeTooManyInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, stringInspector, stringInspector };
     GenericUDTF func = new GetFrequentItemsFromStringsSketchUDTF();
     func.initialize(inspectors);
@@ -60,7 +60,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
 
   @SuppressWarnings("deprecation")
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongCategoryArg1() throws Exception {
+  public void initializeWrongCategoryArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
     GenericUDTF func = new GetFrequentItemsFromStringsSketchUDTF();
     func.initialize(inspectors);
@@ -68,7 +68,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
 
   @SuppressWarnings("deprecation")
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongCategoryArg2() throws Exception {
+  public void initializeWrongCategoryArg2() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, structInspector };
     GenericUDTF func = new GetFrequentItemsFromStringsSketchUDTF();
     func.initialize(inspectors);
@@ -76,7 +76,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
 
   @SuppressWarnings("deprecation")
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongTypeArg1() throws Exception {
+  public void initializeWrongTypeArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, stringInspector };
     GenericUDTF func = new GetFrequentItemsFromStringsSketchUDTF();
     func.initialize(inspectors);
@@ -84,7 +84,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
 
   @SuppressWarnings("deprecation")
   @Test(expectedExceptions = UDFArgumentException.class)
-  public void getEvaluatorWrongTypeArg2() throws Exception {
+  public void initializeWrongTypeArg2() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, binaryInspector };
     GenericUDTF func = new GetFrequentItemsFromStringsSketchUDTF();
     func.initialize(inspectors);
@@ -152,8 +152,8 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
     );
   }
 
-  static class MockCollector implements Collector {
-    public List<Object> list = new ArrayList<Object>();
+  private static class MockCollector implements Collector {
+    List<Object> list = new ArrayList<Object>();
 
     @Override
     public void collect(Object object) throws HiveException {
