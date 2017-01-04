@@ -8,9 +8,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.hadoop.io.BytesWritable;
-
-import org.testng.annotations.Test;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfLongsSerDe;
@@ -54,12 +53,12 @@ public class GetQuantilesFromStringsSketchUDFTest {
     Assert.assertEquals(result.get(2), "c");
   }
 
-  @Test(expectedExceptions = SketchesArgumentException.class)   
-  public void evenlySpacedZero() {   
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);    
-    new GetQuantilesFromStringsSketchUDF()   
-      .evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0);    
-  }    
+  @Test(expectedExceptions = SketchesArgumentException.class)
+  public void evenlySpacedZero() {
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    new GetQuantilesFromStringsSketchUDF()
+      .evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0);
+  }
 
   @Test
   public void evenlySpacedNormalCase() {
@@ -75,9 +74,9 @@ public class GetQuantilesFromStringsSketchUDFTest {
     Assert.assertEquals(result.get(2), "c");
   }
 
-  //Note: this exception is only caught with asserts enabled.
-  //In production an out-of-bounds error will likely be thrown or a Seg Fault
-  @Test(expectedExceptions = AssertionError.class)
+  //Note: this exception is only caught because a bounds error was detected.
+  //If a bounds error is not detected from a wrong type assignment, unexpected results could occur.
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void fractionsWrongSketchType() {
     ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
     sketch.update(1L);
@@ -87,9 +86,9 @@ public class GetQuantilesFromStringsSketchUDFTest {
       .evaluate(new BytesWritable(sketch.toByteArray(new ArrayOfLongsSerDe())), 0.5);
   }
 
-  //Note: this exception is only caught with asserts enabled.
-  // In production an out-of-bounds error will likely be thrown or a Seg Fault
-  @Test(expectedExceptions = AssertionError.class)
+  //Note: this exception is only caught because a bounds error was detected.
+  //If a bounds error is not detected from a wrong type assignment, unexpected results could occur.
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void evenlySpacedWrongSketchType() {
     ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
     sketch.update(1L);
