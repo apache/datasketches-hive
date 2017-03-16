@@ -4,18 +4,16 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
+import static org.testng.AssertJUnit.assertEquals;
 
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.annotations.Test;
 
-import com.yahoo.sketches.hive.theta.IntersectSketchUDF;
-
-import com.yahoo.sketches.theta.UpdateSketch;
 import com.yahoo.memory.Memory;
 import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
-import static org.testng.AssertJUnit.assertEquals;
+import com.yahoo.sketches.theta.UpdateSketch;
 
 public class IntersectSketchUDFTest  {
 
@@ -40,12 +38,12 @@ public class IntersectSketchUDFTest  {
   @Test
   public void evaluateValidSketch() {
     IntersectSketchUDF testObject = new IntersectSketchUDF();
-    
+
     UpdateSketch sketch1 = Sketches.updateSketchBuilder().build(1024);
     for (int i = 0; i<128; i++) {
       sketch1.update(i);
     }
-    
+
     UpdateSketch sketch2 = Sketches.updateSketchBuilder().build(1024);
     for (int i = 100; i<128; i++) {
       sketch2.update(i);
@@ -55,9 +53,9 @@ public class IntersectSketchUDFTest  {
     BytesWritable input2 = new BytesWritable(sketch2.compact().toByteArray());
 
     BytesWritable output = testObject.evaluate(input1, input2);
-    
+
     Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()));
-    
+
     assertEquals(28.0, result.getEstimate());
   }
 
@@ -70,7 +68,7 @@ public class IntersectSketchUDFTest  {
     for (int i = 0; i<128; i++) {
       sketch1.update(i);
     }
-    
+
     UpdateSketch sketch2 = Sketches.updateSketchBuilder().setSeed(seed).build(1024);
     for (int i = 100; i<128; i++) {
       sketch2.update(i);
@@ -80,9 +78,9 @@ public class IntersectSketchUDFTest  {
     BytesWritable input2 = new BytesWritable(sketch2.compact().toByteArray());
 
     BytesWritable output = testObject.evaluate(input1, input2, seed);
-    
+
     Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()), seed);
-    
+
     assertEquals(28.0, result.getEstimate());
   }
 

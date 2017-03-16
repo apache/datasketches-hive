@@ -22,30 +22,30 @@ public class SampleSketchUDF extends UDF {
   /**
    * Main logic called by hive, produces new sketch from original using
    * specified size and sampling probablility.
-   * 
+   *
    * @param binarySketch
    *          sketch to be sampled passed in as bytes writable.
-   * @param sketchSize 
+   * @param sketchSize
    *          Size to use for the new sketch.
    *          This must be a power of 2 and larger than 16. If zero, DEFAULT is used.
    * @param probability
-   *          The sampling probability to use for the new sketch. 
-   *          Should be greater than zero and less than or equal to 1.0 
+   *          The sampling probability to use for the new sketch.
+   *          Should be greater than zero and less than or equal to 1.0
    * @return The sampled sketch encoded as a BytesWritable
    */
   public BytesWritable evaluate(BytesWritable binarySketch, int sketchSize, float probability) {
-    
+
     // Null checks
     if (binarySketch == null) {
       return null;
     }
-    
+
     byte[] serializedSketch = binarySketch.getBytes();
-    
+
     if (serializedSketch.length <= 8) {
       return null;
     }
-    
+
     //  The builder will catch errors with improper sketchSize or probability
     Union union = SetOperation.builder().setP(probability).buildUnion(sketchSize);
 

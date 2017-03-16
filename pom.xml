@@ -124,7 +124,7 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
-              <version>3.6.0</version>
+              <version>3.6.1</version>
               <configuration>
                 <source>${maven.compiler.source}</source>
                 <target>${maven.compiler.target}</target>
@@ -152,13 +152,13 @@
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
-      <version>0.8.3</version>
+      <version>0.8.4</version>
     </dependency>
 
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>memory</artifactId>
-      <version>0.8.3</version>
+      <version>0.8.4</version>
     </dependency>
 
     <!-- Hive Dependencies (provided scope) -->
@@ -301,7 +301,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.7.7.201606060606</version>
+        <version>0.7.8</version>
         <executions>
           <!-- Prepares the property pointing to the JaCoCo runtime agent which
                is passed as VM argument when Maven the Surefire plugin is executed. -->
@@ -399,7 +399,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.10</version>
+          <version>3.0.0</version>
         </plugin>
 
         <plugin>
@@ -441,7 +441,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>1.10</version>
+          <version>1.12</version>
         </plugin>
 
         <plugin>

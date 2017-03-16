@@ -4,6 +4,12 @@
  *******************************************************************************/
 package com.yahoo.sketches.hive.theta;
 
+import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
+import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -25,27 +31,19 @@ import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.yahoo.memory.NativeMemory;
-import com.yahoo.sketches.theta.Sketch;
-import com.yahoo.sketches.theta.UpdateSketch;
-import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.SetOperation;
+import com.yahoo.sketches.theta.Sketch;
+import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.Union;
-
-import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
-import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
+import com.yahoo.sketches.theta.UpdateSketch;
 
 /**
  * Unit tests for DataToSketch UDF
  */
-//@SuppressWarnings("deprecation")
 public class DataToSketchUDAFTest {
 
   static final ObjectInspector intInspector =
@@ -184,15 +182,15 @@ public class DataToSketchUDAFTest {
 
     final long seed = 1;
     UnionState state = (UnionState) eval.getNewAggregationBuffer();
-    eval.iterate(state, new Object[] {new Text("a"), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
-    eval.iterate(state, new Object[] {new Text("b"), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
+    eval.iterate(state, new Object[] {new Text("a"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
+    eval.iterate(state, new Object[] {new Text("b"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
 
     Object result = eval.terminatePartial(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof List);
     List<?> r = (List<?>) result;
     Assert.assertEquals(r.size(), 3);
-    Assert.assertEquals(((IntWritable) (r.get(0))).get(), 8);
+    Assert.assertEquals(((IntWritable) (r.get(0))).get(), 16);
     Assert.assertEquals(((LongWritable) (r.get(1))).get(), seed);
     Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()), seed);
     // because of sampling probability < 1
@@ -246,7 +244,7 @@ public class DataToSketchUDAFTest {
 
     eval.close();
   }
-  
+
   // FINAL mode (Reduce phase in Map-Reduce): merge + terminate
   @Test
   public void finalMode() throws Exception {
@@ -319,8 +317,8 @@ public class DataToSketchUDAFTest {
 
     final long seed = 2;
     UnionState state = (UnionState) eval.getNewAggregationBuffer();
-    eval.iterate(state, new Object[] {new DoubleWritable(1), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
-    eval.iterate(state, new Object[] {new DoubleWritable(2), new IntWritable(8), new FloatWritable(0.99f), new LongWritable(seed)});
+    eval.iterate(state, new Object[] {new DoubleWritable(1), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
+    eval.iterate(state, new Object[] {new DoubleWritable(2), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
 
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
@@ -339,18 +337,18 @@ public class DataToSketchUDAFTest {
     StructObjectInspector structResultInspector = (StructObjectInspector) resultInspector;
     List<?> fields = structResultInspector.getAllStructFieldRefs();
     Assert.assertEquals(fields.size(), 3);
- 
-    ObjectInspector inspector1 = ((StructField) fields.get(0)).getFieldObjectInspector(); 
+
+    ObjectInspector inspector1 = ((StructField) fields.get(0)).getFieldObjectInspector();
     Assert.assertEquals(inspector1.getCategory(), ObjectInspector.Category.PRIMITIVE);
     PrimitiveObjectInspector primitiveInspector1 = (PrimitiveObjectInspector) inspector1;
     Assert.assertEquals(primitiveInspector1.getPrimitiveCategory(), PrimitiveCategory.INT);
 
-    ObjectInspector inspector2 = ((StructField) fields.get(1)).getFieldObjectInspector(); 
+    ObjectInspector inspector2 = ((StructField) fields.get(1)).getFieldObjectInspector();
     Assert.assertEquals(inspector2.getCategory(), ObjectInspector.Category.PRIMITIVE);
     PrimitiveObjectInspector primitiveInspector2 = (PrimitiveObjectInspector) inspector2;
     Assert.assertEquals(primitiveInspector2.getPrimitiveCategory(), PrimitiveCategory.LONG);
 
-    ObjectInspector inspector3 = ((StructField) fields.get(2)).getFieldObjectInspector(); 
+    ObjectInspector inspector3 = ((StructField) fields.get(2)).getFieldObjectInspector();
     Assert.assertEquals(inspector3.getCategory(), ObjectInspector.Category.PRIMITIVE);
     PrimitiveObjectInspector primitiveInspector3 = (PrimitiveObjectInspector) inspector3;
     Assert.assertEquals(primitiveInspector3.getPrimitiveCategory(), PrimitiveCategory.BINARY);

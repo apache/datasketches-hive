@@ -5,17 +5,14 @@
 package com.yahoo.sketches.hive.theta;
 
 import org.apache.hadoop.io.BytesWritable;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.sketches.hive.theta.UnionSketchUDF;
-
-import com.yahoo.sketches.theta.UpdateSketch;
 import com.yahoo.memory.Memory;
 import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
-
-import org.testng.Assert;
+import com.yahoo.sketches.theta.UpdateSketch;
 
 public class UnionSketchUDFTest {
 
@@ -45,7 +42,7 @@ public class UnionSketchUDFTest {
     for (int i = 0; i < 128; i++) {
       sketch1.update(i);
     }
-    
+
     UpdateSketch sketch2 = Sketches.updateSketchBuilder().build(1024);
     for (int i = 100; i < 256; i++) {
       sketch2.update(i);

@@ -7,6 +7,9 @@ package com.yahoo.sketches.hive.theta;
 import static com.yahoo.sketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -21,12 +24,8 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketch;
@@ -157,7 +156,7 @@ public class UnionSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
     DataToSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
-    final int nomEntries = 8;
+    final int nomEntries = 16;
     final long seed = 1;
     UnionState state = (UnionState) eval.getNewAggregationBuffer();
 
@@ -299,7 +298,7 @@ public class UnionSketchUDAFTest {
     ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
     DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
 
-    final int nomEntries = 8;
+    final int nomEntries = 16;
     final long seed = 1;
     UnionState state = (UnionState) eval.getNewAggregationBuffer();
 

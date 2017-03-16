@@ -19,7 +19,7 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   // initializing is needed only in the first phase (iterate)
   void init(final int k) {
     final DoublesUnionBuilder unionBuilder = DoublesUnion.builder();
-    if (k > 0) { unionBuilder.setK(k); }
+    if (k > 0) { unionBuilder.setMaxK(k); }
     union = unionBuilder.build();
   }
 
@@ -37,7 +37,7 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   void update(final byte[] serializedSketch) {
     final DoublesSketch incomingSketch = DoublesSketch.heapify(new NativeMemory(serializedSketch));
     if (union == null) {
-      union = DoublesUnionBuilder.build(incomingSketch);
+      union = DoublesUnionBuilder.heapify(incomingSketch);
     } else {
       union.update(incomingSketch);
     }

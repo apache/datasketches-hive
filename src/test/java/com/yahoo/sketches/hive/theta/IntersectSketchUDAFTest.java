@@ -8,15 +8,15 @@ import java.util.List;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.ql.udf.generic.SimpleGenericUDAFParameterInfo;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -24,8 +24,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.yahoo.memory.NativeMemory;
-import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.Sketch;
+import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.UpdateSketch;
 
 public class IntersectSketchUDAFTest {
@@ -282,13 +282,13 @@ public class IntersectSketchUDAFTest {
     StructObjectInspector structResultInspector = (StructObjectInspector) resultInspector;
     List<?> fields = structResultInspector.getAllStructFieldRefs();
     Assert.assertEquals(fields.size(), 2);
- 
-    ObjectInspector inspector1 = ((StructField) fields.get(0)).getFieldObjectInspector(); 
+
+    ObjectInspector inspector1 = ((StructField) fields.get(0)).getFieldObjectInspector();
     Assert.assertEquals(inspector1.getCategory(), ObjectInspector.Category.PRIMITIVE);
     PrimitiveObjectInspector primitiveInspector1 = (PrimitiveObjectInspector) inspector1;
     Assert.assertEquals(primitiveInspector1.getPrimitiveCategory(), PrimitiveCategory.LONG);
 
-    ObjectInspector inspector2 = ((StructField) fields.get(1)).getFieldObjectInspector(); 
+    ObjectInspector inspector2 = ((StructField) fields.get(1)).getFieldObjectInspector();
     Assert.assertEquals(inspector2.getCategory(), ObjectInspector.Category.PRIMITIVE);
     PrimitiveObjectInspector primitiveInspector2 = (PrimitiveObjectInspector) inspector2;
     Assert.assertEquals(primitiveInspector2.getPrimitiveCategory(), PrimitiveCategory.BINARY);

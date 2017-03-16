@@ -23,5 +23,5 @@ See [Hadoop Hive UDF's](http://datasketches.github.io/docs/Theta/ThetaHiveUDFs.h
 [mavenbadge]:https://search.maven.org/#search|gav|1|g%3A%22com.yahoo.datasketches%22%20AND%20a%3A%22sketches-hive%22
 [mavenbadge img]:https://maven-badges.herokuapp.com/maven-central/com.yahoo.datasketches/sketches-hive/badge.svg
 
-[versioneye]:https://www.versioneye.com/user/projects/5751d95a7757a00034dc3c3c
-[versioneye img]:https://www.versioneye.com/user/projects/5751d95a7757a00034dc3c3c/badge.svg?style=flat
+[versioneye]:https://www.versioneye.com/user/projects/587fd639e25f59002c91bcd7
+[versioneye img]:https://www.versioneye.com/user/projects/587fd639e25f59002c91bcd7/badge.svg?style=flat
