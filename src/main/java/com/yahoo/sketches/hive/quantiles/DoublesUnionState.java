@@ -35,7 +35,7 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   }
 
   void update(final byte[] serializedSketch) {
-    final DoublesSketch incomingSketch = DoublesSketch.heapify(new NativeMemory(serializedSketch));
+    final DoublesSketch incomingSketch = DoublesSketch.wrap(new NativeMemory(serializedSketch));
     if (union == null) {
       union = DoublesUnionBuilder.heapify(incomingSketch);
     } else {

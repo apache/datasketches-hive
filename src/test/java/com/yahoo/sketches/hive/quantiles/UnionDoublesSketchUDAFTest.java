@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 
 import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
+import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
 public class UnionDoublesSketchUDAFTest {
 
@@ -90,11 +91,11 @@ public class UnionDoublesSketchUDAFTest {
 
     DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
 
-    DoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
     sketch1.update(1.0);
     eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()) });
 
-    DoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
     sketch2.update(2.0);
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
 
@@ -117,11 +118,11 @@ public class UnionDoublesSketchUDAFTest {
 
     DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
 
-    DoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
     sketch1.update(1.0);
     eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()), new IntWritable(256) });
 
-    DoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
     sketch2.update(2.0);
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()), new IntWritable(256) });
 
@@ -145,11 +146,11 @@ public class UnionDoublesSketchUDAFTest {
 
     DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
 
-    DoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
     sketch1.update(1.0);
     eval.merge(state, new BytesWritable(sketch1.toByteArray()));
 
-    DoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
     sketch2.update(2.0);
     eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
@@ -173,11 +174,11 @@ public class UnionDoublesSketchUDAFTest {
 
     DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
 
-    DoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
     sketch1.update(1.0);
     eval.merge(state, new BytesWritable(sketch1.toByteArray()));
 
-    DoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
+    UpdateDoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
     sketch2.update(2.0);
     eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
@@ -201,11 +202,11 @@ public class UnionDoublesSketchUDAFTest {
 
     DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
 
-    DoublesSketch sketch1 = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch1 = DoublesSketch.builder().build();
     sketch1.update(1.0);
     eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()) });
 
-    DoublesSketch sketch2 = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch2 = DoublesSketch.builder().build();
     sketch2.update(2.0);
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
 
