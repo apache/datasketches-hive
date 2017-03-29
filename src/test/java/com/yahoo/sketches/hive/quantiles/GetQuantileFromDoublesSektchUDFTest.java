@@ -4,7 +4,7 @@
  */
 package com.yahoo.sketches.hive.quantiles;
 
-import com.yahoo.sketches.quantiles.DoublesSketch;
+import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
 import org.testng.annotations.Test;
 import org.apache.hadoop.io.BytesWritable;
@@ -20,7 +20,7 @@ public class GetQuantileFromDoublesSektchUDFTest {
 
   @Test
   public void normalCase() {
-    DoublesSketch sketch = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);

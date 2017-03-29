@@ -66,7 +66,7 @@ abstract class DoublesEvaluator extends GenericUDAFEvaluator {
     final DoublesUnionState state = (DoublesUnionState) buf;
     final DoublesSketch resultSketch = state.getResult();
     if (resultSketch == null) { return null; }
-    return new BytesWritable(resultSketch.toByteArray());
+    return new BytesWritable(resultSketch.toByteArray(true));
   }
 
   @SuppressWarnings("deprecation")

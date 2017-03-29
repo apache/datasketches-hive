@@ -10,8 +10,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 import com.yahoo.memory.NativeMemory;
-import com.yahoo.sketches.quantiles.DoublesSketch;
-import com.yahoo.sketches.quantiles.DoublesSketchBuilder;
+import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 import com.yahoo.sketches.tuple.DoubleSummary;
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.SketchIterator;
@@ -43,7 +42,7 @@ public class DoubleSummarySketchToPercentileUDF extends UDF {
     }
     final Sketch<DoubleSummary> sketch =
         Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes()));
-    final DoublesSketch qs = new DoublesSketchBuilder().build(QUANTILES_SKETCH_SIZE);
+    final UpdateDoublesSketch qs = UpdateDoublesSketch.builder().build(QUANTILES_SKETCH_SIZE);
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {
       qs.update(it.getSummary().getValue());

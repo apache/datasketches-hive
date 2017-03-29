@@ -11,7 +11,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 
-import com.yahoo.sketches.quantiles.DoublesSketch;
+import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
 public class GetPmfFromDoublesSketchUDFTest {
 
@@ -23,7 +23,7 @@ public class GetPmfFromDoublesSketchUDFTest {
 
   @Test
   public void emptyListOfSplitPoints() {
-    DoublesSketch sketch = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -35,7 +35,7 @@ public class GetPmfFromDoublesSketchUDFTest {
 
   @Test
   public void normalCase() {
-    DoublesSketch sketch = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);

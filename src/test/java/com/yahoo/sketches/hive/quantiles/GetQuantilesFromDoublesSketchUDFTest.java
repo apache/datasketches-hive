@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 import org.testng.Assert;
 
 import com.yahoo.sketches.SketchesArgumentException;
-import com.yahoo.sketches.quantiles.DoublesSketch;
+import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
 public class GetQuantilesFromDoublesSketchUDFTest {
 
@@ -24,7 +24,7 @@ public class GetQuantilesFromDoublesSketchUDFTest {
 
   @Test
   public void emptyListOfFractions() {
-    DoublesSketch sketch = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -35,7 +35,7 @@ public class GetQuantilesFromDoublesSketchUDFTest {
 
   @Test
   public void fractionsNormalCase() {
-    DoublesSketch sketch = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -49,13 +49,13 @@ public class GetQuantilesFromDoublesSketchUDFTest {
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void evenlySpacedZero() {
-    DoublesSketch sketch = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
     new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0);
   }
 
   @Test
   public void evenlySpacedNormalCase() {
-    DoublesSketch sketch = DoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
