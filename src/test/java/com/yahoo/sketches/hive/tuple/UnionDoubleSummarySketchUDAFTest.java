@@ -26,7 +26,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.DoubleSummary;
 import com.yahoo.sketches.tuple.DoubleSummaryFactory;
 import com.yahoo.sketches.tuple.Sketch;
@@ -118,7 +118,7 @@ public class UnionDoubleSummarySketchUDAFTest {
     List<?> r = (List<?>) result;
     Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -154,7 +154,7 @@ public class UnionDoubleSummarySketchUDAFTest {
     List<?> r = (List<?>) result;
     Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), nomNumEntries);
-    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -192,7 +192,7 @@ public class UnionDoubleSummarySketchUDAFTest {
     List<?> r = (List<?>) result;
     Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.reset(state);
@@ -231,7 +231,7 @@ public class UnionDoubleSummarySketchUDAFTest {
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -260,7 +260,7 @@ public class UnionDoubleSummarySketchUDAFTest {
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.reset(state);
@@ -297,7 +297,7 @@ public class UnionDoubleSummarySketchUDAFTest {
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
 
     eval.reset(state);

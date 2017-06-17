@@ -40,7 +40,7 @@ public class EstimateSketchUDFTest {
   public void evaluateValid() {
     EstimateSketchUDF testObject = new EstimateSketchUDF();
     
-    UpdateSketch sketch = Sketches.updateSketchBuilder().build(1024);
+    UpdateSketch sketch = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch.update(i);
     }
@@ -64,7 +64,7 @@ public class EstimateSketchUDFTest {
     EstimateSketchUDF testObject = new EstimateSketchUDF();
     
     final long seed = 1;
-    UpdateSketch sketch = Sketches.updateSketchBuilder().setSeed(seed).build(1024);
+    UpdateSketch sketch = Sketches.updateSketchBuilder().setSeed(seed).setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch.update(i);
     }

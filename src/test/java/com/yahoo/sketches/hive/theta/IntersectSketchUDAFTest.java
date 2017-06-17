@@ -23,7 +23,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.UpdateSketch;
@@ -115,7 +115,7 @@ public class IntersectSketchUDAFTest {
     List<?> r = (List<?>) result;
     Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
@@ -152,7 +152,7 @@ public class IntersectSketchUDAFTest {
     List<?> r = (List<?>) result;
     Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((LongWritable) (r.get(0))).get(), seed);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()), seed);
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()), seed);
     Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
@@ -195,7 +195,7 @@ public class IntersectSketchUDAFTest {
     List<?> r = (List<?>) result;
     Assert.assertEquals(r.size(), 2);
     Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(1))).getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -232,7 +232,7 @@ public class IntersectSketchUDAFTest {
     ));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(bytes.getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
@@ -266,7 +266,7 @@ public class IntersectSketchUDAFTest {
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.reset(state);

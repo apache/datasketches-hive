@@ -7,13 +7,13 @@ package com.yahoo.sketches.hive.theta;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Union;
 
 /**
- * Hive estimate sketch udf.
+ * Hive estimate sketch UDF.
  *
  */
 public class SampleSketchUDF extends UDF {
@@ -21,7 +21,7 @@ public class SampleSketchUDF extends UDF {
 
   /**
    * Main logic called by hive, produces new sketch from original using
-   * specified size and sampling probablility.
+   * specified size and sampling probability.
    *
    * @param binarySketch
    *          sketch to be sampled passed in as bytes writable.
@@ -47,9 +47,9 @@ public class SampleSketchUDF extends UDF {
     }
 
     //  The builder will catch errors with improper sketchSize or probability
-    Union union = SetOperation.builder().setP(probability).buildUnion(sketchSize);
+    Union union = SetOperation.builder().setP(probability).setNominalEntries(sketchSize).buildUnion();
 
-    union.update(new NativeMemory(serializedSketch)); //Union can accept Memory object directly
+    union.update(Memory.wrap(serializedSketch)); //Union can accept Memory object directly
 
     Sketch intermediateSketch = union.getResult(false, null); //to CompactSketch(unordered, on-heap)
     byte[] resultSketch = intermediateSketch.toByteArray();

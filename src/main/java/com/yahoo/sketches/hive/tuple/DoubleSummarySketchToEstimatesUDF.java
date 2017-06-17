@@ -12,7 +12,7 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.DoubleSummary;
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.SketchIterator;
@@ -37,7 +37,7 @@ public class DoubleSummarySketchToEstimatesUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
     final Sketch<DoubleSummary> sketch =
-        Sketches.heapifySketch(new NativeMemory(serializedSketch.getBytes()));
+        Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()));
     double sum = 0;
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {

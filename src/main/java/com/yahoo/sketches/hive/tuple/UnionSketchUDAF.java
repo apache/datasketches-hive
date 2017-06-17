@@ -23,7 +23,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.Sketches;
 import com.yahoo.sketches.tuple.Summary;
 
@@ -112,7 +112,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       }
       final byte[] serializedSketch = (byte[]) sketchInspector_.getPrimitiveJavaObject(data[0]);
       if (serializedSketch == null) { return; }
-      state.update(Sketches.heapifySketch(new NativeMemory(serializedSketch)));
+      state.update(Sketches.heapifySketch(Memory.wrap(serializedSketch)));
     }
 
     protected void initializeState(final UnionState<S> state, final Object[] data) {

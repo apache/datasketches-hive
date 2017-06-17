@@ -7,7 +7,7 @@ package com.yahoo.sketches.hive.frequencies;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.frequencies.ItemsSketch;
 
@@ -37,7 +37,7 @@ class ItemsState<T> extends AbstractAggregationBuffer {
   }
 
   void update(final byte[] serializedSketch) {
-    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(new NativeMemory(serializedSketch), serDe_);
+    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(Memory.wrap(serializedSketch), serDe_);
     if (sketch == null) {
       sketch = incomingSketch;
     } else {

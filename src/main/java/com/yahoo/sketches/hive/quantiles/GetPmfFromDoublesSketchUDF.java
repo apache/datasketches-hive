@@ -11,7 +11,7 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 
 @Description(
@@ -35,7 +35,7 @@ public class GetPmfFromDoublesSketchUDF extends UDF {
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... splitPoints) {
     if (serializedSketch == null) { return null; }
-    final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
+    final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
     return Util.primitivesToList(sketch.getPMF(Util.objectsToPrimitives(splitPoints)));
   }
 

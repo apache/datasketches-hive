@@ -11,7 +11,7 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 
@@ -27,7 +27,7 @@ public class GetKFromStringsSketchUDF extends UDF {
   public Integer evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
-      new NativeMemory(serializedSketch.getBytes()),
+      Memory.wrap(serializedSketch.getBytes()),
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()
     );

@@ -34,7 +34,7 @@ import org.apache.hadoop.io.Text;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
@@ -165,7 +165,7 @@ public class DataToSketchUDAFTest {
     Assert.assertEquals(r.size(), 3);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
     Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
     Assert.assertFalse(resultSketch.isEstimationMode());
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
@@ -192,7 +192,7 @@ public class DataToSketchUDAFTest {
     Assert.assertEquals(r.size(), 3);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), 16);
     Assert.assertEquals(((LongWritable) (r.get(1))).get(), seed);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()), seed);
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()), seed);
     // because of sampling probability < 1
     Assert.assertTrue(resultSketch.isEstimationMode());
     Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
@@ -239,7 +239,7 @@ public class DataToSketchUDAFTest {
     Assert.assertEquals(r.size(), 3);
     Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
     Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) (r.get(2))).getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -275,7 +275,7 @@ public class DataToSketchUDAFTest {
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.close();
@@ -297,7 +297,7 @@ public class DataToSketchUDAFTest {
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()));
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
     Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
     eval.reset(state);
@@ -323,7 +323,7 @@ public class DataToSketchUDAFTest {
     Object result = eval.terminate(state);
     Assert.assertNotNull(result);
     Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.heapifySketch(new NativeMemory(((BytesWritable) result).getBytes()), seed);
+    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()), seed);
     // because of sampling probability < 1
     Assert.assertTrue(resultSketch.isEstimationMode());
     Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);

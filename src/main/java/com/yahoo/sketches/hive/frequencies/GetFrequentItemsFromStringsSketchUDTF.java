@@ -19,7 +19,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.frequencies.ErrorType;
 import com.yahoo.sketches.frequencies.ItemsSketch;
@@ -79,7 +79,7 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
     final BytesWritable serializedSketch =
         (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
-        new NativeMemory(serializedSketch.getBytes()), new ArrayOfStringsSerDe());
+        Memory.wrap(serializedSketch.getBytes()), new ArrayOfStringsSerDe());
     ErrorType errorType = ErrorType.NO_FALSE_POSITIVES;
     if (data.length > 1) {
       errorType = ErrorType.valueOf((String) errorTypeObjectInspector.getPrimitiveJavaObject(data[1]));

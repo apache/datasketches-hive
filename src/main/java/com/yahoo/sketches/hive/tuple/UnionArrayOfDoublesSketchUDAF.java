@@ -25,7 +25,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
 
 @Description(
@@ -117,7 +117,7 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
       }
       final byte[] serializedSketch = (byte[]) sketchInspector_.getPrimitiveJavaObject(data[0]);
       if (serializedSketch == null) { return; }
-      state.update(ArrayOfDoublesSketches.wrapSketch(new NativeMemory(serializedSketch)));
+      state.update(ArrayOfDoublesSketches.wrapSketch(Memory.wrap(serializedSketch)));
     }
 
     private void initializeState(final ArrayOfDoublesUnionState state, final Object[] data) {

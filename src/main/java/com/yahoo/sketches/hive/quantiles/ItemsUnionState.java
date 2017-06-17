@@ -9,7 +9,7 @@ import java.util.Comparator;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 import com.yahoo.sketches.quantiles.ItemsUnion;
@@ -47,7 +47,7 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
 
   void update(final byte[] serializedSketch) {
     final ItemsSketch<T> incomingSketch =
-        ItemsSketch.getInstance(new NativeMemory(serializedSketch), comparator_, serDe_);
+        ItemsSketch.getInstance(Memory.wrap(serializedSketch), comparator_, serDe_);
     if (union == null) {
       union = ItemsUnion.getInstance(incomingSketch);
     } else {

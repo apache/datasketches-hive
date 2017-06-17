@@ -28,7 +28,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.Intersection;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
@@ -192,7 +192,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
       }
 
       void update(final byte[] serializedSketch) {
-        intersection_.update(Sketches.wrapSketch(new NativeMemory(serializedSketch), seed_));
+        intersection_.update(Sketches.wrapSketch(Memory.wrap(serializedSketch), seed_));
       }
 
       Sketch getResult() {

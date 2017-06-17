@@ -14,7 +14,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
 
@@ -52,7 +52,7 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
     final BytesWritable serializedSketch =
         (BytesWritable) intermediateInspector_.getStructFieldData(
             data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
-    state.update(ArrayOfDoublesSketches.wrapSketch(new NativeMemory(serializedSketch.getBytes())));
+    state.update(ArrayOfDoublesSketches.wrapSketch(Memory.wrap(serializedSketch.getBytes())));
   }
 
   private void initializeState(final ArrayOfDoublesUnionState state, final Object data) {

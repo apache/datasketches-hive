@@ -26,7 +26,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspect
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 
 /**
  * Hive Generic UDAF Resolver Class for MergeSketchUDAF.
@@ -151,7 +151,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       }
       final byte[] serializedSketch = (byte[]) inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
       if (serializedSketch == null) { return; }
-      state.update(new NativeMemory(serializedSketch));
+      state.update(Memory.wrap(serializedSketch));
     }
 
     private void initializeState(final UnionState state, final Object[] parameters) {

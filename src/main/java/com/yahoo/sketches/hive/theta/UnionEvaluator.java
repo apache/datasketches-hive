@@ -15,7 +15,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.Sketch;
 
 /**
@@ -78,7 +78,7 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
     final BytesWritable serializedSketch =
         (BytesWritable) intermediateObjectInspector.getStructFieldData(
             partial, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD));
-    state.update(new NativeMemory(serializedSketch.getBytes()));
+    state.update(Memory.wrap(serializedSketch.getBytes()));
   }
 
   private void initializeState(final UnionState state, final Object partial) {

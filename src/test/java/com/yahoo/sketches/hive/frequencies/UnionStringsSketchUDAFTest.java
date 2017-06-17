@@ -21,7 +21,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.frequencies.ItemsSketch;
@@ -87,7 +87,7 @@ public class UnionStringsSketchUDAFTest {
     eval.iterate(state, new Object[] { new BytesWritable(sketch.toByteArray(serDe)) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), serDe);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
     Assert.assertEquals(resultSketch.getStreamLength(), 2);
     Assert.assertEquals(resultSketch.getNumActiveItems(), 2);
     Assert.assertEquals(resultSketch.getEstimate("a"), 1);
@@ -114,7 +114,7 @@ public class UnionStringsSketchUDAFTest {
     eval.merge(state, new BytesWritable(sketch.toByteArray(serDe)));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
-    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), serDe);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
     Assert.assertEquals(resultSketch.getStreamLength(), 2);
     Assert.assertEquals(resultSketch.getNumActiveItems(), 2);
     Assert.assertEquals(resultSketch.getEstimate("a"), 1);

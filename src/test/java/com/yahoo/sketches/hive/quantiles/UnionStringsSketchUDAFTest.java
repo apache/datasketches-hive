@@ -22,7 +22,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.quantiles.ItemsSketch;
@@ -106,7 +106,7 @@ public class UnionStringsSketchUDAFTest {
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
     Assert.assertEquals(resultSketch.getK(), 128);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -134,7 +134,7 @@ public class UnionStringsSketchUDAFTest {
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)), new IntWritable(256) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
     Assert.assertEquals(resultSketch.getK(), 256);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -163,7 +163,7 @@ public class UnionStringsSketchUDAFTest {
     eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
     Assert.assertEquals(resultSketch.getK(), 256);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -192,7 +192,7 @@ public class UnionStringsSketchUDAFTest {
     eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
-    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
     Assert.assertEquals(resultSketch.getK(), 256);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -221,7 +221,7 @@ public class UnionStringsSketchUDAFTest {
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)) });
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
-    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(new NativeMemory(bytes.getBytes()), comparator, serDe);
+    ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
     Assert.assertEquals(resultSketch.getK(), 128);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), "a");

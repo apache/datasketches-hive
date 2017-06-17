@@ -21,7 +21,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
@@ -100,7 +100,7 @@ public class UnionDoublesSketchUDAFTest {
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getK(), 128);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -127,7 +127,7 @@ public class UnionDoublesSketchUDAFTest {
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()), new IntWritable(256) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getK(), 256);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -155,7 +155,7 @@ public class UnionDoublesSketchUDAFTest {
     eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getK(), 256);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -183,7 +183,7 @@ public class UnionDoublesSketchUDAFTest {
     eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
     BytesWritable bytes = (BytesWritable) eval.terminate(state);
-    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getK(), 256);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -211,7 +211,7 @@ public class UnionDoublesSketchUDAFTest {
     eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
 
     BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-    DoublesSketch resultSketch = DoublesSketch.heapify(new NativeMemory(bytes.getBytes()));
+    DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
     Assert.assertEquals(resultSketch.getK(), 128);
     Assert.assertEquals(resultSketch.getRetainedItems(), 2);
     Assert.assertEquals(resultSketch.getMinValue(), 1.0);

@@ -9,7 +9,7 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 
 @Description(name = "GetQuantile", value = "_FUNC_(sketch, fraction)",
@@ -29,7 +29,7 @@ public class GetQuantileFromDoublesSketchUDF extends UDF {
    */
   public Double evaluate(final BytesWritable serializedSketch, final double fraction) {
     if (serializedSketch == null) { return null; }
-    final DoublesSketch sketch = DoublesSketch.heapify(new NativeMemory(serializedSketch.getBytes()));
+    final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
     return sketch.getQuantile(fraction);
   }
 

@@ -10,7 +10,6 @@ import org.apache.hadoop.io.BytesWritable;
 import org.testng.annotations.Test;
 
 import com.yahoo.memory.Memory;
-import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.UpdateSketch;
@@ -21,8 +20,8 @@ public class IntersectSketchUDFTest  {
   public void evaluateNull() {
     IntersectSketchUDF testObject = new IntersectSketchUDF();
     BytesWritable intermResult = testObject.evaluate(null, null);
-    Memory mem = new NativeMemory(intermResult.getBytes());
-    Sketch testResult = Sketches.heapifySketch(mem);
+    Memory mem = Memory.wrap(intermResult.getBytes());
+    Sketch testResult = Sketches.wrapSketch(mem);
     assertEquals(0.0, testResult.getEstimate());
   }
 
@@ -30,8 +29,8 @@ public class IntersectSketchUDFTest  {
   public void evaluateEmpty() {
     IntersectSketchUDF testObject = new IntersectSketchUDF();
     BytesWritable intermResult = testObject.evaluate(new BytesWritable(), new BytesWritable());
-    Memory mem = new NativeMemory(intermResult.getBytes());
-    Sketch testResult = Sketches.heapifySketch(mem);
+    Memory mem = Memory.wrap(intermResult.getBytes());
+    Sketch testResult = Sketches.wrapSketch(mem);
     assertEquals(0.0, testResult.getEstimate());
   }
 
@@ -39,12 +38,12 @@ public class IntersectSketchUDFTest  {
   public void evaluateValidSketch() {
     IntersectSketchUDF testObject = new IntersectSketchUDF();
 
-    UpdateSketch sketch1 = Sketches.updateSketchBuilder().build(1024);
+    UpdateSketch sketch1 = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch1.update(i);
     }
 
-    UpdateSketch sketch2 = Sketches.updateSketchBuilder().build(1024);
+    UpdateSketch sketch2 = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 100; i<128; i++) {
       sketch2.update(i);
     }
@@ -54,7 +53,7 @@ public class IntersectSketchUDFTest  {
 
     BytesWritable output = testObject.evaluate(input1, input2);
 
-    Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()));
+    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()));
 
     assertEquals(28.0, result.getEstimate());
   }
@@ -64,12 +63,12 @@ public class IntersectSketchUDFTest  {
     IntersectSketchUDF testObject = new IntersectSketchUDF();
 
     final long seed = 1;
-    UpdateSketch sketch1 = Sketches.updateSketchBuilder().setSeed(seed).build(1024);
+    UpdateSketch sketch1 = Sketches.updateSketchBuilder().setSeed(seed).setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch1.update(i);
     }
 
-    UpdateSketch sketch2 = Sketches.updateSketchBuilder().setSeed(seed).build(1024);
+    UpdateSketch sketch2 = Sketches.updateSketchBuilder().setSeed(seed).setNominalEntries(1024).build();
     for (int i = 100; i<128; i++) {
       sketch2.update(i);
     }
@@ -79,7 +78,7 @@ public class IntersectSketchUDFTest  {
 
     BytesWritable output = testObject.evaluate(input1, input2, seed);
 
-    Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()), seed);
+    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()), seed);
 
     assertEquals(28.0, result.getEstimate());
   }

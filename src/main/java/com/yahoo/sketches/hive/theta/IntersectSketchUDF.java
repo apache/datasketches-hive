@@ -10,7 +10,7 @@ import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.Intersection;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Sketch;
@@ -37,12 +37,12 @@ public class IntersectSketchUDF extends UDF {
       final BytesWritable secondSketchBytes, final long hashSeed) {
     Sketch firstSketch = null;
     if (firstSketchBytes != null && firstSketchBytes.getLength() > 0) {
-      firstSketch = Sketch.wrap(new NativeMemory(firstSketchBytes.getBytes()), hashSeed);
+      firstSketch = Sketch.wrap(Memory.wrap(firstSketchBytes.getBytes()), hashSeed);
     }
 
     Sketch secondSketch = null;
     if (secondSketchBytes != null && secondSketchBytes.getLength() > 0) {
-      secondSketch = Sketch.wrap(new NativeMemory(secondSketchBytes.getBytes()), hashSeed);
+      secondSketch = Sketch.wrap(Memory.wrap(secondSketchBytes.getBytes()), hashSeed);
     }
 
     final Intersection intersect = SetOperation.builder().setSeed(hashSeed).buildIntersection();

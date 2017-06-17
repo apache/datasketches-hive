@@ -11,7 +11,6 @@ import org.apache.hadoop.io.BytesWritable;
 import org.testng.annotations.Test;
 
 import com.yahoo.memory.Memory;
-import com.yahoo.memory.NativeMemory;
 import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.UpdateSketch;
@@ -24,9 +23,9 @@ public class ExcludeSketchUDFTest {
 
     BytesWritable intermResult = testObject.evaluate(null, null);
 
-    Memory mem = new NativeMemory(intermResult.getBytes());
+    Memory mem = Memory.wrap(intermResult.getBytes());
 
-    Sketch testResult = Sketches.heapifySketch(mem);
+    Sketch testResult = Sketches.wrapSketch(mem);
 
     assertEquals(0.0, testResult.getEstimate());
   }
@@ -37,9 +36,9 @@ public class ExcludeSketchUDFTest {
 
     BytesWritable intermResult = testObject.evaluate(new BytesWritable(), new BytesWritable());
 
-    Memory mem = new NativeMemory(intermResult.getBytes());
+    Memory mem = Memory.wrap(intermResult.getBytes());
 
-    Sketch testResult = Sketches.heapifySketch(mem);
+    Sketch testResult = Sketches.wrapSketch(mem);
 
     assertEquals(0.0, testResult.getEstimate());
   }
@@ -48,12 +47,12 @@ public class ExcludeSketchUDFTest {
   public void evaluateValidSketch () {
     ExcludeSketchUDF testObject = new ExcludeSketchUDF();
 
-    UpdateSketch sketch1 = Sketches.updateSketchBuilder().build(1024);
+    UpdateSketch sketch1 = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch1.update(i);
     }
 
-    UpdateSketch sketch2 = Sketches.updateSketchBuilder().build(1024);
+    UpdateSketch sketch2 = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 100; i<128; i++) {
       sketch2.update(i);
     }
@@ -63,7 +62,7 @@ public class ExcludeSketchUDFTest {
 
     BytesWritable output = testObject.evaluate(input1, input2);
 
-    Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()));
+    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()));
 
     assertEquals(100.0, result.getEstimate());
   }
@@ -72,12 +71,12 @@ public class ExcludeSketchUDFTest {
   public void evaluateValidSketchWithDefaultSeed () {
     ExcludeSketchUDF testObject = new ExcludeSketchUDF();
 
-    UpdateSketch sketch1 = Sketches.updateSketchBuilder().build(1024);
+    UpdateSketch sketch1 = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch1.update(i);
     }
 
-    UpdateSketch sketch2 = Sketches.updateSketchBuilder().build(1024);
+    UpdateSketch sketch2 = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 100; i<128; i++) {
       sketch2.update(i);
     }
@@ -87,7 +86,7 @@ public class ExcludeSketchUDFTest {
 
     BytesWritable output = testObject.evaluate(input1, input2, DEFAULT_UPDATE_SEED);
 
-    Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()));
+    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()));
 
     assertEquals(100.0, result.getEstimate());
   }
@@ -97,12 +96,12 @@ public class ExcludeSketchUDFTest {
     ExcludeSketchUDF testObject = new ExcludeSketchUDF();
 
     final long seed = 1;
-    UpdateSketch sketch1 = Sketches.updateSketchBuilder().setSeed(seed).build(1024);
+    UpdateSketch sketch1 = Sketches.updateSketchBuilder().setSeed(seed).setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch1.update(i);
     }
 
-    UpdateSketch sketch2 = Sketches.updateSketchBuilder().setSeed(seed).build(1024);
+    UpdateSketch sketch2 = Sketches.updateSketchBuilder().setSeed(seed).setNominalEntries(1024).build();
     for (int i = 100; i<128; i++) {
       sketch2.update(i);
     }
@@ -112,7 +111,7 @@ public class ExcludeSketchUDFTest {
 
     BytesWritable output = testObject.evaluate(input1, input2, seed);
 
-    Sketch result = Sketches.heapifySketch(new NativeMemory(output.getBytes()), seed);
+    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()), seed);
 
     assertEquals(100.0, result.getEstimate());
   }

@@ -15,7 +15,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketchIterator;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
@@ -55,7 +55,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
     final BytesWritable serializedSketch =
       (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
-        new NativeMemory(serializedSketch.getBytes()));
+        Memory.wrap(serializedSketch.getBytes()));
     final ArrayOfDoublesSketchIterator it = sketch.iterator();
     while (it.next()) {
       forward(new Object[] { primitivesToList(it.getValues()) });

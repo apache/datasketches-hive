@@ -10,7 +10,7 @@ import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.Sketch;
 
 /**
@@ -49,7 +49,7 @@ public class EstimateSketchUDF extends UDF {
       return 0.0;
     }
 
-    return Sketch.wrap(new NativeMemory(serializedSketch), seed).getEstimate();
+    return Sketch.wrap(Memory.wrap(serializedSketch), seed).getEstimate();
   }
 
 }

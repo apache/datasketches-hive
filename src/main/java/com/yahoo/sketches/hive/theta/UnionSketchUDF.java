@@ -11,7 +11,7 @@ import static com.yahoo.sketches.Util.DEFAULT_UPDATE_SEED;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import com.yahoo.memory.NativeMemory;
+import com.yahoo.memory.Memory;
 import com.yahoo.sketches.theta.SetOperation;
 import com.yahoo.sketches.theta.Union;
 
@@ -39,14 +39,14 @@ public class UnionSketchUDF extends UDF {
   public BytesWritable evaluate(final BytesWritable firstSketch, final BytesWritable secondSketch,
       final int sketchSize, final long seed) {
 
-    final Union union = SetOperation.builder().setSeed(seed).buildUnion(sketchSize);
+    final Union union = SetOperation.builder().setSeed(seed).setNominalEntries(sketchSize).buildUnion();
 
     if ((firstSketch != null) && (firstSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
-      union.update(new NativeMemory(firstSketch.getBytes()));
+      union.update(Memory.wrap(firstSketch.getBytes()));
     }
 
     if ((secondSketch != null) && (secondSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
-      union.update(new NativeMemory(secondSketch.getBytes()));
+      union.update(Memory.wrap(secondSketch.getBytes()));
     }
 
     return new BytesWritable(union.getResult().toByteArray());
