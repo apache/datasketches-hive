@@ -95,10 +95,9 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
         );
-      } else {
-        // final results include just the sketch
-        return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
       }
+      // final results include just the sketch
+      return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
     }
 
     @Override

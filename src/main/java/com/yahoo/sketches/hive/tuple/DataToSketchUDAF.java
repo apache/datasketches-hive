@@ -109,7 +109,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
-        // intermediate results need to include the the nominal number of entries
+        // intermediate results need to include the nominal number of entries
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SKETCH_FIELD),
           Arrays.asList(
@@ -117,10 +117,9 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
         );
-      } else {
-        // final results include just the sketch
-        return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
       }
+      // final results include just the sketch
+      return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
     }
 
     @Override

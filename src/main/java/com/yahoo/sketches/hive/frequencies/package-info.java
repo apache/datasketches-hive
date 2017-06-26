@@ -4,16 +4,12 @@
  */
 
 /**
- * <p>This package is dedicated to streaming algorithms that enable estimation of the
- * frequency of occurence of items in a weighted multiset stream of items.
- * If the frequency distribution of items is sufficiently skewed, these algorithms are very
- * useful in identifying the "Heavy Hitters" that occured most frequently in the stream.
- * The accuracy of the estimation of the frequency of an item has well understood error
- * bounds that can be returned by the sketch.</p>
+ * Hive UDFs for Frequent Items sketch.
+ * This includes generic implementation in the form of abstract classed DataToItemsSketchUDAF
+ * and UnionItemsSketchUDAF to be specialized for particular types of items.
+ * An implementation for strings is provided: DataToStringsSketchUDAF and UnionStringsSketchUDAF.
+ * GetFrequentItemsFromStringsSketchUDTF is to obtain results from sketches.
  *
- * <p>These sketches are mergable and can be serialized and deserialized to/from a compact
- * form.</p>
- *
- * @author Lee Rhodes
+ * @author Alexander Saydakov
  */
 package com.yahoo.sketches.hive.frequencies;

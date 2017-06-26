@@ -103,9 +103,8 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
         );
-      } else {
-        return resultInspector;
       }
+      return resultInspector;
     }
 
     @Override
