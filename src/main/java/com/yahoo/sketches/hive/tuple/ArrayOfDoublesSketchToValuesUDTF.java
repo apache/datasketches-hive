@@ -2,6 +2,7 @@
  * Copyright 2016, Yahoo! Inc.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
  */
+
 package com.yahoo.sketches.hive.tuple;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
 
   @Override
   public void process(final Object[] data) throws HiveException {
-    if (data == null || data[0] == null) { return; }
+    if ((data == null) || (data[0] == null)) { return; }
     final BytesWritable serializedSketch =
       (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
@@ -71,7 +72,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
   }
 
   static List<Double> primitivesToList(final double[] array) {
-    final List<Double> result = new ArrayList<Double>(array.length);
+    final List<Double> result = new ArrayList<>(array.length);
     for (double item: array) { result.add(item); }
     return result;
   }

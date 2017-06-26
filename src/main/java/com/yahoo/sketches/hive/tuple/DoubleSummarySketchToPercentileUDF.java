@@ -10,6 +10,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 import com.yahoo.memory.Memory;
+import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 import com.yahoo.sketches.tuple.DoubleSummary;
 import com.yahoo.sketches.tuple.Sketch;
@@ -37,12 +38,12 @@ public class DoubleSummarySketchToPercentileUDF extends UDF {
    */
   public Double evaluate(final BytesWritable serializedSketch, final double percentile) {
     if (serializedSketch == null) { return null; }
-    if (percentile < 0 || percentile > 100) {
+    if ((percentile < 0) || (percentile > 100)) {
       throw new IllegalArgumentException("percentile must be between 0 and 100");
     }
     final Sketch<DoubleSummary> sketch =
         Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()));
-    final UpdateDoublesSketch qs = UpdateDoublesSketch.builder().setK(QUANTILES_SKETCH_SIZE).build();
+    final UpdateDoublesSketch qs = DoublesSketch.builder().setK(QUANTILES_SKETCH_SIZE).build();
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {
       qs.update(it.getSummary().getValue());

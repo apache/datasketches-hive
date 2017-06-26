@@ -94,6 +94,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    */
   public static class UnionSketchUDAFEvaluator extends SketchEvaluator {
 
+    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       return new UnionState();
@@ -115,7 +116,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         inputInspector_ = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
           lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
@@ -128,7 +129,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateInspector_ = (StandardStructObjectInspector) parameters[0];
       }
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
         // intermediate results need to include the lgK and the target HLL type
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(LG_K_FIELD, HLL_TYPE_FIELD, SKETCH_FIELD),
