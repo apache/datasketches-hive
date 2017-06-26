@@ -7,11 +7,11 @@ package com.yahoo.sketches.hive.quantiles;
 import java.util.List;
 
 import org.apache.hadoop.io.BytesWritable;
-
-import org.testng.annotations.Test;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.yahoo.sketches.SketchesArgumentException;
+import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
 public class GetQuantilesFromDoublesSketchUDFTest {
@@ -24,7 +24,7 @@ public class GetQuantilesFromDoublesSketchUDFTest {
 
   @Test
   public void emptyListOfFractions() {
-    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -35,7 +35,7 @@ public class GetQuantilesFromDoublesSketchUDFTest {
 
   @Test
   public void fractionsNormalCase() {
-    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -49,13 +49,13 @@ public class GetQuantilesFromDoublesSketchUDFTest {
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void evenlySpacedZero() {
-    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0);
   }
 
   @Test
   public void evenlySpacedNormalCase() {
-    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);

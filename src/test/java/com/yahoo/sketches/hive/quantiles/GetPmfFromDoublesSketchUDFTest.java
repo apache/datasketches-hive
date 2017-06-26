@@ -7,10 +7,10 @@ package com.yahoo.sketches.hive.quantiles;
 import java.util.List;
 
 import org.apache.hadoop.io.BytesWritable;
-
-import org.testng.annotations.Test;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
+import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
 public class GetPmfFromDoublesSketchUDFTest {
@@ -23,7 +23,7 @@ public class GetPmfFromDoublesSketchUDFTest {
 
   @Test
   public void emptyListOfSplitPoints() {
-    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -35,7 +35,7 @@ public class GetPmfFromDoublesSketchUDFTest {
 
   @Test
   public void normalCase() {
-    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);

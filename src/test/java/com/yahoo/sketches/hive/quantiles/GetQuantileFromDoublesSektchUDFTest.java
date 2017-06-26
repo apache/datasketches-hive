@@ -4,11 +4,12 @@
  */
 package com.yahoo.sketches.hive.quantiles;
 
-import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
-
-import org.testng.annotations.Test;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.yahoo.sketches.quantiles.DoublesSketch;
+import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
 public class GetQuantileFromDoublesSektchUDFTest {
 
@@ -20,7 +21,7 @@ public class GetQuantileFromDoublesSektchUDFTest {
 
   @Test
   public void normalCase() {
-    UpdateDoublesSketch sketch = UpdateDoublesSketch.builder().build();
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
