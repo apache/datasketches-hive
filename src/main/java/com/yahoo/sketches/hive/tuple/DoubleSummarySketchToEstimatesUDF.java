@@ -31,7 +31,7 @@ public class DoubleSummarySketchToEstimatesUDF extends UDF {
 
   /**
    * Get estimates from a given Sketch&lt;DoubleSummary&gt;
-   * @param serializedSketch DoubleSummarySketch in as serialized binary
+   * @param serializedSketch DoubleSummarySketch in a serialized binary form
    * @return list of estimates
    */
   public List<Double> evaluate(final BytesWritable serializedSketch) {

@@ -29,8 +29,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import com.yahoo.memory.Memory;
 
 /**
- * Hive Generic UDAF Resolver Class for MergeSketchUDAF.
- *
+ * Hive UDAF to compute union of theta Sketch objects
  */
 @Description(
     name = "unionSketch",
@@ -127,10 +126,9 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
         );
-      } else {
-        // final results include just the sketch
-        return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
       }
+      // final results include just the sketch
+      return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
     }
 
     /**

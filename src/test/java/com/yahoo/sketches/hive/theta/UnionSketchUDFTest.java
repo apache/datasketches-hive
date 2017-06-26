@@ -54,7 +54,7 @@ public class UnionSketchUDFTest {
 
     Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()));
 
-    Assert.assertEquals(256.0, result.getEstimate());
+    Assert.assertEquals(result.getEstimate(), 256.0);
   }
 
   @Test
@@ -79,7 +79,7 @@ public class UnionSketchUDFTest {
 
     Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()), seed);
 
-    Assert.assertEquals(256.0, result.getEstimate(), 256 * 0.02);
+    Assert.assertEquals(result.getEstimate(), 256.0, 256 * 0.02);
     Assert.assertTrue(result.getRetainedEntries(true) <= 128.0);
   }
 

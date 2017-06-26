@@ -92,9 +92,8 @@ public class UnionDoubleSummaryWithModeSketchUDAF extends UnionSketchUDAF {
             PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY)
           )
         );
-      } else {
-        return resultInspector;
       }
+      return resultInspector;
     }
 
     @Override
