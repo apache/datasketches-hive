@@ -46,7 +46,8 @@ class SketchState extends State {
       sketch_.update(PrimitiveObjectInspectorUtils.getLong(data, keyObjectInspector));
       return;
     case STRING:
-      sketch_.update(PrimitiveObjectInspectorUtils.getString(data, keyObjectInspector));
+      // conversion to char[] avoids costly UTF-8 encoding
+      sketch_.update(PrimitiveObjectInspectorUtils.getString(data, keyObjectInspector).toCharArray());
       return;
     default:
       throw new IllegalArgumentException(
