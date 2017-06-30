@@ -8,7 +8,7 @@
 
   <groupId>com.yahoo.datasketches</groupId>
   <artifactId>sketches-hive</artifactId>
-  <version>0.10.2</version>
+  <version>0.10.3-SNAPSHOT</version>
 
   <!-- Project Information -->
   <name>${project.groupId}:${project.artifactId}</name>
@@ -92,7 +92,7 @@
     <connection>scm:git:ssh://git@github.com/DataSketches/sketches-hive.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/DataSketches/sketches-hive.git</developerConnection>
     <url>https://github.com/DataSketches/sketches-hive.git</url>
-    <tag>sketches-hive-0.10.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <prerequisites>
