@@ -5,7 +5,7 @@
 
 /**
  * Hive UDFs for Frequent Items sketch.
- * This includes generic implementation in the form of abstract classed DataToItemsSketchUDAF
+ * This includes generic implementation in the form of abstract classes DataToItemsSketchUDAF
  * and UnionItemsSketchUDAF to be specialized for particular types of items.
  * An implementation for strings is provided: DataToStringsSketchUDAF and UnionStringsSketchUDAF.
  * GetFrequentItemsFromStringsSketchUDTF is to obtain results from sketches.
