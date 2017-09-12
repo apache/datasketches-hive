@@ -59,7 +59,7 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
     }
     final BytesWritable serializedSketch = (BytesWritable) intermediateInspector_.getStructFieldData(
         data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
-    state.update(HllSketch.heapify(Memory.wrap(serializedSketch.getBytes())));
+    state.update(HllSketch.wrap(Memory.wrap(serializedSketch.getBytes())));
   }
 
   private void initializeState(final UnionState state, final Object data) {

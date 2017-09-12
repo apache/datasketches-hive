@@ -162,7 +162,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       }
       final byte[] serializedSketch = (byte[]) inputInspector_.getPrimitiveJavaObject(parameters[0]);
       if (serializedSketch == null) { return; }
-      state.update(HllSketch.heapify(Memory.wrap(serializedSketch)));
+      state.update(HllSketch.wrap(Memory.wrap(serializedSketch)));
     }
 
     private void initializeState(final UnionState state, final Object[] parameters) {

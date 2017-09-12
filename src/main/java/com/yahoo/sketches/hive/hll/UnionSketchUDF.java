@@ -39,11 +39,11 @@ public class UnionSketchUDF extends UDF {
     final Union union = new Union(lgK);
 
     if (firstSketch != null) {
-      union.update(HllSketch.heapify(Memory.wrap(firstSketch.getBytes())));
+      union.update(HllSketch.wrap(Memory.wrap(firstSketch.getBytes())));
     }
 
     if (secondSketch != null) {
-      union.update(HllSketch.heapify(Memory.wrap(secondSketch.getBytes())));
+      union.update(HllSketch.wrap(Memory.wrap(secondSketch.getBytes())));
     }
 
     return new BytesWritable(union.getResult(hllType).toCompactByteArray());

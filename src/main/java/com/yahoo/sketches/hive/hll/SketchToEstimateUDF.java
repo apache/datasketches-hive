@@ -26,7 +26,7 @@ public class SketchToEstimateUDF extends UDF {
    */
   public Double evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
-    final HllSketch sketch = HllSketch.heapify(Memory.wrap(serializedSketch.getBytes()));
+    final HllSketch sketch = HllSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
     return sketch.getEstimate();
   }
 
