@@ -10,6 +10,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 import com.yahoo.memory.Memory;
+import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.DoublesSketchBuilder;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
@@ -55,18 +56,21 @@ public class ArrayOfDoublesSketchToQuantilesSketchUDF extends UDF {
    * @param k parameter that determines the accuracy and size of the quantiles sketch
    * @return serialized DoublesSketch
    */
-  public BytesWritable evaluate(final BytesWritable serializedSketch, final int column, final int k) {
+  public BytesWritable evaluate(final BytesWritable serializedSketch, final int column,
+      final int k) {
     if (serializedSketch == null) { return null; }
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
         Memory.wrap(serializedSketch.getBytes()));
     if (column < 1) {
-      throw new IllegalArgumentException("Column number must be greater than zero. Received: " + column);
+      throw new IllegalArgumentException("Column number must be greater than zero. Received: "
+          + column);
     }
     if (column > sketch.getNumValues()) {
-      throw new IllegalArgumentException("Column number " + column + " is out of range. The given sketch has "
-        + sketch.getNumValues() + " columns");
+      throw new IllegalArgumentException("Column number " + column
+          + " is out of range. The given sketch has "
+          + sketch.getNumValues() + " columns");
     }
-    final DoublesSketchBuilder builder = UpdateDoublesSketch.builder();
+    final DoublesSketchBuilder builder = DoublesSketch.builder();
     if (k > 0) {
       builder.setK(k);
     }
