@@ -6,6 +6,7 @@
 package com.yahoo.sketches.hive.hll;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 
 import com.yahoo.sketches.hll.HllSketch;
 import com.yahoo.sketches.hll.TgtHllType;
@@ -27,6 +28,10 @@ abstract class State extends AbstractAggregationBuffer {
   TgtHllType getType() {
     return type_;
   }
+
+  abstract boolean isInitialized();
+
+  abstract void update(final Object data, final PrimitiveObjectInspector keyObjectInspector);
 
   abstract HllSketch getResult();
 

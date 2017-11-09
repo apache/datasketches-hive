@@ -178,6 +178,33 @@ public class DataToSketchUDAFTest {
     eval.close();
   }
 
+  // A user reported a problem, which seems to be a case of Hive calling getNewAggregationBuffer() before init()
+  @Test
+  public void partial1ModeGetStateBeforeInit() throws Exception {
+    ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
+
+    State state = (State) eval.getNewAggregationBuffer();
+    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+    checkIntermediateResultInspector(resultInspector);
+
+    eval.iterate(state, new Object[] {new IntWritable(1)});
+    eval.iterate(state, new Object[] {new IntWritable(2)});
+
+    Object result = eval.terminatePartial(state);
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result instanceof List);
+    List<?> r = (List<?>) result;
+    Assert.assertEquals(r.size(), 3);
+    Assert.assertEquals(((IntWritable) r.get(0)).get(), SketchEvaluator.DEFAULT_LG_K);
+    Assert.assertEquals(((Text) r.get(1)).toString(), SketchEvaluator.DEFAULT_HLL_TYPE.toString());
+    HllSketch resultSketch = HllSketch.wrap(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+    Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
+
+    eval.close();
+  }
+
   // PARTIAL2 mode (Combine phase in Map-Reduce): merge + terminatePartial
   @Test
   public void partial2Mode() throws Exception {

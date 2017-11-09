@@ -15,6 +15,7 @@ class SketchState extends State {
 
   private HllSketch sketch_;
 
+  @Override
   boolean isInitialized() {
     return sketch_ != null;
   }
@@ -25,34 +26,42 @@ class SketchState extends State {
     sketch_ = new HllSketch(logK, type);
   }
 
-  void update(final Object data, final PrimitiveObjectInspector keyObjectInspector) {
-    switch (keyObjectInspector.getPrimitiveCategory()) {
-    case BINARY:
-      sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, keyObjectInspector).getBytes());
-      return;
-    case BYTE:
-      sketch_.update(PrimitiveObjectInspectorUtils.getByte(data, keyObjectInspector));
-      return;
-    case DOUBLE:
-      sketch_.update(PrimitiveObjectInspectorUtils.getDouble(data, keyObjectInspector));
-      return;
-    case FLOAT:
-      sketch_.update(PrimitiveObjectInspectorUtils.getFloat(data, keyObjectInspector));
-      return;
-    case INT:
-      sketch_.update(PrimitiveObjectInspectorUtils.getInt(data, keyObjectInspector));
-      return;
-    case LONG:
-      sketch_.update(PrimitiveObjectInspectorUtils.getLong(data, keyObjectInspector));
-      return;
-    case STRING:
-      // conversion to char[] avoids costly UTF-8 encoding
-      sketch_.update(PrimitiveObjectInspectorUtils.getString(data, keyObjectInspector).toCharArray());
-      return;
-    default:
-      throw new IllegalArgumentException(
-          "Unrecongnized input data type, please use data of type: "
-      + "byte, double, float, int, long, or string only.");
+  @Override
+  void update(final Object data, final PrimitiveObjectInspector objectInspector) {
+    switch (objectInspector.getPrimitiveCategory()) {
+      case BINARY:
+        sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector).getBytes());
+        return;
+      case BYTE:
+        sketch_.update(PrimitiveObjectInspectorUtils.getByte(data, objectInspector));
+        return;
+      case DOUBLE:
+        sketch_.update(PrimitiveObjectInspectorUtils.getDouble(data, objectInspector));
+        return;
+      case FLOAT:
+        sketch_.update(PrimitiveObjectInspectorUtils.getFloat(data, objectInspector));
+        return;
+      case INT:
+        sketch_.update(PrimitiveObjectInspectorUtils.getInt(data, objectInspector));
+        return;
+      case LONG:
+        sketch_.update(PrimitiveObjectInspectorUtils.getLong(data, objectInspector));
+        return;
+      case STRING:
+        // conversion to char[] avoids costly UTF-8 encoding
+        sketch_.update(PrimitiveObjectInspectorUtils.getString(data, objectInspector).toCharArray());
+        return;
+      case CHAR:
+    	    sketch_.update(PrimitiveObjectInspectorUtils.getHiveChar(data, objectInspector).getValue().toCharArray());
+    	    return;
+      case VARCHAR:
+  	    sketch_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(data, objectInspector).getValue().toCharArray());
+  	    return;
+      default:
+        throw new IllegalArgumentException(
+          "Unrecongnized input data type " + data.getClass().getSimpleName() + " category "
+          + objectInspector.getPrimitiveCategory() + ", please use data of the following types: "
+          + "byte, double, float, int, long, char, varchar or string.");
     }
   }
 
