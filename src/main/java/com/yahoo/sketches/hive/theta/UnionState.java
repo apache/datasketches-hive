@@ -74,10 +74,10 @@ class UnionState extends AbstractAggregationBuffer {
       union_.update(PrimitiveObjectInspectorUtils.getString(value, objectInspector));
       return;
     case CHAR:
-      union_.update(PrimitiveObjectInspectorUtils.getHiveChar(value, objectInspector).getValue().toCharArray());
+      union_.update(PrimitiveObjectInspectorUtils.getHiveChar(value, objectInspector).getValue());
       return;
     case VARCHAR:
-      union_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(value, objectInspector).getValue().toCharArray());
+      union_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(value, objectInspector).getValue());
       return;
     default:
       throw new IllegalArgumentException(
