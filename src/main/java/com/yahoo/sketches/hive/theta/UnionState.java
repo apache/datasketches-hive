@@ -73,10 +73,17 @@ class UnionState extends AbstractAggregationBuffer {
     case STRING:
       union_.update(PrimitiveObjectInspectorUtils.getString(value, objectInspector));
       return;
+    case CHAR:
+      union_.update(PrimitiveObjectInspectorUtils.getHiveChar(value, objectInspector).getValue().toCharArray());
+      return;
+    case VARCHAR:
+      union_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(value, objectInspector).getValue().toCharArray());
+      return;
     default:
       throw new IllegalArgumentException(
-          "Unrecongnized input data type. Please use data of type: "
-      + "byte, double, float, int, long, or string only.");
+        "Unrecongnized input data type " + value.getClass().getSimpleName() + " category "
+        + objectInspector.getPrimitiveCategory() + ", please use data of the following types: "
+        + "byte, double, float, int, long, char, varchar or string.");
     }
   }
 
