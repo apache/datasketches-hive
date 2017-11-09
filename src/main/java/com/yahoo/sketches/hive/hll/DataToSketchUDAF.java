@@ -104,7 +104,12 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) {
+    	  // Different State is used for the iterate phase and the merge phase.
+    	  // A user reported that in some version of Hive this was apparently called before init,
+    	  // so the mode_ was null. A solution was implemented to have UnionState, which can work
+    	  // in both cases, but SketchState is more space-efficient.
+    	  // HLL sketch is about compactness, so let's use SketchState if possible.
+    	  if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) { // iterate() will be used
         return new SketchState();
       }
       return new UnionState();
@@ -164,14 +169,14 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
-      final SketchState state = (SketchState) agg;
+      final State state = (State) agg;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
       state.update(parameters[0], inputInspector_);
     }
 
-    private void initializeState(final SketchState state, final Object[] parameters) {
+    private void initializeState(final State state, final Object[] parameters) {
       int lgK = DEFAULT_LG_K;
       if (lgKInspector_ != null) {
         lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], lgKInspector_);

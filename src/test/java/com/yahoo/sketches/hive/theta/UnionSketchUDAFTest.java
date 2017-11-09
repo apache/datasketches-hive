@@ -35,7 +35,6 @@ import com.yahoo.sketches.theta.UpdateSketch;
 /**
  * Unit tests for UnionSketch UDF
  */
-@SuppressWarnings("deprecation")
 public class UnionSketchUDAFTest {
 
   static final ObjectInspector intInspector =
