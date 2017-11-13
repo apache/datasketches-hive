@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2015, Yahoo! Inc.
-     Licensed under the terms of the Apache License 2.0. 
+     Licensed under the terms of the Apache License 2.0.
      See LICENSE file at the project root for terms. -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -189,7 +189,7 @@
 
   <build>
     <plugins>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -247,8 +247,8 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.4</version>
         <configuration>
-          <!-- 
-            <show>private</show> 
+          <!--
+            <show>private</show>
           -->
           <stylesheetfile>src/main/javadoc/stylesheet.css</stylesheetfile>
           <docfilessubdirs>true</docfilessubdirs>
