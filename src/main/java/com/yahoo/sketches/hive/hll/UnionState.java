@@ -31,7 +31,8 @@ class UnionState extends State {
   void update(final Object data, final PrimitiveObjectInspector objectInspector) {
     switch (objectInspector.getPrimitiveCategory()) {
       case BINARY:
-        union_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector).getBytes());
+        union_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector)
+            .getBytes());
         return;
       case BYTE:
         union_.update(PrimitiveObjectInspectorUtils.getByte(data, objectInspector));
@@ -50,14 +51,17 @@ class UnionState extends State {
         return;
       case STRING:
         // conversion to char[] avoids costly UTF-8 encoding
-        union_.update(PrimitiveObjectInspectorUtils.getString(data, objectInspector).toCharArray());
+        union_.update(PrimitiveObjectInspectorUtils.getString(data, objectInspector)
+            .toCharArray());
         return;
       case CHAR:
-  	    union_.update(PrimitiveObjectInspectorUtils.getHiveChar(data, objectInspector).getValue().toCharArray());
-  	    return;
+        union_.update(PrimitiveObjectInspectorUtils.getHiveChar(data, objectInspector)
+            .getValue().toCharArray());
+        return;
       case VARCHAR:
-	    union_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(data, objectInspector).getValue().toCharArray());
-	    return;
+        union_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(data, objectInspector)
+            .getValue().toCharArray());
+        return;
       default:
         throw new IllegalArgumentException(
           "Unrecongnized input data type " + data.getClass().getSimpleName() + " category "
@@ -73,7 +77,7 @@ class UnionState extends State {
   @Override
   HllSketch getResult() {
     if (union_ == null) { return null; }
-    return union_.getResult(this.getType());
+    return union_.getResult(getType());
   }
 
   @Override

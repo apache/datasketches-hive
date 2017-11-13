@@ -30,7 +30,8 @@ class SketchState extends State {
   void update(final Object data, final PrimitiveObjectInspector objectInspector) {
     switch (objectInspector.getPrimitiveCategory()) {
       case BINARY:
-        sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector).getBytes());
+        sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector)
+            .getBytes());
         return;
       case BYTE:
         sketch_.update(PrimitiveObjectInspectorUtils.getByte(data, objectInspector));
@@ -49,14 +50,17 @@ class SketchState extends State {
         return;
       case STRING:
         // conversion to char[] avoids costly UTF-8 encoding
-        sketch_.update(PrimitiveObjectInspectorUtils.getString(data, objectInspector).toCharArray());
+        sketch_.update(PrimitiveObjectInspectorUtils.getString(data, objectInspector)
+            .toCharArray());
         return;
       case CHAR:
-    	    sketch_.update(PrimitiveObjectInspectorUtils.getHiveChar(data, objectInspector).getValue().toCharArray());
-    	    return;
+        sketch_.update(PrimitiveObjectInspectorUtils.getHiveChar(data, objectInspector)
+            .getValue().toCharArray());
+        return;
       case VARCHAR:
-  	    sketch_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(data, objectInspector).getValue().toCharArray());
-  	    return;
+        sketch_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(data, objectInspector)
+            .getValue().toCharArray());
+        return;
       default:
         throw new IllegalArgumentException(
           "Unrecongnized input data type " + data.getClass().getSimpleName() + " category "

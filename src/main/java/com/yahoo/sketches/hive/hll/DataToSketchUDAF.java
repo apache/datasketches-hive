@@ -104,12 +104,12 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-    	  // Different State is used for the iterate phase and the merge phase.
-    	  // A user reported that in some version of Hive this was apparently called before init,
-    	  // so the mode_ was null. A solution was implemented to have UnionState, which can work
-    	  // in both cases, but SketchState is more space-efficient.
-    	  // HLL sketch is about compactness, so let's use SketchState if possible.
-    	  if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) { // iterate() will be used
+      // Different State is used for the iterate phase and the merge phase.
+      // A user reported that in some version of Hive this was apparently called before init,
+      // so the mode_ was null. A solution was implemented to have UnionState, which can work
+      // in both cases, but SketchState is more space-efficient.
+      // HLL sketch is about compactness, so let's use SketchState if possible.
+      if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) { // iterate() will be used
         return new SketchState();
       }
       return new UnionState();
