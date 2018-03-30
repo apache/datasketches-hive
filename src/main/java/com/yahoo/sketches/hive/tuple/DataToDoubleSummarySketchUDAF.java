@@ -13,8 +13,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 
 import com.yahoo.sketches.tuple.DoubleSummary;
+import com.yahoo.sketches.tuple.DoubleSummaryDeserializer;
 import com.yahoo.sketches.tuple.DoubleSummaryFactory;
+import com.yahoo.sketches.tuple.DoubleSummarySetOperations;
+import com.yahoo.sketches.tuple.SummaryDeserializer;
 import com.yahoo.sketches.tuple.SummaryFactory;
+import com.yahoo.sketches.tuple.SummarySetOperations;
 
 /**
  * This simple implementation is to give an example of a concrete UDAF based on the abstract
@@ -50,14 +54,28 @@ public class DataToDoubleSummarySketchUDAF extends DataToSketchUDAF {
 
   static class DataToDoubleSummarySketchEvaluator extends DataToSketchEvaluator<Double, DoubleSummary> {
 
+    private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER = new DoubleSummaryDeserializer();
+    private static final SummaryFactory<DoubleSummary> SUMMARY_FACTORY = new DoubleSummaryFactory();
+    private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS = new DoubleSummarySetOperations();
+
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForIterate(final Object[] data) {
-      return new DoubleSummaryFactory();
+    protected SummaryDeserializer<DoubleSummary> getSummaryDeserializer() {
+      return SUMMARY_DESERIALIZER;
     }
 
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForMerge(final Object data) {
-      return new DoubleSummaryFactory();
+    protected SummaryFactory<DoubleSummary> getSummaryFactory(final Object[] data) {
+      return SUMMARY_FACTORY;
+    }
+
+    @Override
+    protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForIterate(final Object[] data) {
+      return SUMMARY_SET_OPS;
+    }
+
+    @Override
+    protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForMerge(final Object data) {
+      return SUMMARY_SET_OPS;
     }
 
   }

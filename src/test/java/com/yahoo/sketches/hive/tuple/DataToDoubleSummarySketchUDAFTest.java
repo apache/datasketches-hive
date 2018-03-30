@@ -34,6 +34,7 @@ import org.testng.annotations.Test;
 
 import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.DoubleSummary;
+import com.yahoo.sketches.tuple.DoubleSummaryDeserializer;
 import com.yahoo.sketches.tuple.DoubleSummaryFactory;
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.Sketches;
@@ -145,7 +146,8 @@ public class DataToDoubleSummarySketchUDAFTest {
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) r.get(1)).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) r.get(1)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertFalse(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
@@ -170,7 +172,8 @@ public class DataToDoubleSummarySketchUDAFTest {
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), 32);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) r.get(1)).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) r.get(1)).getBytes()), new DoubleSummaryDeserializer());
       // because of sampling probability < 1
       Assert.assertTrue(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
@@ -209,7 +212,8 @@ public class DataToDoubleSummarySketchUDAFTest {
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) r.get(1)).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) r.get(1)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
   
       eval.reset(state);
@@ -247,7 +251,8 @@ public class DataToDoubleSummarySketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }
@@ -269,7 +274,8 @@ public class DataToDoubleSummarySketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
   
       eval.reset(state);
@@ -295,7 +301,8 @@ public class DataToDoubleSummarySketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       // because of sampling probability < 1
       Assert.assertTrue(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
@@ -323,7 +330,8 @@ public class DataToDoubleSummarySketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 10000.0, 10000 * 0.03);
       Assert.assertTrue(resultSketch.getRetainedEntries() <= 4096, "retained entries: " + resultSketch.getRetainedEntries());
   

@@ -50,7 +50,9 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final int number) {
     if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
-    return Util.primitivesToList(sketch.getQuantiles(number));
+    final double[] quantiles = sketch.getQuantiles(number);
+    if (quantiles == null) { return null; }
+    return Util.primitivesToList(quantiles);
   }
 
 }

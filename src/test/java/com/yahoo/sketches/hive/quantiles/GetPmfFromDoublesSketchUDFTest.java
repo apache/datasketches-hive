@@ -34,6 +34,13 @@ public class GetPmfFromDoublesSketchUDFTest {
   }
 
   @Test
+  public void emptySketch() {
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
+    List<Double> result = new GetPmfFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0);
+    Assert.assertNull(result);
+  }
+
+  @Test
   public void normalCase() {
     UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);

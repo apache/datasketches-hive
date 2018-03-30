@@ -24,9 +24,13 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
 import com.yahoo.sketches.tuple.DoubleSummary;
+import com.yahoo.sketches.tuple.DoubleSummaryDeserializer;
 import com.yahoo.sketches.tuple.DoubleSummaryFactory;
+import com.yahoo.sketches.tuple.DoubleSummarySetOperations;
 import com.yahoo.sketches.tuple.Sketch;
+import com.yahoo.sketches.tuple.SummaryDeserializer;
 import com.yahoo.sketches.tuple.SummaryFactory;
+import com.yahoo.sketches.tuple.SummarySetOperations;
 
 /**
  * This is an example of a concrete UDAF based on the abstract DataToSketchUDAF if extra arguments
@@ -75,12 +79,19 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
   static class DataToDoubleSummaryWithModeSketchEvaluator
       extends DataToSketchEvaluator<Double, DoubleSummary> {
 
+    private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =
+        new DoubleSummaryDeserializer();
     private static final String SUMMARY_MODE_FIELD = "summaryMode";
     private PrimitiveObjectInspector summaryModeInspector_;
     private DoubleSummary.Mode summaryMode_;
 
     public DataToDoubleSummaryWithModeSketchEvaluator() {
       summaryMode_ = DoubleSummary.Mode.Sum;
+    }
+
+    @Override
+    protected SummaryDeserializer<DoubleSummary> getSummaryDeserializer() {
+      return SUMMARY_DESERIALIZER;
     }
 
     // need to add summary mode
@@ -108,13 +119,23 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
     }
 
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForIterate(final Object[] data) {
+    protected SummaryFactory<DoubleSummary> getSummaryFactory(final Object[] data) {
       if (summaryModeInspector_ != null) {
         summaryMode_ = DoubleSummary.Mode.valueOf(
           PrimitiveObjectInspectorUtils.getString(data[4], summaryModeInspector_)
         );
       }
       return new DoubleSummaryFactory(summaryMode_);
+    }
+
+    @Override
+    protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForIterate(final Object[] data) {
+      if (summaryModeInspector_ != null) {
+        summaryMode_ = DoubleSummary.Mode.valueOf(
+          PrimitiveObjectInspectorUtils.getString(data[4], summaryModeInspector_)
+        );
+      }
+      return new DoubleSummarySetOperations(summaryMode_);
     }
 
     // need to add summary mode
@@ -134,10 +155,10 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
     }
 
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForMerge(final Object data) {
+    protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForMerge(final Object data) {
       summaryMode_ = DoubleSummary.Mode.valueOf(((Text) intermediateInspector_.getStructFieldData(
           data, intermediateInspector_.getStructFieldRef(SUMMARY_MODE_FIELD))).toString());
-      return new DoubleSummaryFactory(summaryMode_);
+      return new DoubleSummarySetOperations(summaryMode_);
     }
 
   }

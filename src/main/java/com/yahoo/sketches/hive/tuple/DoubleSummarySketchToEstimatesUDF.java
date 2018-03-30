@@ -14,9 +14,11 @@ import org.apache.hadoop.io.BytesWritable;
 
 import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.DoubleSummary;
+import com.yahoo.sketches.tuple.DoubleSummaryDeserializer;
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.SketchIterator;
 import com.yahoo.sketches.tuple.Sketches;
+import com.yahoo.sketches.tuple.SummaryDeserializer;
 
 @Description(
     name = "DoubleSummarySketchToEstimates",
@@ -29,6 +31,9 @@ import com.yahoo.sketches.tuple.Sketches;
     + " This estimate assumes that the DoubleSummary was used in the Sum mode.)")
 public class DoubleSummarySketchToEstimatesUDF extends UDF {
 
+  private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =
+      new DoubleSummaryDeserializer();
+
   /**
    * Get estimates from a given Sketch&lt;DoubleSummary&gt;
    * @param serializedSketch DoubleSummarySketch in a serialized binary form
@@ -37,7 +42,7 @@ public class DoubleSummarySketchToEstimatesUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
     final Sketch<DoubleSummary> sketch =
-        Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()));
+        Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()), SUMMARY_DESERIALIZER);
     double sum = 0;
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {
