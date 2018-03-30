@@ -130,12 +130,7 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
 
     @Override
     protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForIterate(final Object[] data) {
-      if (summaryModeInspector_ != null) {
-        summaryMode_ = DoubleSummary.Mode.valueOf(
-          PrimitiveObjectInspectorUtils.getString(data[4], summaryModeInspector_)
-        );
-      }
-      return new DoubleSummarySetOperations(summaryMode_);
+      return null; // not needed for building sketches
     }
 
     // need to add summary mode

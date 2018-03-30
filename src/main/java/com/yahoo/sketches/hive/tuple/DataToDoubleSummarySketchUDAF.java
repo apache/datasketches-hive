@@ -70,7 +70,7 @@ public class DataToDoubleSummarySketchUDAF extends DataToSketchUDAF {
 
     @Override
     protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForIterate(final Object[] data) {
-      return SUMMARY_SET_OPS;
+      return null; // not needed for building sketches
     }
 
     @Override
