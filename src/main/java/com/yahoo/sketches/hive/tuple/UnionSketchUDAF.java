@@ -111,7 +111,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       }
       final byte[] serializedSketch = (byte[]) sketchInspector_.getPrimitiveJavaObject(data[0]);
       if (serializedSketch == null) { return; }
-      state.update(Sketches.heapifySketch(Memory.wrap(serializedSketch)));
+      state.update(Sketches.heapifySketch(Memory.wrap(serializedSketch), getSummaryDeserializer()));
     }
 
     protected void initializeState(final UnionState<S> state, final Object[] data) {
@@ -119,7 +119,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (nominalNumEntriesInspector_ != null) {
         nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[1], nominalNumEntriesInspector_);
       }
-      state.init(nominalNumEntries, getSummaryFactoryForIterate(data));
+      state.init(nominalNumEntries, getSummarySetOperationsForIterate(data));
     }
 
     @SuppressWarnings("deprecation")

@@ -40,6 +40,13 @@ public class GetPmfFromStringsSketchUDFTest {
   }
 
   @Test
+  public void emptySketch() {
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    List<Double> result = new GetPmfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), "a");
+    Assert.assertNull(result);
+  }
+
+  @Test
   public void normalCase() {
     ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
     sketch.update("a");

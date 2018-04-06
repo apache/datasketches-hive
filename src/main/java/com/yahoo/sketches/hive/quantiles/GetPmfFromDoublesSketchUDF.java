@@ -36,7 +36,9 @@ public class GetPmfFromDoublesSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... splitPoints) {
     if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
-    return Util.primitivesToList(sketch.getPMF(Util.objectsToPrimitives(splitPoints)));
+    final double[] pmf = sketch.getPMF(Util.objectsToPrimitives(splitPoints));
+    if (pmf == null) { return null; }
+    return Util.primitivesToList(pmf);
   }
 
 }

@@ -9,8 +9,11 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 
 import com.yahoo.sketches.tuple.DoubleSummary;
-import com.yahoo.sketches.tuple.DoubleSummaryFactory;
+import com.yahoo.sketches.tuple.DoubleSummaryDeserializer;
+import com.yahoo.sketches.tuple.DoubleSummarySetOperations;
+import com.yahoo.sketches.tuple.SummaryDeserializer;
 import com.yahoo.sketches.tuple.SummaryFactory;
+import com.yahoo.sketches.tuple.SummarySetOperations;
 
 /**
  * This simple implementation is to give an example of a concrete UDAF based on the abstract
@@ -37,14 +40,27 @@ public class UnionDoubleSummarySketchUDAF extends UnionSketchUDAF {
 
   public static class UnionDoubleSummarySketchEvaluator extends UnionSketchEvaluator<DoubleSummary> {
 
+    private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER = new DoubleSummaryDeserializer();
+    private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS = new DoubleSummarySetOperations();
+
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForIterate(final Object[] data) {
-      return new DoubleSummaryFactory();
+    protected SummaryDeserializer<DoubleSummary> getSummaryDeserializer() {
+      return SUMMARY_DESERIALIZER;
     }
 
     @Override
-    protected SummaryFactory<DoubleSummary> getSummaryFactoryForMerge(final Object data) {
-      return new DoubleSummaryFactory();
+    protected SummaryFactory<DoubleSummary> getSummaryFactory(final Object[] data) {
+      return null; // union never needs to create new instances
+    }
+
+    @Override
+    protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForIterate(final Object[] data) {
+      return SUMMARY_SET_OPS;
+    }
+
+    @Override
+    protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForMerge(final Object data) {
+      return SUMMARY_SET_OPS;
     }
 
   }

@@ -61,7 +61,9 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()
     );
-    return Arrays.asList(sketch.getQuantiles(number));
+    final String[] quantiles = sketch.getQuantiles(number);
+    if (quantiles == null) { return null; }
+    return Arrays.asList(quantiles);
   }
 
 }

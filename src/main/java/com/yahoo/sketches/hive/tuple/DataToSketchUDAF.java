@@ -144,7 +144,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[3],
             samplingProbabilityInspector_);
       }
-      state.init(nominalNumEntries, samplingProbability, getSummaryFactoryForIterate(data));
+      state.init(nominalNumEntries, samplingProbability, getSummaryFactory(data));
     }
 
     @SuppressWarnings("deprecation")

@@ -56,8 +56,16 @@ public class GetQuantilesFromStringsSketchUDFTest {
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void evenlySpacedZero() {
     ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    sketch.update("a");
     new GetQuantilesFromStringsSketchUDF()
       .evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0);
+  }
+
+  @Test
+  public void evenlySpacedEmptySketch() {
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    List<String> result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), 1);
+    Assert.assertNull(result);
   }
 
   @Test

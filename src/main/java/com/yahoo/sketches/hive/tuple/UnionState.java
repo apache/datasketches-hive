@@ -7,7 +7,7 @@ package com.yahoo.sketches.hive.tuple;
 
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.Summary;
-import com.yahoo.sketches.tuple.SummaryFactory;
+import com.yahoo.sketches.tuple.SummarySetOperations;
 import com.yahoo.sketches.tuple.Union;
 
 class UnionState<S extends Summary> extends State<S> {
@@ -18,9 +18,9 @@ class UnionState<S extends Summary> extends State<S> {
     return union_ != null;
   }
 
-  void init(final int nominalNumEntries, final SummaryFactory<S> summaryFactory) {
+  void init(final int nominalNumEntries, final SummarySetOperations<S> summarySetOps) {
     super.init(nominalNumEntries);
-    union_ = new Union<S>(nominalNumEntries, summaryFactory);
+    union_ = new Union<S>(nominalNumEntries, summarySetOps);
   }
 
   void update(final Sketch<S> sketch) {

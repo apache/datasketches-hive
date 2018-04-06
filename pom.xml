@@ -152,7 +152,7 @@
     <dependency>
       <groupId>com.yahoo.datasketches</groupId>
       <artifactId>sketches-core</artifactId>
-      <version>0.10.3</version>
+      <version>0.11.0</version>
     </dependency>
 
     <!-- Hive Dependencies (provided scope) -->

@@ -13,9 +13,11 @@ import com.yahoo.memory.Memory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 import com.yahoo.sketches.tuple.DoubleSummary;
+import com.yahoo.sketches.tuple.DoubleSummaryDeserializer;
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.SketchIterator;
 import com.yahoo.sketches.tuple.Sketches;
+import com.yahoo.sketches.tuple.SummaryDeserializer;
 
 @Description(
     name = "DoubleSummarySketchToPercentile",
@@ -28,7 +30,9 @@ import com.yahoo.sketches.tuple.Sketches;
   + " distribution from the lower half)")
 public class DoubleSummarySketchToPercentileUDF extends UDF {
 
-  private static final int QUANTILES_SKETCH_SIZE = 1024;
+  private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =
+      new DoubleSummaryDeserializer();
+  private static final int QUANTILES_SKETCH_K = 1024;
 
   /**
    * Get percentile from a given Sketch&lt;DoubleSummary&gt;
@@ -42,8 +46,8 @@ public class DoubleSummarySketchToPercentileUDF extends UDF {
       throw new IllegalArgumentException("percentile must be between 0 and 100");
     }
     final Sketch<DoubleSummary> sketch =
-        Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()));
-    final UpdateDoublesSketch qs = DoublesSketch.builder().setK(QUANTILES_SKETCH_SIZE).build();
+        Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()), SUMMARY_DESERIALIZER);
+    final UpdateDoublesSketch qs = DoublesSketch.builder().setK(QUANTILES_SKETCH_K).build();
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {
       qs.update(it.getSummary().getValue());

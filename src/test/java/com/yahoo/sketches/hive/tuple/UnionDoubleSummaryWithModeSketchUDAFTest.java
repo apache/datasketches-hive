@@ -32,6 +32,7 @@ import org.testng.annotations.Test;
 
 import com.yahoo.memory.Memory;
 import com.yahoo.sketches.tuple.DoubleSummary;
+import com.yahoo.sketches.tuple.DoubleSummaryDeserializer;
 import com.yahoo.sketches.tuple.DoubleSummaryFactory;
 import com.yahoo.sketches.tuple.Sketch;
 import com.yahoo.sketches.tuple.SketchIterator;
@@ -143,7 +144,8 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
       Assert.assertEquals(((Text) r.get(1)).toString(), DoubleSummary.Mode.Sum.toString());
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) r.get(2)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
       SketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
@@ -185,7 +187,8 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), nomNumEntries);
       Assert.assertEquals(((Text) r.get(1)).toString(), DoubleSummary.Mode.Max.toString());
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) r.get(2)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
       SketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
@@ -231,7 +234,8 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
       Assert.assertEquals(((Text) r.get(1)).toString(), DoubleSummary.Mode.Sum.toString());
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) r.get(2)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
       SketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
@@ -277,7 +281,8 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
       SketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
@@ -311,7 +316,8 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
       SketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
@@ -353,7 +359,8 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
       SketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
@@ -395,7 +402,8 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
+          Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
       SketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {

@@ -47,9 +47,17 @@ public class GetQuantilesFromDoublesSketchUDFTest {
     Assert.assertEquals(result.get(2), 3.0);
   }
 
+  @Test
+  public void evenlySpacedEmptySketch() {
+    UpdateDoublesSketch sketch = DoublesSketch.builder().build();
+    List<Double> result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 1);
+    Assert.assertNull(result);
+  }
+
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void evenlySpacedZero() {
     UpdateDoublesSketch sketch = DoublesSketch.builder().build();
+    sketch.update(1);
     new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0);
   }
 

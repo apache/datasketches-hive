@@ -42,7 +42,9 @@ public class GetPmfFromStringsSketchUDF extends UDF {
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()
     );
-    return Util.primitivesToList(sketch.getPMF(splitPoints));
+    final double[] pmf = sketch.getPMF(splitPoints);
+    if (pmf == null) { return null; }
+    return Util.primitivesToList(pmf);
   }
 
 }
