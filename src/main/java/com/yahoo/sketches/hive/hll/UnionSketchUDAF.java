@@ -94,12 +94,6 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    */
   public static class UnionSketchUDAFEvaluator extends SketchEvaluator {
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      return new UnionState();
-    }
-
     /**
      * Receives the passed in argument object inspectors and returns the desired
      * return type's object inspector to inform hive of return type of UDAF.
@@ -156,7 +150,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
-      final UnionState state = (UnionState) buf;
+      final State state = (State) buf;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
@@ -165,7 +159,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       state.update(HllSketch.wrap(Memory.wrap(serializedSketch)));
     }
 
-    private void initializeState(final UnionState state, final Object[] parameters) {
+    private void initializeState(final State state, final Object[] parameters) {
       int lgK = DEFAULT_LG_K;
       if (lgKInspector_ != null) {
         lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], lgKInspector_);

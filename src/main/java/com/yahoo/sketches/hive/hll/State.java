@@ -7,18 +7,22 @@ package com.yahoo.sketches.hive.hll;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
 import com.yahoo.sketches.hll.HllSketch;
 import com.yahoo.sketches.hll.TgtHllType;
+import com.yahoo.sketches.hll.Union;
 
-abstract class State extends AbstractAggregationBuffer {
+class State extends AbstractAggregationBuffer {
 
   private int lgK_;
   private TgtHllType type_;
+  private Union union_;
 
   void init(final int lgK, final TgtHllType type) {
     lgK_ = lgK;
     type_ = type;
+    union_ = new Union(lgK);
   }
 
   int getLgK() {
@@ -29,12 +33,63 @@ abstract class State extends AbstractAggregationBuffer {
     return type_;
   }
 
-  abstract boolean isInitialized();
+  boolean isInitialized() {
+    return union_ != null;
+  }
 
-  abstract void update(final Object data, final PrimitiveObjectInspector keyObjectInspector);
+  void update(final Object data, final PrimitiveObjectInspector objectInspector) {
+    switch (objectInspector.getPrimitiveCategory()) {
+      case BINARY:
+        union_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector)
+            .getBytes());
+        return;
+      case BYTE:
+        union_.update(PrimitiveObjectInspectorUtils.getByte(data, objectInspector));
+        return;
+      case DOUBLE:
+        union_.update(PrimitiveObjectInspectorUtils.getDouble(data, objectInspector));
+        return;
+      case FLOAT:
+        union_.update(PrimitiveObjectInspectorUtils.getFloat(data, objectInspector));
+        return;
+      case INT:
+        union_.update(PrimitiveObjectInspectorUtils.getInt(data, objectInspector));
+        return;
+      case LONG:
+        union_.update(PrimitiveObjectInspectorUtils.getLong(data, objectInspector));
+        return;
+      case STRING:
+        // conversion to char[] avoids costly UTF-8 encoding
+        union_.update(PrimitiveObjectInspectorUtils.getString(data, objectInspector)
+            .toCharArray());
+        return;
+      case CHAR:
+        union_.update(PrimitiveObjectInspectorUtils.getHiveChar(data, objectInspector)
+            .getValue().toCharArray());
+        return;
+      case VARCHAR:
+        union_.update(PrimitiveObjectInspectorUtils.getHiveVarchar(data, objectInspector)
+            .getValue().toCharArray());
+        return;
+      default:
+        throw new IllegalArgumentException(
+          "Unrecongnized input data type " + data.getClass().getSimpleName() + " category "
+          + objectInspector.getPrimitiveCategory() + ", please use data of the following types: "
+          + "byte, double, float, int, long, char, varchar or string.");
+    }
+  }
 
-  abstract HllSketch getResult();
+  void update(final HllSketch sketch) {
+    union_.update(sketch);
+  }
 
-  abstract void reset();
+  HllSketch getResult() {
+    if (union_ == null) { return null; }
+    return union_.getResult(getType());
+  }
+
+  void reset() {
+    union_ = null;
+  }
 
 }

@@ -35,6 +35,12 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
   protected PrimitiveObjectInspector hllTypeInspector_;
   protected StructObjectInspector intermediateInspector_;
 
+  @SuppressWarnings("deprecation")
+  @Override
+  public AggregationBuffer getNewAggregationBuffer() throws HiveException {
+    return new State();
+  }
+
   @Override
   public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf)
       throws HiveException {
@@ -53,7 +59,7 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
   public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object data)
       throws HiveException {
     if (data == null) { return; }
-    final UnionState state = (UnionState) buf;
+    final State state = (State) buf;
     if (!state.isInitialized()) {
       initializeState(state, data);
     }
@@ -62,7 +68,7 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
     state.update(HllSketch.wrap(Memory.wrap(serializedSketch.getBytes())));
   }
 
-  private void initializeState(final UnionState state, final Object data) {
+  private void initializeState(final State state, final Object data) {
     final int lgK = ((IntWritable) intermediateInspector_.getStructFieldData(
         data, intermediateInspector_.getStructFieldRef(LG_K_FIELD))).get();
     final TgtHllType type = TgtHllType.valueOf(((Text) intermediateInspector_.getStructFieldData(
@@ -73,8 +79,8 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
   @Override
   public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf)
       throws HiveException {
+    if (buf == null) { return null; }
     final State state = (State) buf;
-    if (state == null) { return null; }
     final HllSketch result = state.getResult();
     if (result == null) { return null; }
     return new BytesWritable(result.toCompactByteArray());
