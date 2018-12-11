@@ -54,9 +54,12 @@ public class DataToDoubleSummarySketchUDAF extends DataToSketchUDAF {
 
   static class DataToDoubleSummarySketchEvaluator extends DataToSketchEvaluator<Double, DoubleSummary> {
 
-    private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER = new DoubleSummaryDeserializer();
-    private static final SummaryFactory<DoubleSummary> SUMMARY_FACTORY = new DoubleSummaryFactory();
-    private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS = new DoubleSummarySetOperations();
+    private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =
+        new DoubleSummaryDeserializer();
+    private static final SummaryFactory<DoubleSummary> SUMMARY_FACTORY =
+        new DoubleSummaryFactory();
+    private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS =
+        new DoubleSummarySetOperations();
 
     @Override
     protected SummaryDeserializer<DoubleSummary> getSummaryDeserializer() {

@@ -40,8 +40,10 @@ public class UnionDoubleSummarySketchUDAF extends UnionSketchUDAF {
 
   public static class UnionDoubleSummarySketchEvaluator extends UnionSketchEvaluator<DoubleSummary> {
 
-    private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER = new DoubleSummaryDeserializer();
-    private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS = new DoubleSummarySetOperations();
+    private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =
+        new DoubleSummaryDeserializer();
+    private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS =
+        new DoubleSummarySetOperations();
 
     @Override
     protected SummaryDeserializer<DoubleSummary> getSummaryDeserializer() {
