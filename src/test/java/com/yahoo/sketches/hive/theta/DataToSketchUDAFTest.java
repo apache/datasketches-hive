@@ -75,7 +75,7 @@ public class DataToSketchUDAFTest {
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void initTooFewArguments() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] {}, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] {}, false, false, false);
 
     udf.getEvaluator(params);
   }
@@ -85,7 +85,7 @@ public class DataToSketchUDAFTest {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] {
       intInspector, intConstantInspector, floatConstantInspector, longConstantInspector, longConstantInspector
-    }, false, false);
+    }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -93,7 +93,7 @@ public class DataToSketchUDAFTest {
   public void initInvalidCategoryArg1() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { structInspector }, false, false);
+        new ObjectInspector[] { structInspector }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -101,7 +101,7 @@ public class DataToSketchUDAFTest {
   public void initInvalidCategoryArg2() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { intInspector, structInspector }, false, false);
+        new ObjectInspector[] { intInspector, structInspector }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -109,7 +109,7 @@ public class DataToSketchUDAFTest {
   public void initInvalidTypeArg2() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { intInspector, floatConstantInspector }, false, false);
+        new ObjectInspector[] { intInspector, floatConstantInspector }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -117,7 +117,7 @@ public class DataToSketchUDAFTest {
   public void initInvalidCategoryArg3() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { stringInspector, intConstantInspector, structInspector }, false, false);
+        new ObjectInspector[] { stringInspector, intConstantInspector, structInspector }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -125,7 +125,7 @@ public class DataToSketchUDAFTest {
   public void initInvalidTypeArg3() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { stringInspector, intConstantInspector, intConstantInspector }, false, false);
+        new ObjectInspector[] { stringInspector, intConstantInspector, intConstantInspector }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -133,7 +133,7 @@ public class DataToSketchUDAFTest {
   public void initInvalidCategoryArg4() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, structInspector }, false, false);
+        new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, structInspector }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -141,7 +141,7 @@ public class DataToSketchUDAFTest {
   public void initInvalidTypeArg4() throws SemanticException {
     DataToSketchUDAF udf = new DataToSketchUDAF();
     GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(
-        new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, floatConstantInspector }, false, false);
+        new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, floatConstantInspector }, false, false, false);
     udf.getEvaluator(params);
   }
 
@@ -149,186 +149,180 @@ public class DataToSketchUDAFTest {
   @Test
   public void partial1ModeIntValuesDefaultParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    checkIntermediateResultInspector(resultInspector);
-
-    UnionState state = (UnionState) eval.getNewAggregationBuffer();
-    eval.iterate(state, new Object[] {new IntWritable(1)});
-    eval.iterate(state, new Object[] {new IntWritable(2)});
-
-    Object result = eval.terminatePartial(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof List);
-    List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 3);
-    Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-    Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
-    Assert.assertFalse(resultSketch.isEstimationMode());
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+      checkIntermediateResultInspector(resultInspector);
+  
+      UnionState state = (UnionState) eval.getNewAggregationBuffer();
+      eval.iterate(state, new Object[] {new IntWritable(1)});
+      eval.iterate(state, new Object[] {new IntWritable(2)});
+  
+      Object result = eval.terminatePartial(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof List);
+      List<?> r = (List<?>) result;
+      Assert.assertEquals(r.size(), 3);
+      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertFalse(resultSketch.isEstimationMode());
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    }
   }
 
   @Test
   public void partial1ModeStringValuesExplicitParameters() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { stringInspector, intConstantInspector, floatConstantInspector, longConstantInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    checkIntermediateResultInspector(resultInspector);
-
-    final long seed = 1;
-    UnionState state = (UnionState) eval.getNewAggregationBuffer();
-    eval.iterate(state, new Object[] {new Text("a"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
-    eval.iterate(state, new Object[] {new Text("b"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
-
-    Object result = eval.terminatePartial(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof List);
-    List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 3);
-    Assert.assertEquals(((IntWritable) (r.get(0))).get(), 16);
-    Assert.assertEquals(((LongWritable) (r.get(1))).get(), seed);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()), seed);
-    // because of sampling probability < 1
-    Assert.assertTrue(resultSketch.isEstimationMode());
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
-
-    // check if seed is correct in the result
-    Union union = SetOperation.builder().setSeed(seed).buildUnion();
-    // this must fail if the seed is incompatible
-    union.update(resultSketch);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+      checkIntermediateResultInspector(resultInspector);
+  
+      final long seed = 1;
+      UnionState state = (UnionState) eval.getNewAggregationBuffer();
+      eval.iterate(state, new Object[] {new Text("a"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
+      eval.iterate(state, new Object[] {new Text("b"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
+  
+      Object result = eval.terminatePartial(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof List);
+      List<?> r = (List<?>) result;
+      Assert.assertEquals(r.size(), 3);
+      Assert.assertEquals(((IntWritable) (r.get(0))).get(), 16);
+      Assert.assertEquals(((LongWritable) (r.get(1))).get(), seed);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()), seed);
+      // because of sampling probability < 1
+      Assert.assertTrue(resultSketch.isEstimationMode());
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
+  
+      // check if seed is correct in the result
+      Union union = SetOperation.builder().setSeed(seed).buildUnion();
+      // this must fail if the seed is incompatible
+      union.update(resultSketch);
+    }
   }
 
   // PARTIAL2 mode (Combine phase in Map-Reduce): merge + terminatePartial
   @Test
   public void partial2Mode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
-    checkIntermediateResultInspector(resultInspector);
-
-    UnionState state = (UnionState) eval.getNewAggregationBuffer();
-
-    UpdateSketch sketch1 = UpdateSketch.builder().build();
-    sketch1.update(1);
-    eval.merge(state, Arrays.asList(
-      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch1.compact().toByteArray()))
-    );
-
-    UpdateSketch sketch2 = UpdateSketch.builder().build();
-    sketch2.update(2);
-    eval.merge(state, Arrays.asList(
-      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch2.compact().toByteArray()))
-    );
-
-    Object result = eval.terminatePartial(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof List);
-    List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 3);
-    Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-    Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
+      checkIntermediateResultInspector(resultInspector);
+  
+      UnionState state = (UnionState) eval.getNewAggregationBuffer();
+  
+      UpdateSketch sketch1 = UpdateSketch.builder().build();
+      sketch1.update(1);
+      eval.merge(state, Arrays.asList(
+        new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch1.compact().toByteArray()))
+      );
+  
+      UpdateSketch sketch2 = UpdateSketch.builder().build();
+      sketch2.update(2);
+      eval.merge(state, Arrays.asList(
+        new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch2.compact().toByteArray()))
+      );
+  
+      Object result = eval.terminatePartial(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof List);
+      List<?> r = (List<?>) result;
+      Assert.assertEquals(r.size(), 3);
+      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    }
   }
 
   // FINAL mode (Reduce phase in Map-Reduce): merge + terminate
   @Test
   public void finalMode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
-    checkFinalResultInspector(resultInspector);
-
-    UnionState state = (UnionState) eval.getNewAggregationBuffer();
-
-    UpdateSketch sketch1 = UpdateSketch.builder().build();
-    sketch1.update(1);
-    eval.merge(state, Arrays.asList(
-      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch1.compact().toByteArray()))
-    );
-
-    UpdateSketch sketch2 = UpdateSketch.builder().build();
-    sketch2.update(2);
-    eval.merge(state, Arrays.asList(
-      new IntWritable(DEFAULT_NOMINAL_ENTRIES),
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch2.compact().toByteArray()))
-    );
-
-    Object result = eval.terminate(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
+      checkFinalResultInspector(resultInspector);
+  
+      UnionState state = (UnionState) eval.getNewAggregationBuffer();
+  
+      UpdateSketch sketch1 = UpdateSketch.builder().build();
+      sketch1.update(1);
+      eval.merge(state, Arrays.asList(
+        new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch1.compact().toByteArray()))
+      );
+  
+      UpdateSketch sketch2 = UpdateSketch.builder().build();
+      sketch2.update(2);
+      eval.merge(state, Arrays.asList(
+        new IntWritable(DEFAULT_NOMINAL_ENTRIES),
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch2.compact().toByteArray()))
+      );
+  
+      Object result = eval.terminate(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof BytesWritable);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    }
   }
 
   // COMPLETE mode (single mode, alternative to MapReduce): iterate + terminate
   @Test
   public void completeModeIntValuesDefaultParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
-    checkFinalResultInspector(resultInspector);
-
-    UnionState state = (UnionState) eval.getNewAggregationBuffer();
-    eval.iterate(state, new Object[] {new IntWritable(1)});
-    eval.iterate(state, new Object[] {new IntWritable(2)});
-
-    Object result = eval.terminate(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.reset(state);
-    result = eval.terminate(state);
-    Assert.assertNull(result);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+      checkFinalResultInspector(resultInspector);
+  
+      UnionState state = (UnionState) eval.getNewAggregationBuffer();
+      eval.iterate(state, new Object[] {new IntWritable(1)});
+      eval.iterate(state, new Object[] {new IntWritable(2)});
+  
+      Object result = eval.terminate(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof BytesWritable);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+  
+      eval.reset(state);
+      result = eval.terminate(state);
+      Assert.assertNull(result);
+    }
   }
 
   @Test
   public void completeModeDoubleValuesExplicitParameters() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { doubleInspector, intConstantInspector, floatConstantInspector, longConstantInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
-    checkFinalResultInspector(resultInspector);
-
-    final long seed = 2;
-    UnionState state = (UnionState) eval.getNewAggregationBuffer();
-    eval.iterate(state, new Object[] {new DoubleWritable(1), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
-    eval.iterate(state, new Object[] {new DoubleWritable(2), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
-
-    Object result = eval.terminate(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()), seed);
-    // because of sampling probability < 1
-    Assert.assertTrue(resultSketch.isEstimationMode());
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+      checkFinalResultInspector(resultInspector);
+  
+      final long seed = 2;
+      UnionState state = (UnionState) eval.getNewAggregationBuffer();
+      eval.iterate(state, new Object[] {new DoubleWritable(1), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
+      eval.iterate(state, new Object[] {new DoubleWritable(2), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
+  
+      Object result = eval.terminate(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof BytesWritable);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()), seed);
+      // because of sampling probability < 1
+      Assert.assertTrue(resultSketch.isEstimationMode());
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
+    }
   }
 
   static void checkIntermediateResultInspector(ObjectInspector resultInspector) {

@@ -48,21 +48,21 @@ public class IntersectSketchUDAFTest {
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooFewInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new IntersectSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooManyInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, longInspector, longInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new IntersectSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentTypeException.class)
   public void getEvaluatorWrongCategoryArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new IntersectSketchUDAF().getEvaluator(info);
   }
 
@@ -71,21 +71,21 @@ public class IntersectSketchUDAFTest {
     ObjectInspector intInspector =
         PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.INT);
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new IntersectSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongCategoryArg2() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, structInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new IntersectSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongTypeArg2() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new IntersectSketchUDAF().getEvaluator(info);
   }
 
@@ -93,191 +93,186 @@ public class IntersectSketchUDAFTest {
   @Test
   public void partia1lDefaultSeed() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    checkIntermediateResultInspector(resultInspector);
-
-    IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
-        (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
-
-    UpdateSketch sketch1 = UpdateSketch.builder().build();
-    sketch1.update(1);
-    sketch1.update(2);
-    sketch1.update(3);
-    eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()) });
-
-    UpdateSketch sketch2 = UpdateSketch.builder().build();
-    sketch2.update(2);
-    sketch2.update(3);
-    sketch2.update(4);
-    eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
-
-    Object result = eval.terminatePartial(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof List);
-    List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 2);
-    Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
-    Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+      checkIntermediateResultInspector(resultInspector);
+  
+      IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
+          (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
+  
+      UpdateSketch sketch1 = UpdateSketch.builder().build();
+      sketch1.update(1);
+      sketch1.update(2);
+      sketch1.update(3);
+      eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()) });
+  
+      UpdateSketch sketch2 = UpdateSketch.builder().build();
+      sketch2.update(2);
+      sketch2.update(3);
+      sketch2.update(4);
+      eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
+  
+      Object result = eval.terminatePartial(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof List);
+      List<?> r = (List<?>) result;
+      Assert.assertEquals(r.size(), 2);
+      Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
+      Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    }
   }
 
   @Test
   public void partial1ModeExplicitSeed() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, longInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
-    checkIntermediateResultInspector(resultInspector);
-
-    final long seed = 1;
-    IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
-        (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
-
-    UpdateSketch sketch1 = UpdateSketch.builder().setSeed(seed).build();
-    sketch1.update(1);
-    sketch1.update(2);
-    sketch1.update(3);
-    eval.iterate(state, new Object[] {new BytesWritable(sketch1.toByteArray()), new LongWritable(seed)});
-
-    UpdateSketch sketch2 = UpdateSketch.builder().setSeed(seed).build();
-    sketch2.update(2);
-    sketch2.update(3);
-    sketch2.update(4);
-    eval.iterate(state, new Object[] {new BytesWritable(sketch2.toByteArray()), new LongWritable(seed) });
-
-    Object result = eval.terminatePartial(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof List);
-    List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 2);
-    Assert.assertEquals(((LongWritable) (r.get(0))).get(), seed);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()), seed);
-    Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
+      checkIntermediateResultInspector(resultInspector);
+  
+      final long seed = 1;
+      IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
+          (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
+  
+      UpdateSketch sketch1 = UpdateSketch.builder().setSeed(seed).build();
+      sketch1.update(1);
+      sketch1.update(2);
+      sketch1.update(3);
+      eval.iterate(state, new Object[] {new BytesWritable(sketch1.toByteArray()), new LongWritable(seed)});
+  
+      UpdateSketch sketch2 = UpdateSketch.builder().setSeed(seed).build();
+      sketch2.update(2);
+      sketch2.update(3);
+      sketch2.update(4);
+      eval.iterate(state, new Object[] {new BytesWritable(sketch2.toByteArray()), new LongWritable(seed) });
+  
+      Object result = eval.terminatePartial(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof List);
+      List<?> r = (List<?>) result;
+      Assert.assertEquals(r.size(), 2);
+      Assert.assertEquals(((LongWritable) (r.get(0))).get(), seed);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()), seed);
+      Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    }
   }
 
   // PARTIAL2 mode (Combine phase in Map-Reduce): merge + terminatePartial
   @Test
   public void partial2Mode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
-    checkIntermediateResultInspector(resultInspector);
-
-    IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
-        (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
-
-    UpdateSketch sketch1 = UpdateSketch.builder().build();
-    sketch1.update(1);
-    sketch1.update(2);
-    sketch1.update(3);
-    eval.merge(state, Arrays.asList(
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch1.compact().toByteArray()))
-    );
-
-    UpdateSketch sketch2 = UpdateSketch.builder().build();
-    sketch2.update(2);
-    sketch2.update(3);
-    sketch2.update(4);
-    eval.merge(state, Arrays.asList(
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch2.compact().toByteArray()))
-    );
-
-    Object result = eval.terminatePartial(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof List);
-    List<?> r = (List<?>) result;
-    Assert.assertEquals(r.size(), 2);
-    Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
+      checkIntermediateResultInspector(resultInspector);
+  
+      IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
+          (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
+  
+      UpdateSketch sketch1 = UpdateSketch.builder().build();
+      sketch1.update(1);
+      sketch1.update(2);
+      sketch1.update(3);
+      eval.merge(state, Arrays.asList(
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch1.compact().toByteArray()))
+      );
+  
+      UpdateSketch sketch2 = UpdateSketch.builder().build();
+      sketch2.update(2);
+      sketch2.update(3);
+      sketch2.update(4);
+      eval.merge(state, Arrays.asList(
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch2.compact().toByteArray()))
+      );
+  
+      Object result = eval.terminatePartial(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof List);
+      List<?> r = (List<?>) result;
+      Assert.assertEquals(r.size(), 2);
+      Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    }
   }
 
   // FINAL mode (Reduce phase in Map-Reduce): merge + terminate
   @Test
   public void finalMode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
-    DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
-
-    IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
-        (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
-
-    UpdateSketch sketch1 = UpdateSketch.builder().build();
-    sketch1.update(1);
-    sketch1.update(2);
-    sketch1.update(3);
-    eval.merge(state, Arrays.asList(
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch1.compact().toByteArray())
-    ));
-
-    UpdateSketch sketch2 = UpdateSketch.builder().build();
-    sketch2.update(2);
-    sketch2.update(3);
-    sketch2.update(4);
-    eval.merge(state, Arrays.asList(
-      new LongWritable(DEFAULT_UPDATE_SEED),
-      new BytesWritable(sketch2.compact().toByteArray())
-    ));
-
-    BytesWritable bytes = (BytesWritable) eval.terminate(state);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(bytes.getBytes()));
-    Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
+      DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
+  
+      IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
+          (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
+  
+      UpdateSketch sketch1 = UpdateSketch.builder().build();
+      sketch1.update(1);
+      sketch1.update(2);
+      sketch1.update(3);
+      eval.merge(state, Arrays.asList(
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch1.compact().toByteArray())
+      ));
+  
+      UpdateSketch sketch2 = UpdateSketch.builder().build();
+      sketch2.update(2);
+      sketch2.update(3);
+      sketch2.update(4);
+      eval.merge(state, Arrays.asList(
+        new LongWritable(DEFAULT_UPDATE_SEED),
+        new BytesWritable(sketch2.compact().toByteArray())
+      ));
+  
+      BytesWritable bytes = (BytesWritable) eval.terminate(state);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(bytes.getBytes()));
+      Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+    }
   }
 
   // COMPLETE mode (single mode, alternative to MapReduce): iterate + terminate
   @Test
   public void completeModeDefaultSeed() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
-    GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info);
-    ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
-    DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
-
-    IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
-        (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
-
-    UpdateSketch sketch1 = UpdateSketch.builder().build();
-    sketch1.update(1);
-    sketch1.update(2);
-    sketch1.update(3);
-    eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
-
-    UpdateSketch sketch2 = UpdateSketch.builder().build();
-    sketch2.update(2);
-    sketch2.update(3);
-    sketch2.update(4);
-    eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
-
-    Object result = eval.terminate(state);
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result instanceof BytesWritable);
-    Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
-    Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-
-    eval.reset(state);
-    result = eval.terminate(state);
-    Assert.assertNull(result);
-
-    eval.close();
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
+    try (GenericUDAFEvaluator eval = new IntersectSketchUDAF().getEvaluator(info)) {
+      ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
+      DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
+  
+      IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState state =
+          (IntersectSketchUDAF.IntersectSketchUDAFEvaluator.IntersectionState) eval.getNewAggregationBuffer();
+  
+      UpdateSketch sketch1 = UpdateSketch.builder().build();
+      sketch1.update(1);
+      sketch1.update(2);
+      sketch1.update(3);
+      eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
+  
+      UpdateSketch sketch2 = UpdateSketch.builder().build();
+      sketch2.update(2);
+      sketch2.update(3);
+      sketch2.update(4);
+      eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
+  
+      Object result = eval.terminate(state);
+      Assert.assertNotNull(result);
+      Assert.assertTrue(result instanceof BytesWritable);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      Assert.assertEquals(resultSketch.getEstimate(), 2.0);
+  
+      eval.reset(state);
+      result = eval.terminate(state);
+      Assert.assertNull(result);
+    }
   }
 
   private static void checkIntermediateResultInspector(ObjectInspector resultInspector) {

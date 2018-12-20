@@ -62,56 +62,56 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void tooFewArguments() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentException.class })
   public void tooManyArguments() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, stringInspector, intInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidCategoryArg1() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidTypeArg1() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidCategoryArg2() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, structInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidTypeArg2() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, floatInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidCategorysArg3() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector,  structInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
   @Test(expectedExceptions = { UDFArgumentTypeException.class })
   public void invalidTypeArg3() throws SemanticException {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector,  floatInspector };
-    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo params = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(params);
   }
 
@@ -119,7 +119,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test
   public void partial1ModeDefaultParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkIntermediateResultInspector(resultInspector);
@@ -157,7 +157,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test
   public void partial1ModeExplicitParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, stringInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkIntermediateResultInspector(resultInspector);
@@ -201,7 +201,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test
   public void partial2Mode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
       checkIntermediateResultInspector(resultInspector);
@@ -252,7 +252,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test
   public void finalMode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
       DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);
@@ -295,7 +295,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test
   public void completeModeDefaultParams() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);
@@ -333,7 +333,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test
   public void completeModeExplicitNominalNumEntries() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);
@@ -376,7 +376,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
   @Test
   public void completeModeExplicitNominalNumEntriesAndMode() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, intInspector, stringInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new UnionDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);

@@ -45,42 +45,42 @@ public class DataToSketchUDAFTest {
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooFewInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new DataToSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorTooManyInspectors() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { floatInspector, intInspector, intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new DataToSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongCategoryArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { structInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new DataToSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongTypeArg1() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new DataToSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongCategoryArg2() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { floatInspector, structInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new DataToSketchUDAF().getEvaluator(info);
   }
 
   @Test(expectedExceptions = UDFArgumentException.class)
   public void getEvaluatorWrongTypeArg2() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { floatInspector, floatInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     new DataToSketchUDAF().getEvaluator(info);
   }
 
@@ -88,7 +88,7 @@ public class DataToSketchUDAFTest {
   @Test
   public void partial1ModeDefaultK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { floatInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkResultInspector(resultInspector);
@@ -109,7 +109,7 @@ public class DataToSketchUDAFTest {
   @Test
   public void partial1ModeGivenK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { floatInspector, intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkResultInspector(resultInspector);
@@ -130,7 +130,7 @@ public class DataToSketchUDAFTest {
   // PARTIAL2 mode (Combine phase in Map-Reduce): merge + terminatePartial
   @Test
   public void partial2Mode() throws Exception {
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { floatInspector }, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { floatInspector }, false, false, false);
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {binaryInspector});
       checkResultInspector(resultInspector);
@@ -156,7 +156,7 @@ public class DataToSketchUDAFTest {
   // FINAL mode (Reduce phase in Map-Reduce): merge + terminate
   @Test
   public void finalMode() throws Exception {
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { floatInspector }, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(new ObjectInspector[] { floatInspector }, false, false, false);
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {binaryInspector});
       checkResultInspector(resultInspector);
@@ -184,7 +184,7 @@ public class DataToSketchUDAFTest {
   @Test
   public void completeModeDefaultK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { floatInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkResultInspector(resultInspector);
@@ -205,7 +205,7 @@ public class DataToSketchUDAFTest {
   @Test
   public void completeModeGivenK() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { floatInspector, intInspector };
-    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false);
+    GenericUDAFParameterInfo info = new SimpleGenericUDAFParameterInfo(inspectors, false, false, false);
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkResultInspector(resultInspector);
