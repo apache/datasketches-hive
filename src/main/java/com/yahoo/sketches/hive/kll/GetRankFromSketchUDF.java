@@ -21,7 +21,7 @@ public class GetRankFromSketchUDF extends UDF {
   /**
    * Returns a normalized rank of a given value from a given sketch
    * @param serializedSketch serialized sketch
-   * @param value
+   * @param value the given value
    * @return rank
    */
   public Double evaluate(final BytesWritable serializedSketch, final float value) {
