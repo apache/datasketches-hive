@@ -23,7 +23,7 @@ public class SketchToEstimateAndErrorBoundsUDFTest {
 
   @Test
   public void emptySketch() {
-    final HllSketch sketch = new HllSketch();
+    final HllSketch sketch = new HllSketch(12);
     final List<Double> result = new SketchToEstimateAndErrorBoundsUDF().evaluate(new BytesWritable(sketch.toCompactByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
@@ -34,7 +34,7 @@ public class SketchToEstimateAndErrorBoundsUDFTest {
 
   @Test
   public void normalCase() {
-    final HllSketch sketch = new HllSketch();
+    final HllSketch sketch = new HllSketch(12);
     sketch.update(1);
     sketch.update(2);
     List<Double> result = new SketchToEstimateAndErrorBoundsUDF().evaluate(new BytesWritable(sketch.toCompactByteArray()));
@@ -47,7 +47,7 @@ public class SketchToEstimateAndErrorBoundsUDFTest {
 
   @Test
   public void normalCaseWithKappa() {
-    final HllSketch sketch = new HllSketch();
+    final HllSketch sketch = new HllSketch(12);
     sketch.update(1);
     sketch.update(2);
     List<Double> result = new SketchToEstimateAndErrorBoundsUDF().evaluate(new BytesWritable(sketch.toCompactByteArray()), 3);

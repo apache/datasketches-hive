@@ -21,7 +21,7 @@ public class SketchToStringUDFTest {
 
   @Test
   public void emptySketch() {
-    final HllSketch sketch = new HllSketch();
+    final HllSketch sketch = new HllSketch(12);
     final String result = new SketchToStringUDF().evaluate(new BytesWritable(sketch.toCompactByteArray()));
     Assert.assertNotNull(result);
     Assert.assertTrue(result.length() > 0);
@@ -29,7 +29,7 @@ public class SketchToStringUDFTest {
 
   @Test
   public void normalCase() {
-    final HllSketch sketch = new HllSketch();
+    final HllSketch sketch = new HllSketch(12);
     sketch.update(1);
     sketch.update(2);
     final String result = new SketchToStringUDF().evaluate(new BytesWritable(sketch.toCompactByteArray()));
