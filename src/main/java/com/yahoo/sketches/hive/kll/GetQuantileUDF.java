@@ -19,7 +19,7 @@ extended = " Returns a quantile value from a given KllFloatsSketch."
 + " For example, a fraction of 0.5 corresponds to 50th percentile, which is"
 + " the median value of the distribution (the number separating the higher half"
 + " of the probability distribution from the lower half).")
-public class GetQuantileFromSketchUDF extends UDF {
+public class GetQuantileUDF extends UDF {
 
   /**
    * Returns a quantile value from a given sketch

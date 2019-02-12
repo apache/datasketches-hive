@@ -11,11 +11,11 @@ import org.testng.annotations.Test;
 
 import com.yahoo.sketches.kll.KllFloatsSketch;
 
-public class GetNFromSektchUDFTest {
+public class GetNUDFTest {
 
   @Test
   public void nullSketch() {
-    final Long result = new GetNFromSketchUDF().evaluate(null);
+    final Long result = new GetNUDF().evaluate(null);
     Assert.assertNull(result);
   }
 
@@ -26,7 +26,7 @@ public class GetNFromSektchUDFTest {
     sketch.update(2);
     sketch.update(3);
     sketch.update(4);
-    final Long result = new GetNFromSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()));
+    final Long result = new GetNUDF().evaluate(new BytesWritable(sketch.toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result, Long.valueOf(4));
   }

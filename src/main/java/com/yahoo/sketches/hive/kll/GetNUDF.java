@@ -14,7 +14,7 @@ import com.yahoo.sketches.kll.KllFloatsSketch;
 
 @Description(name = "GetN", value = "_FUNC_(sketch)",
 extended = " Returns the total number of observed input values (stream length) from a given KllFloatsSketch.")
-public class GetNFromSketchUDF extends UDF {
+public class GetNUDF extends UDF {
 
   /**
    * Returns N from a given sketch

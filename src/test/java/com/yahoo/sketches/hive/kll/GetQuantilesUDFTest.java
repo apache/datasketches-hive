@@ -13,11 +13,11 @@ import org.testng.annotations.Test;
 
 import com.yahoo.sketches.kll.KllFloatsSketch;
 
-public class GetQuantilesFromSketchUDFTest {
+public class GetQuantilesUDFTest {
 
   @Test
   public void nullSketch() {
-    final List<Float> result = new GetQuantilesFromSketchUDF().evaluate(null, 0.0);
+    final List<Float> result = new GetQuantilesUDF().evaluate(null, 0.0);
     Assert.assertNull(result);
   }
 
@@ -27,7 +27,7 @@ public class GetQuantilesFromSketchUDFTest {
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
-    final List<Float> result = new GetQuantilesFromSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()));
+    final List<Float> result = new GetQuantilesUDF().evaluate(new BytesWritable(sketch.toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 0);
   }
@@ -38,7 +38,7 @@ public class GetQuantilesFromSketchUDFTest {
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
-    final List<Float> result = new GetQuantilesFromSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0, 0.5, 1.0);
+    final List<Float> result = new GetQuantilesUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0, 0.5, 1.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals(result.get(0), 1f);
