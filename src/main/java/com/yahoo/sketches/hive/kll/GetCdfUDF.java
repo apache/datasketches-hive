@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Oath Inc.
+ * Copyright 2019, Verizon Media.
  * Licensed under the terms of the Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
@@ -15,20 +15,20 @@ import com.yahoo.memory.Memory;
 import com.yahoo.sketches.kll.KllFloatsSketch;
 
 @Description(
-  name = "GetPMF",
+  name = "GetCDF",
   value = "_FUNC_(sketch, split points...)",
-  extended = "Returns an approximation to the Probability Mass Function (PMF)"
+  extended = "Returns an approximation to the Cumulative Distribution Function (CDF)"
   + " from a sketch given a set of split points (values)."
   + " Split points are an array of M unique, monotonically increasing values"
   + " that divide the real number line into M+1 consecutive disjoint intervals."
-  + " The function returns an array of M+1 doubles, each of which is an approximation"
-  + " to the fraction of the values that fell into one of those intervals."
-  + " The definition of an interval is inclusive of the left split point and exclusive"
-  + " of the right split point")
-public class GetPmfFromSketchUDF extends UDF {
+  + " The function returns an array of M+1 double valuess, the first M of which are approximations"
+  + " to the ranks of the corresponding split points (fraction of input stream values that are less"
+  + " than a split point). The last value is always 1."
+  + " CDF can also be viewed as a cumulative version of PMF.")
+public class GetCdfUDF extends UDF {
 
   /**
-   * Returns a list of fractions (PMF) from a given sketch
+   * Returns a list of ranks (CDF) from a given sketch
    * @param serializedSketch serialized sketch
    * @param splitPoints list of unique and monotonically increasing values
    * @return list of fractions from 0 to 1
@@ -36,9 +36,9 @@ public class GetPmfFromSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final Float... splitPoints) {
     if (serializedSketch == null) { return null; }
     final KllFloatsSketch sketch = KllFloatsSketch.heapify(Memory.wrap(serializedSketch.getBytes()));
-    final double[] pmf = sketch.getPMF(Util.objectsToPrimitives(splitPoints));
-    if (pmf == null) { return null; }
-    return Util.primitivesToList(pmf);
+    final double[] cdf = sketch.getCDF(Util.objectsToPrimitives(splitPoints));
+    if (cdf == null) { return null; }
+    return Util.primitivesToList(cdf);
   }
 
 }

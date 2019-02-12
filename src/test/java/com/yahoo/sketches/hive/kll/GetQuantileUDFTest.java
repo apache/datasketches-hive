@@ -11,11 +11,11 @@ import org.testng.annotations.Test;
 
 import com.yahoo.sketches.kll.KllFloatsSketch;
 
-public class GetRankFromSektchUDFTest {
+public class GetQuantileUDFTest {
 
   @Test
   public void nullSketch() {
-    final Double result = new GetRankFromSketchUDF().evaluate(null, 0);
+    final Float result = new GetQuantileUDF().evaluate(null, 0);
     Assert.assertNull(result);
   }
 
@@ -25,10 +25,9 @@ public class GetRankFromSektchUDFTest {
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
-    sketch.update(4);
-    final Double result = new GetRankFromSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 3f);
+    final Float result = new GetQuantileUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
     Assert.assertNotNull(result);
-    Assert.assertEquals(result, 0.5);
+    Assert.assertEquals(result, 2f);
   }
 
 }
