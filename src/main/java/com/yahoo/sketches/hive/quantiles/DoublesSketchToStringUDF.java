@@ -14,6 +14,7 @@ import com.yahoo.sketches.quantiles.DoublesSketch;
 
 @Description(name = "ToString", value = "_FUNC_(sketch)",
 extended = " Returns a human-readable summary of a given DoublesSketch.")
+@SuppressWarnings("javadoc")
 public class DoublesSketchToStringUDF extends UDF {
 
   /**

@@ -19,6 +19,7 @@ import com.yahoo.sketches.cpc.CpcSketch;
     value = "_FUNC_(sketch)",
     extended = "Returns an estimate of unique count from a given CpcSketch."
     + " The result is a double value.")
+@SuppressWarnings("javadoc")
 public class GetEstimateUDF extends UDF {
 
   /**

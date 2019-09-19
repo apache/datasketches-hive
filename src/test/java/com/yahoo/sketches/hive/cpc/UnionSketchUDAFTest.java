@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
 import com.yahoo.memory.Memory;
 import com.yahoo.sketches.cpc.CpcSketch;
 
+@SuppressWarnings("javadoc")
 public class UnionSketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -248,9 +249,9 @@ public class UnionSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
       DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
-  
+
       State state = (State) eval.getNewAggregationBuffer();
-  
+
       CpcSketch sketch1 = new CpcSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch1.update(1);
       eval.merge(state, Arrays.asList(

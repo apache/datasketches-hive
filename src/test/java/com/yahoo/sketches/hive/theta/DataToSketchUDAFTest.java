@@ -44,6 +44,7 @@ import com.yahoo.sketches.theta.UpdateSketch;
 /**
  * Unit tests for DataToSketch UDF
  */
+@SuppressWarnings("javadoc")
 public class DataToSketchUDAFTest {
 
   static final ObjectInspector intInspector =
@@ -153,11 +154,11 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkIntermediateResultInspector(resultInspector);
-  
+
       UnionState state = (UnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new IntWritable(1)});
       eval.iterate(state, new Object[] {new IntWritable(2)});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -178,12 +179,12 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkIntermediateResultInspector(resultInspector);
-  
+
       final long seed = 1;
       UnionState state = (UnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new Text("a"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
       eval.iterate(state, new Object[] {new Text("b"), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -195,7 +196,7 @@ public class DataToSketchUDAFTest {
       // because of sampling probability < 1
       Assert.assertTrue(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
-  
+
       // check if seed is correct in the result
       Union union = SetOperation.builder().setSeed(seed).buildUnion();
       // this must fail if the seed is incompatible
@@ -211,9 +212,9 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
       checkIntermediateResultInspector(resultInspector);
-  
+
       UnionState state = (UnionState) eval.getNewAggregationBuffer();
-  
+
       UpdateSketch sketch1 = UpdateSketch.builder().build();
       sketch1.update(1);
       eval.merge(state, Arrays.asList(
@@ -221,7 +222,7 @@ public class DataToSketchUDAFTest {
         new LongWritable(DEFAULT_UPDATE_SEED),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
-  
+
       UpdateSketch sketch2 = UpdateSketch.builder().build();
       sketch2.update(2);
       eval.merge(state, Arrays.asList(
@@ -229,7 +230,7 @@ public class DataToSketchUDAFTest {
         new LongWritable(DEFAULT_UPDATE_SEED),
         new BytesWritable(sketch2.compact().toByteArray()))
       );
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -250,9 +251,9 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
       checkFinalResultInspector(resultInspector);
-  
+
       UnionState state = (UnionState) eval.getNewAggregationBuffer();
-  
+
       UpdateSketch sketch1 = UpdateSketch.builder().build();
       sketch1.update(1);
       eval.merge(state, Arrays.asList(
@@ -260,7 +261,7 @@ public class DataToSketchUDAFTest {
         new LongWritable(DEFAULT_UPDATE_SEED),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
-  
+
       UpdateSketch sketch2 = UpdateSketch.builder().build();
       sketch2.update(2);
       eval.merge(state, Arrays.asList(
@@ -268,7 +269,7 @@ public class DataToSketchUDAFTest {
         new LongWritable(DEFAULT_UPDATE_SEED),
         new BytesWritable(sketch2.compact().toByteArray()))
       );
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -285,17 +286,17 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkFinalResultInspector(resultInspector);
-  
+
       UnionState state = (UnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new IntWritable(1)});
       eval.iterate(state, new Object[] {new IntWritable(2)});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
       Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -309,12 +310,12 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkFinalResultInspector(resultInspector);
-  
+
       final long seed = 2;
       UnionState state = (UnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new DoubleWritable(1), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
       eval.iterate(state, new Object[] {new DoubleWritable(2), new IntWritable(16), new FloatWritable(0.99f), new LongWritable(seed)});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);

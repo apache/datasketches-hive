@@ -16,6 +16,7 @@ import com.yahoo.sketches.kll.KllFloatsSketch;
 extended = " Returns a normalized rank of a given value from a given KllFloatsSketch."
 + " The returned rank is an approximation to the fraction of values of the distribution"
 + " that are less than the given value (mass of the distribution below the given value).")
+@SuppressWarnings("javadoc")
 public class GetRankUDF extends UDF {
 
   /**

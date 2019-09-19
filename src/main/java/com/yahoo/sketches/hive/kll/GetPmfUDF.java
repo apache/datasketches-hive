@@ -25,6 +25,7 @@ import com.yahoo.sketches.kll.KllFloatsSketch;
   + " to the fraction of the values that fell into one of those intervals."
   + " The definition of an interval is inclusive of the left split point and exclusive"
   + " of the right split point")
+@SuppressWarnings("javadoc")
 public class GetPmfUDF extends UDF {
 
   /**

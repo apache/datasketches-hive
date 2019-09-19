@@ -23,6 +23,7 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
     extended = "Returns a list of variance values from a given ArrayOfDoublesSketch."
     + " The result will be N double values, where N is the number of double values kept in the"
     + " sketch per key.")
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToVariancesUDF extends UDF {
 
   /**
@@ -40,7 +41,7 @@ public class ArrayOfDoublesSketchToVariancesUDF extends UDF {
     }
 
     final SummaryStatistics[] summaries = ArrayOfDoublesSketchStats.sketchToSummaryStatistics(sketch);
-    final List<Double> variances = new ArrayList<Double>(sketch.getNumValues());
+    final List<Double> variances = new ArrayList<>(sketch.getNumValues());
     for (int i = 0; i < sketch.getNumValues(); i++) {
       variances.add(summaries[i].getVariance());
     }

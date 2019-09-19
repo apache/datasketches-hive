@@ -28,6 +28,7 @@ import com.yahoo.sketches.frequencies.ItemsSketch;
     + "Returns a list of frequent items in descending order by estimated frequency."
     + " Error type is optional and must be one of the following: "
     + "NO_FALSE_POSITIVES (default) or NO_FALSE_NEGATIVES.")
+@SuppressWarnings("javadoc")
 public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
 
   PrimitiveObjectInspector inputObjectInspector;
@@ -35,7 +36,7 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
 
   @Override
   public StructObjectInspector initialize(final ObjectInspector[] inspectors) throws UDFArgumentException {
-    if (inspectors.length != 1 && inspectors.length != 2) {
+    if ((inspectors.length != 1) && (inspectors.length != 2)) {
       throw new UDFArgumentException("One or two arguments expected");
     }
 
@@ -75,7 +76,7 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
 
   @Override
   public void process(final Object[] data) throws HiveException {
-    if (data == null || data[0] == null) { return; }
+    if ((data == null) || (data[0] == null)) { return; }
     final BytesWritable serializedSketch =
         (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(

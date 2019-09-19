@@ -31,6 +31,7 @@ import com.yahoo.sketches.tuple.SummarySetOperations;
     + " from the sketch. A number of 16384 can be expected to yield errors of roughly +-1.5% in"
     + " the estimation of uniques. The default number is defined in the sketches-core library"
     + " and at the time of this writing was 4096 (about 3% error).")
+@SuppressWarnings("javadoc")
 public class UnionDoubleSummarySketchUDAF extends UnionSketchUDAF {
 
   @Override

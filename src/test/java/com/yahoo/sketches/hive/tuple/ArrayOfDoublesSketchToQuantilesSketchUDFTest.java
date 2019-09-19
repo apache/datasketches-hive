@@ -14,6 +14,7 @@ import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToQuantilesSketchUDFTest {
 
   @Test

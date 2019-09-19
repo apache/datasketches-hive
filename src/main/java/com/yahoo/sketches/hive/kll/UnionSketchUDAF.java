@@ -19,12 +19,13 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 @Description(name = "UnionSketch", value = "_FUNC_(sketch) - "
     + "Returns a KllFloatsSketch in a serialized form as a binary blob."
     + " Input values are also serialized sketches.")
+@SuppressWarnings("javadoc")
 public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
-    if (inspectors.length != 1 && inspectors.length != 2) {
+    if ((inspectors.length != 1) && (inspectors.length != 2)) {
       throw new UDFArgumentException("One or two arguments expected");
     }
     ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, PrimitiveCategory.BINARY);

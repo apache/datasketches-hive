@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import com.yahoo.memory.Memory;
 import com.yahoo.sketches.cpc.CpcSketch;
 
+@SuppressWarnings("javadoc")
 public class UnionSketchUDFTest {
 
   @Test

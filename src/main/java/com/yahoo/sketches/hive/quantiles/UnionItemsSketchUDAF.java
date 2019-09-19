@@ -23,12 +23,13 @@ import com.yahoo.sketches.ArrayOfItemsSerDe;
  * This is a generic implementation to be specialized in subclasses
  * @param <T> type of item
  */
+@SuppressWarnings("javadoc")
 public abstract class UnionItemsSketchUDAF<T> extends AbstractGenericUDAFResolver {
 
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
-    if (inspectors.length != 1 && inspectors.length != 2) {
+    if ((inspectors.length != 1) && (inspectors.length != 2)) {
       throw new UDFArgumentException("One or two arguments expected");
     }
     ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0, PrimitiveCategory.BINARY);

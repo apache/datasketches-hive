@@ -22,6 +22,7 @@ import com.yahoo.sketches.ArrayOfItemsSerDe;
  * This is a generic implementation to be specialized in subclasses
  * @param <T> type of item
  */
+@SuppressWarnings("javadoc")
 public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolver {
 
   @Override
@@ -68,7 +69,7 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       // Parameters:
       // In PARTIAL1 and COMPLETE mode, the parameters are original data.
       // In PARTIAL2 and FINAL mode, the parameters are just partial aggregations.
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         if (parameters.length > 1) {
           maxMapSizeObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }

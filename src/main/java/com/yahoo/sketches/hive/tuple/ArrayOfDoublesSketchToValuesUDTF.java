@@ -25,6 +25,7 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketchIterator;
 import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
 
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
 
   PrimitiveObjectInspector inputObjectInspector;

@@ -39,6 +39,7 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
     + " the estimation of uniques. The default number is defined in the sketches-core library,"
     + " and at the time of this writing was 4096 (about 3% error)."
     + " The number of values is optional and must match all input sketches (defaults to 1)")
+@SuppressWarnings("javadoc")
 public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -77,7 +78,7 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       super.init(mode, inspectors);
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
         sketchInspector_ = (PrimitiveObjectInspector) inspectors[0];
         if (inspectors.length > 1) {
@@ -91,7 +92,7 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateInspector_ = (StructObjectInspector) inspectors[0];
       }
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
         // intermediate results need to include the the nominal number of entries and number of values
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, NUM_VALUES_FIELD, SKETCH_FIELD),

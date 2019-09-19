@@ -14,6 +14,7 @@ import com.yahoo.sketches.theta.UpdateSketch;
 import com.yahoo.sketches.theta.Sketches;
 import static org.testng.AssertJUnit.assertEquals;
 
+@SuppressWarnings("javadoc")
 public class EstimateSketchUDFTest {
 
   @Test
@@ -35,34 +36,34 @@ public class EstimateSketchUDFTest {
 
     assertEquals(testResult, 0.0);
   }
-  
+
   @Test
   public void evaluateValid() {
     EstimateSketchUDF testObject = new EstimateSketchUDF();
-    
+
     UpdateSketch sketch = Sketches.updateSketchBuilder().setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {
       sketch.update(i);
     }
-    
+
     BytesWritable input = new BytesWritable(sketch.toByteArray());
-    
+
     Double testResult = testObject.evaluate(input);
-    
+
     assertEquals(128.0, testResult);
-    
+
     CompactSketch compactSketch = sketch.compact(false, null);
     input = new BytesWritable(compactSketch.toByteArray());
-    
+
     testResult = testObject.evaluate(input);
-    
+
     assertEquals(128.0, testResult);
   }
 
   @Test
   public void evaluateValidExplicitSeed() {
     EstimateSketchUDF testObject = new EstimateSketchUDF();
-    
+
     final long seed = 1;
     UpdateSketch sketch = Sketches.updateSketchBuilder().setSeed(seed).setNominalEntries(1024).build();
     for (int i = 0; i<128; i++) {

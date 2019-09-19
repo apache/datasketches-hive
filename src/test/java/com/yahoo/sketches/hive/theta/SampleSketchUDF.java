@@ -14,8 +14,8 @@ import com.yahoo.sketches.theta.Union;
 
 /**
  * Hive estimate sketch UDF.
- *
  */
+@SuppressWarnings("javadoc")
 public class SampleSketchUDF extends UDF {
   public static final int DEFAULT_SIZE = 16384;
 

@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 
+@SuppressWarnings("javadoc")
 public class DoublesSektchToStringUDFTest {
 
   @Test

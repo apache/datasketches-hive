@@ -17,6 +17,7 @@ import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.SketchesArgumentException;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 
+@SuppressWarnings("javadoc")
 public class GetQuantilesFromStringsSketchUDFTest {
 
   static final Comparator<String> comparator = Comparator.naturalOrder();

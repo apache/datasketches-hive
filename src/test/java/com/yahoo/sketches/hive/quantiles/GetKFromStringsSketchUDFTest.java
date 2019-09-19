@@ -15,6 +15,7 @@ import com.yahoo.sketches.quantiles.ItemsSketch;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 
+@SuppressWarnings("javadoc")
 public class GetKFromStringsSketchUDFTest {
 
   static final Comparator<String> comparator = Comparator.naturalOrder();

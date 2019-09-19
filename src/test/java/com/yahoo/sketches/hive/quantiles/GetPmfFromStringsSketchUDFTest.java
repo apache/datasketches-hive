@@ -16,6 +16,7 @@ import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 
+@SuppressWarnings("javadoc")
 public class GetPmfFromStringsSketchUDFTest {
 
   static final Comparator<String> comparator = Comparator.naturalOrder();

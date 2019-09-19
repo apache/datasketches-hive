@@ -14,6 +14,7 @@ import com.yahoo.sketches.kll.KllFloatsSketch;
 
 @Description(name = "SketchToString", value = "_FUNC_(sketch)",
 extended = " Returns a human-readable summary of a given KllFloatsSketch.")
+@SuppressWarnings("javadoc")
 public class SketchToStringUDF extends UDF {
 
   /**

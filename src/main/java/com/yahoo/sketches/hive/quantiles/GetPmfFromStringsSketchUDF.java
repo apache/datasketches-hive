@@ -27,6 +27,7 @@ import com.yahoo.sketches.quantiles.ItemsSketch;
     + " to the fraction of the values that fell into one of those intervals."
     + " The definition of an interval is inclusive of the left split point and exclusive"
     + " of the right split point")
+@SuppressWarnings("javadoc")
 public class GetPmfFromStringsSketchUDF extends UDF {
 
   /**

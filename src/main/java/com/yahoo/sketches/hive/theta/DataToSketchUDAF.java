@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + "and at the time of this writing was 4096 (about 3% error)."
     + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)"
     + " The seed is optional, and using it is not recommended unless you really know why you need it")
+@SuppressWarnings("javadoc")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
@@ -126,7 +127,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
         inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
@@ -143,7 +144,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateObjectInspector = (StructObjectInspector) parameters[0];
       }
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
         // intermediate results need to include the the nominal number of entries and the seed
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_ENTRIES_FIELD, SEED_FIELD, SKETCH_FIELD),

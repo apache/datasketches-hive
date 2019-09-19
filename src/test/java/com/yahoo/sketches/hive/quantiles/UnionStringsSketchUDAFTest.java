@@ -27,6 +27,7 @@ import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.quantiles.ItemsSketch;
 
+@SuppressWarnings("javadoc")
 public class UnionStringsSketchUDAFTest {
 
   static final Comparator<String> comparator = Comparator.naturalOrder();
@@ -93,18 +94,18 @@ public class UnionStringsSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-  
+
       ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
       sketch1.update("a");
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)) });
-  
+
       ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
       sketch2.update("b");
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 128);
@@ -121,18 +122,18 @@ public class UnionStringsSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-  
+
       ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
       sketch1.update("a");
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)), new IntWritable(256) });
-  
+
       ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
       sketch2.update("b");
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)), new IntWritable(256) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
@@ -150,18 +151,18 @@ public class UnionStringsSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, inspectors);
       DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-  
+
       ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
       sketch1.update("a");
       eval.merge(state, new BytesWritable(sketch1.toByteArray(serDe)));
-  
+
       ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
       sketch2.update("b");
       eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
@@ -179,18 +180,18 @@ public class UnionStringsSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, inspectors);
       DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-  
+
       ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
       sketch1.update("a");
       eval.merge(state, new BytesWritable(sketch1.toByteArray(serDe)));
-  
+
       ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
       sketch2.update("b");
       eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
@@ -208,25 +209,25 @@ public class UnionStringsSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToDoublesSketchUDAFTest.checkResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
-  
+
       ItemsSketch<String> sketch1 = ItemsSketch.getInstance(comparator);
       sketch1.update("a");
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)) });
-  
+
       ItemsSketch<String> sketch2 = ItemsSketch.getInstance(comparator);
       sketch2.update("b");
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 128);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), "a");
       Assert.assertEquals(resultSketch.getMaxValue(), "b");
-  
+
       eval.reset(state);
       Assert.assertNull(eval.terminate(state));
     }

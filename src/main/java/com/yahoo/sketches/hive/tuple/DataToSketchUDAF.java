@@ -26,6 +26,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 
 import com.yahoo.sketches.tuple.UpdatableSummary;
 
+@SuppressWarnings("javadoc")
 public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -49,8 +50,8 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     if (inspectors.length > 3) {
       ObjectInspectorValidator.validateCategoryPrimitive(inspectors[3], 3);
       final PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector) inspectors[3];
-      if (primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.FLOAT
-          && primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.DOUBLE) {
+      if ((primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.FLOAT)
+          && (primitiveInspector.getPrimitiveCategory() != PrimitiveCategory.DOUBLE)) {
         throw new UDFArgumentTypeException(3, "float or double value expected as parameter 4 but "
             + primitiveInspector.getPrimitiveCategory().name() + " was received");
       }
@@ -93,7 +94,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       super.init(mode, inspectors);
       mode_ = mode;
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
         keyInspector_ = (PrimitiveObjectInspector) inspectors[0];
         valueInspector_ = (PrimitiveObjectInspector) inspectors[1];
@@ -108,7 +109,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateInspector_ = (StructObjectInspector) inspectors[0];
       }
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
         // intermediate results need to include the nominal number of entries
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SKETCH_FIELD),
@@ -150,7 +151,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      if (mode_ == Mode.PARTIAL1 || mode_ == Mode.COMPLETE) {
+      if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) {
         return new SketchState<U, S>();
       }
       return new UnionState<S>();

@@ -68,6 +68,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    */
   public abstract GenericUDAFEvaluator createEvaluator();
 
+  @SuppressWarnings("javadoc")
   public static abstract class UnionSketchEvaluator<S extends Summary> extends SketchEvaluator<S> {
 
     private PrimitiveObjectInspector sketchInspector_;
@@ -75,7 +76,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       super.init(mode, inspectors);
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
         sketchInspector_ = (PrimitiveObjectInspector) inspectors[0];
         if (inspectors.length > 1) {
@@ -86,7 +87,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateInspector_ = (StructObjectInspector) inspectors[0];
       }
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
         // intermediate results need to include the the nominal number of entries
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SKETCH_FIELD),

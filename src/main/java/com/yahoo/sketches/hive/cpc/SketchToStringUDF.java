@@ -18,6 +18,7 @@ import com.yahoo.sketches.cpc.CpcSketch;
     name = "SketchToString",
     value = "_FUNC_(sketch, seed)",
     extended = "Returns a human-readable summary of a given CpcSketch.")
+@SuppressWarnings("javadoc")
 public class SketchToStringUDF extends UDF {
 
   /**

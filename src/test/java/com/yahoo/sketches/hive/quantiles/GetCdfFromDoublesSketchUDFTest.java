@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
+@SuppressWarnings("javadoc")
 public class GetCdfFromDoublesSketchUDFTest {
 
   @Test

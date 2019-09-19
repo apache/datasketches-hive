@@ -17,6 +17,7 @@ import com.yahoo.sketches.hll.HllSketch;
     value = "_FUNC_(sketch)",
     extended = "Returns an estimate of unique count from a given HllSketch."
     + " The result is a double value.")
+@SuppressWarnings("javadoc")
 public class SketchToEstimateUDF extends UDF {
 
   /**

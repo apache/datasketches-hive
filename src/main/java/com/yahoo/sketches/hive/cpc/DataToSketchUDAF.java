@@ -95,6 +95,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     return new DataToSketchEvaluator();
   }
 
+  @SuppressWarnings("javadoc") //TODO
   public static class DataToSketchEvaluator extends SketchEvaluator {
 
     private Mode mode_;

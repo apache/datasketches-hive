@@ -25,6 +25,7 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
     + " The result will be N double values, where N is the number of double values kept in the"
     + " sketch per key. The resulting p-values are probabilities that differences in means are"
     + " due to chance")
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchesTTestUDF extends UDF {
 
   /**
@@ -34,7 +35,7 @@ public class ArrayOfDoublesSketchesTTestUDF extends UDF {
    * @return list of p-values
    */
   public List<Double> evaluate(final BytesWritable serializedSketchA, final BytesWritable serializedSketchB) {
-    if (serializedSketchA == null || serializedSketchB == null) { return null; }
+    if ((serializedSketchA == null) || (serializedSketchB == null)) { return null; }
     final ArrayOfDoublesSketch sketchA =
         ArrayOfDoublesSketches.wrapSketch(Memory.wrap(serializedSketchA.getBytes()));
     final ArrayOfDoublesSketch sketchB =
@@ -45,7 +46,7 @@ public class ArrayOfDoublesSketchesTTestUDF extends UDF {
     }
 
     // If the sketches contain fewer than 2 values, the p-value can't be calculated
-    if (sketchA.getRetainedEntries() < 2 || sketchB.getRetainedEntries() < 2) {
+    if ((sketchA.getRetainedEntries() < 2) || (sketchB.getRetainedEntries() < 2)) {
       return null;
     }
 
@@ -53,7 +54,7 @@ public class ArrayOfDoublesSketchesTTestUDF extends UDF {
     final SummaryStatistics[] summariesB = ArrayOfDoublesSketchStats.sketchToSummaryStatistics(sketchB);
 
     final TTest tTest = new TTest();
-    final List<Double> pValues = new ArrayList<Double>(sketchA.getNumValues());
+    final List<Double> pValues = new ArrayList<>(sketchA.getNumValues());
     for (int i = 0; i < sketchA.getNumValues(); i++) {
       pValues.add(tTest.tTest(summariesA[i], summariesB[i]));
     }

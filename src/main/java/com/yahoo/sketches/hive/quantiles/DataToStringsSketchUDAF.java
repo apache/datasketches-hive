@@ -22,6 +22,7 @@ import com.yahoo.sketches.ArrayOfStringsSerDe;
     + " Values must be of string type."
     + " Parameter k controls the accuracy and the size of the sketch."
     + " If k is ommitted, the default is used.")
+@SuppressWarnings("javadoc")
 public class DataToStringsSketchUDAF extends DataToItemsSketchUDAF<String> {
 
   @Override

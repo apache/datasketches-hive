@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToValuesUDTFTest {
 
   static final ObjectInspector binaryInspector =
@@ -105,7 +106,7 @@ public class ArrayOfDoublesSketchToValuesUDTFTest {
   }
 
   private static class MockCollector implements Collector {
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
 
     @Override
     public void collect(Object object) throws HiveException {

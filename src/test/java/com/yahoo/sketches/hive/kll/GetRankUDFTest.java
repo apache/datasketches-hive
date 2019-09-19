@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import com.yahoo.sketches.kll.KllFloatsSketch;
 
+@SuppressWarnings("javadoc")
 public class GetRankUDFTest {
 
   @Test

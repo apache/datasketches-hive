@@ -28,6 +28,7 @@ import com.yahoo.sketches.tuple.SummaryDeserializer;
   + " percent. For example, 50th percentile is the median value of the"
   + " distribution (the number separating the higher half of a probability"
   + " distribution from the lower half)")
+@SuppressWarnings("javadoc")
 public class DoubleSummarySketchToPercentileUDF extends UDF {
 
   private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =

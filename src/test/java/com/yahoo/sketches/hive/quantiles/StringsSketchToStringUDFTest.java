@@ -16,6 +16,7 @@ import com.yahoo.sketches.quantiles.ItemsSketch;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 
+@SuppressWarnings("javadoc")
 public class StringsSketchToStringUDFTest {
 
   static final Comparator<String> COMPARATOR = Comparator.naturalOrder();

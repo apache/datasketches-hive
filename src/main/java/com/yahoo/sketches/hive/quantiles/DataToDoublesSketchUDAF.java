@@ -21,13 +21,14 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
   + " Values must be of type double."
   + " Parameter k controls the accuracy and the size of the sketch."
   + " If k is ommitted, the default is used.")
+@SuppressWarnings("javadoc")
 public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info)
       throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
-    if (inspectors.length != 1 && inspectors.length != 2) {
+    if ((inspectors.length != 1) && (inspectors.length != 2)) {
       throw new UDFArgumentException("One or two arguments expected");
     }
     ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[0], 0,
@@ -46,7 +47,7 @@ public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
       if (data[0] == null) { return; }
       final DoublesUnionState state = (DoublesUnionState) buf;
-      if (!state.isInitialized() && kObjectInspector != null) {
+      if (!state.isInitialized() && (kObjectInspector != null)) {
         final int k = PrimitiveObjectInspectorUtils.getInt(data[1], kObjectInspector);
         state.init(k);
       }

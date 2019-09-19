@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToNumberOfRetainedEntriesUDFTest {
 
   @Test

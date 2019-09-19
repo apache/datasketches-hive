@@ -18,6 +18,7 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
     value = "_FUNC_(sketch)",
     extended = "Returns the number of retained entries from a given ArrayOfDoublesSketch."
     + " The result is an integer value.")
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToNumberOfRetainedEntriesUDF extends UDF {
 
   /**

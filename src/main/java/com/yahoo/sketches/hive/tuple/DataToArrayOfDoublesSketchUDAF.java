@@ -35,6 +35,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + " uniques. The default number is defined in the sketches-core library, and at the time of this"
     + " writing was 4096 (about 3% error)."
     + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)")
+@SuppressWarnings("javadoc")
 public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -47,7 +48,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     ObjectInspectorValidator.validateCategoryPrimitive(inspectors[0], 0);
 
     int numValues = 0;
-    while (numValues + 1 < inspectors.length) {
+    while ((numValues + 1) < inspectors.length) {
       ObjectInspectorValidator.validateCategoryPrimitive(inspectors[numValues + 1], numValues + 1);
       final PrimitiveObjectInspector primitiveInspector =
           (PrimitiveObjectInspector) inspectors[numValues + 1];
@@ -59,18 +60,18 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     }
 
     // nominal number of entries
-    if (inspectors.length > numValues + 1) {
+    if (inspectors.length > (numValues + 1)) {
       ObjectInspectorValidator.validateIntegralParameter(inspectors[numValues + 1], numValues + 1);
     }
 
     // sampling probability
-    if (inspectors.length > numValues + 2) {
+    if (inspectors.length > (numValues + 2)) {
       ObjectInspectorValidator.validateGivenPrimitiveCategory(inspectors[numValues + 2],
           numValues + 2, PrimitiveCategory.FLOAT);
     }
 
     // there must be nothing after sampling probability
-    if (inspectors.length > numValues + 3) {
+    if (inspectors.length > (numValues + 3)) {
       throw new UDFArgumentException("Unexpected argument " + (numValues + 4));
     }
 
@@ -92,11 +93,11 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
       mode_ = mode;
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
         keyInspector_ = (PrimitiveObjectInspector) parameters[0];
         numValues_ = 0;
-        while (numValues_ + 1 < parameters.length) {
+        while ((numValues_ + 1) < parameters.length) {
           if (((PrimitiveObjectInspector) parameters[numValues_ + 1]).getPrimitiveCategory()
               != PrimitiveCategory.DOUBLE) {
             break;
@@ -107,10 +108,10 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
         for (int i = 0; i < numValues_; i++) {
           valuesInspectors_[i] = (PrimitiveObjectInspector) parameters[i + 1];
         }
-        if (parameters.length > numValues_ + 1) {
+        if (parameters.length > (numValues_ + 1)) {
           nominalNumEntriesInspector_ = (PrimitiveObjectInspector) parameters[numValues_ + 1];
         }
-        if (parameters.length > numValues_ + 2) {
+        if (parameters.length > (numValues_ + 2)) {
           samplingProbabilityInspector_ = (PrimitiveObjectInspector) parameters[numValues_ + 2];
         }
       } else {
@@ -118,7 +119,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
         intermediateInspector_ = (StructObjectInspector) parameters[0];
       }
 
-      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
         // intermediate results need to include the the nominal number of entries and number of values
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, NUM_VALUES_FIELD, SKETCH_FIELD),
@@ -161,7 +162,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      if (mode_ == Mode.PARTIAL1 || mode_ == Mode.COMPLETE) {
+      if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) {
         return new ArrayOfDoublesSketchState();
       }
       return new ArrayOfDoublesUnionState();

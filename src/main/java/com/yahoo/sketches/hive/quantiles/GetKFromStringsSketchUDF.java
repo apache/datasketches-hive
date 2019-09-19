@@ -17,6 +17,7 @@ import com.yahoo.sketches.quantiles.ItemsSketch;
 
 @Description(name = "GetK", value = "_FUNC_(sketch)",
 extended = " Returns parameter K from a given ItemsSketch<String> sketch.")
+@SuppressWarnings("javadoc")
 public class GetKFromStringsSketchUDF extends UDF {
 
   /**

@@ -22,6 +22,7 @@ import com.yahoo.memory.Memory;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
+@SuppressWarnings("javadoc")
 public class DataToDoublesSketchUDAFTest {
 
   static final ObjectInspector doubleInspector =
@@ -88,11 +89,11 @@ public class DataToDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkResultInspector(resultInspector);
-  
+
       DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new DoubleWritable(1.0) });
       eval.iterate(state, new Object[] { new DoubleWritable(2.0) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getK(), 128);
@@ -109,11 +110,11 @@ public class DataToDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkResultInspector(resultInspector);
-  
+
       DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new DoubleWritable(1.0), new IntWritable(256) });
       eval.iterate(state, new Object[] { new DoubleWritable(2.0), new IntWritable(256) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getK(), 256);
@@ -130,17 +131,17 @@ public class DataToDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {binaryInspector});
       checkResultInspector(resultInspector);
-  
+
       DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
-  
+
       UpdateDoublesSketch sketch1 = DoublesSketch.builder().build();
       sketch1.update(1.0);
       eval.merge(state, new BytesWritable(sketch1.toByteArray()));
-  
+
       UpdateDoublesSketch sketch2 = DoublesSketch.builder().build();
       sketch2.update(2.0);
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
@@ -156,17 +157,17 @@ public class DataToDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {binaryInspector});
       checkResultInspector(resultInspector);
-  
+
       DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
-  
+
       UpdateDoublesSketch sketch1 = DoublesSketch.builder().setK(256).build();
       sketch1.update(1.0);
       eval.merge(state, new BytesWritable(sketch1.toByteArray()));
-  
+
       UpdateDoublesSketch sketch2 = DoublesSketch.builder().setK(256).build();
       sketch2.update(2.0);
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getK(), 256);
@@ -184,11 +185,11 @@ public class DataToDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkResultInspector(resultInspector);
-  
+
       DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new DoubleWritable(1.0) });
       eval.iterate(state, new Object[] { new DoubleWritable(2.0) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getK(), 128);
@@ -205,11 +206,11 @@ public class DataToDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkResultInspector(resultInspector);
-  
+
       DoublesUnionState state = (DoublesUnionState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new DoubleWritable(1.0), new IntWritable(256) });
       eval.iterate(state, new Object[] { new DoubleWritable(2.0), new IntWritable(256) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getK(), 256);

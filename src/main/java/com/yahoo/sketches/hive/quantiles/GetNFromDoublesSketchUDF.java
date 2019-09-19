@@ -14,6 +14,7 @@ import com.yahoo.sketches.quantiles.DoublesSketch;
 
 @Description(name = "GetN", value = "_FUNC_(sketch)",
 extended = " Returns the total number of observed input values (stream length) from a given DoublesSketch.")
+@SuppressWarnings("javadoc")
 public class GetNFromDoublesSketchUDF extends UDF {
 
   /**

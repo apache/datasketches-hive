@@ -36,6 +36,7 @@ import org.testng.annotations.Test;
 import com.yahoo.memory.Memory;
 import com.yahoo.sketches.cpc.CpcSketch;
 
+@SuppressWarnings("javadoc")
 public class DataToSketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -301,17 +302,17 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkFinalResultInspector(resultInspector);
-  
+
       State state = (State) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new IntWritable(1)});
       eval.iterate(state, new Object[] {new IntWritable(2)});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
       CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(((BytesWritable) result).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);

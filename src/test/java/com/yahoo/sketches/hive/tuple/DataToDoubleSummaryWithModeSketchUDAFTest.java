@@ -42,6 +42,7 @@ import com.yahoo.sketches.tuple.Sketches;
 import com.yahoo.sketches.tuple.UpdatableSketch;
 import com.yahoo.sketches.tuple.UpdatableSketchBuilder;
 
+@SuppressWarnings("javadoc")
 public class DataToDoubleSummaryWithModeSketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -135,14 +136,14 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkIntermediateResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new IntWritable(1), new DoubleWritable(1)});
       eval.iterate(state, new Object[] {new IntWritable(2), new DoubleWritable(2)});
       eval.iterate(state, new Object[] {new IntWritable(1), new DoubleWritable(2)});
       eval.iterate(state, new Object[] {new IntWritable(2), new DoubleWritable(1)});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -168,14 +169,14 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkIntermediateResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new Text("a"), new DoubleWritable(1), new IntWritable(32), new FloatWritable(0.99f), new Text("Min")});
       eval.iterate(state, new Object[] {new Text("b"), new DoubleWritable(2), new IntWritable(32), new FloatWritable(0.99f), new Text("Min")});
       eval.iterate(state, new Object[] {new Text("a"), new DoubleWritable(2), new IntWritable(32), new FloatWritable(0.99f), new Text("Min")});
       eval.iterate(state, new Object[] {new Text("b"), new DoubleWritable(1), new IntWritable(32), new FloatWritable(0.99f), new Text("Min")});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -203,11 +204,11 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
       checkIntermediateResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
-  
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+
+      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
       sketch1.update(1, 1.0);
       sketch1.update(2, 2.0);
       eval.merge(state, Arrays.asList(
@@ -215,8 +216,8 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
         new Text("Sum"),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
-  
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+
+      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
       sketch2.update(1, 2.0);
       sketch2.update(2, 1.0);
       eval.merge(state, Arrays.asList(
@@ -224,7 +225,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
         new Text("Sum"),
         new BytesWritable(sketch2.compact().toByteArray()))
       );
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -239,7 +240,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -254,11 +255,11 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
       checkFinalResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
-  
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+
+      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
       sketch1.update(1, 1.0);
       sketch1.update(2, 2.0);
       eval.merge(state, Arrays.asList(
@@ -266,8 +267,8 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
         new Text("Sum"),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
-  
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+
+      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
       sketch2.update(1, 2.0);
       sketch2.update(2, 1.0);
       eval.merge(state, Arrays.asList(
@@ -275,7 +276,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
         new Text("Sum"),
         new BytesWritable(sketch2.compact().toByteArray()))
       );
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -297,14 +298,14 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkFinalResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new IntWritable(1), new DoubleWritable(1)});
       eval.iterate(state, new Object[] {new IntWritable(2), new DoubleWritable(2)});
       eval.iterate(state, new Object[] {new IntWritable(1), new DoubleWritable(2)});
       eval.iterate(state, new Object[] {new IntWritable(2), new DoubleWritable(1)});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -315,7 +316,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -330,14 +331,14 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkFinalResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] {new DoubleWritable(1), new DoubleWritable(1), new IntWritable(32), new FloatWritable(0.99f), new Text("Max")});
       eval.iterate(state, new Object[] {new DoubleWritable(2), new DoubleWritable(2), new IntWritable(32), new FloatWritable(0.99f), new Text("Max")});
       eval.iterate(state, new Object[] {new DoubleWritable(1), new DoubleWritable(2), new IntWritable(32), new FloatWritable(0.99f), new Text("Max")});
       eval.iterate(state, new Object[] {new DoubleWritable(2), new DoubleWritable(1), new IntWritable(32), new FloatWritable(0.99f), new Text("Max")});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -350,7 +351,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 2.0);
       }
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -364,13 +365,13 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToDoubleSummaryWithModeSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkFinalResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
       for (int i = 0; i < 10000; i++) {
         eval.iterate(state, new Object[] {new IntWritable(i), new DoubleWritable(1)});
       }
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -378,7 +379,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
           Memory.wrap(((BytesWritable) result).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 10000.0, 10000 * 0.03);
       Assert.assertTrue(resultSketch.getRetainedEntries() <= 4096, "retained entries: " + resultSketch.getRetainedEntries());
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);

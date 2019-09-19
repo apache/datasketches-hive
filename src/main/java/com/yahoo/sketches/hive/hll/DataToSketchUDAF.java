@@ -41,6 +41,7 @@ import com.yahoo.sketches.hll.TgtHllType;
     + " of roughly +-3% in the estimation of uniques with 95% confidence."
     + " The target type parameter is optional and must be 'HLL_4', 'HLL_6' or 'HLL_8'."
     + " The default is 'HLL_4'")
+@SuppressWarnings("javadoc")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**

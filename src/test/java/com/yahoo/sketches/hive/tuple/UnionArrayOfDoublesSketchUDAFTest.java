@@ -32,6 +32,7 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketch;
 import com.yahoo.sketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
+@SuppressWarnings("javadoc")
 public class UnionArrayOfDoublesSketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -112,17 +113,17 @@ public class UnionArrayOfDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToArrayOfDoublesSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
-  
+
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
-  
+
       ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch1.update(1, new double[] {1});
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
-  
+
       ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch2.update(2, new double[] {1});
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -142,23 +143,23 @@ public class UnionArrayOfDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToArrayOfDoublesSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
-  
+
       final int nomNumEntries = 8;
       final int numValues = 2;
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
-  
+
       ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder()
           .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
       sketch1.update(1, new double[] {1, 2});
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray()),
           new IntWritable(nomNumEntries), new IntWritable(numValues)});
-  
+
       ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder()
           .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
       sketch2.update(2, new double[] {1, 2});
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray()),
           new IntWritable(nomNumEntries), new IntWritable(numValues)});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -179,9 +180,9 @@ public class UnionArrayOfDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
       DataToArrayOfDoublesSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
-  
+
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
-  
+
       ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch1.update(1, new double[] {1});
       eval.merge(state, Arrays.asList(
@@ -189,7 +190,7 @@ public class UnionArrayOfDoublesSketchUDAFTest {
         new IntWritable(1),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
-  
+
       ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch2.update(2, new double[] {1});
       eval.merge(state, Arrays.asList(
@@ -197,7 +198,7 @@ public class UnionArrayOfDoublesSketchUDAFTest {
         new IntWritable(1),
         new BytesWritable(sketch2.compact().toByteArray()))
       );
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -207,7 +208,7 @@ public class UnionArrayOfDoublesSketchUDAFTest {
       Assert.assertEquals(((IntWritable) (r.get(1))).get(), 1);
       ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -222,9 +223,9 @@ public class UnionArrayOfDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
       DataToArrayOfDoublesSketchUDAFTest.checkFinalResultInspector(resultInspector);
-  
+
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
-  
+
       ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch1.update(1, new double[] {1});
       eval.merge(state, Arrays.asList(
@@ -232,7 +233,7 @@ public class UnionArrayOfDoublesSketchUDAFTest {
         new IntWritable(1),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
-  
+
       ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch2.update(2, new double[] {1});
       eval.merge(state, Arrays.asList(
@@ -240,7 +241,7 @@ public class UnionArrayOfDoublesSketchUDAFTest {
         new IntWritable(1),
         new BytesWritable(sketch2.compact().toByteArray()))
       );
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -257,23 +258,23 @@ public class UnionArrayOfDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToArrayOfDoublesSketchUDAFTest.checkFinalResultInspector(resultInspector);
-  
+
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
-  
+
       ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch1.update(1, new double[] {1});
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
-  
+
       ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder().build();
       sketch2.update(2, new double[] {1});
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
       ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -287,29 +288,29 @@ public class UnionArrayOfDoublesSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionArrayOfDoublesSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToArrayOfDoublesSketchUDAFTest.checkFinalResultInspector(resultInspector);
-  
+
       final int nomNumEntries = 8;
       final int numValues = 2;
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
-  
+
       ArrayOfDoublesUpdatableSketch sketch1 = new ArrayOfDoublesUpdatableSketchBuilder()
           .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
       sketch1.update(1, new double[] {1, 2});
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray()),
           new IntWritable(nomNumEntries), new IntWritable(numValues)});
-  
+
       ArrayOfDoublesUpdatableSketch sketch2 = new ArrayOfDoublesUpdatableSketchBuilder()
           .setNominalEntries(nomNumEntries).setNumberOfValues(numValues).build();
       sketch2.update(2, new double[] {1, 2});
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray()),
           new IntWritable(nomNumEntries), new IntWritable(numValues)});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
       ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);

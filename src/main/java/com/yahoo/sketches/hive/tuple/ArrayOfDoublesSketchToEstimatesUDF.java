@@ -25,6 +25,7 @@ import com.yahoo.sketches.tuple.ArrayOfDoublesSketches;
     + " sketch per key. The first estimate is the estimate of the number of unique keys in the"
     + " original population. Next there are N estimates of the sums of the parameters in the"
     + " original population (sums of the values in the sketch scaled to the original population)")
+@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToEstimatesUDF extends UDF {
 
   /**
@@ -44,7 +45,7 @@ public class ArrayOfDoublesSketchToEstimatesUDF extends UDF {
          sums[i] += values[i];
       }
     }
-    final List<Double> estimates = new ArrayList<Double>(sketch.getNumValues() + 1);
+    final List<Double> estimates = new ArrayList<>(sketch.getNumValues() + 1);
     estimates.add(sketch.getEstimate());
     for (int i = 0; i < sums.length; i++) {
       estimates.add(sums[i] / sketch.getTheta());

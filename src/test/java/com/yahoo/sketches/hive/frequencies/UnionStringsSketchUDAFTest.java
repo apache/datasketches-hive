@@ -26,6 +26,7 @@ import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.frequencies.ItemsSketch;
 
+@SuppressWarnings("javadoc")
 public class UnionStringsSketchUDAFTest {
 
   static final ArrayOfItemsSerDe<String> serDe = new ArrayOfStringsSerDe();
@@ -75,17 +76,17 @@ public class UnionStringsSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       ItemsState<String> state = (ItemsState<String>) eval.getNewAggregationBuffer();
       state.init(256);
       state.update("a");
-  
-      ItemsSketch<String> sketch = new ItemsSketch<String>(256);
+
+      ItemsSketch<String> sketch = new ItemsSketch<>(256);
       sketch.update("b");
-  
+
       eval.iterate(state, new Object[] { new BytesWritable(sketch.toByteArray(serDe)) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
       Assert.assertEquals(resultSketch.getStreamLength(), 2);
@@ -102,17 +103,17 @@ public class UnionStringsSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionStringsSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, inspectors);
       checkResultInspector(resultInspector);
-  
+
       @SuppressWarnings("unchecked")
       ItemsState<String> state = (ItemsState<String>) eval.getNewAggregationBuffer();
       state.init(256);
       state.update("a");
-  
-      ItemsSketch<String> sketch = new ItemsSketch<String>(256);
+
+      ItemsSketch<String> sketch = new ItemsSketch<>(256);
       sketch.update("b");
-  
+
       eval.merge(state, new BytesWritable(sketch.toByteArray(serDe)));
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
       Assert.assertEquals(resultSketch.getStreamLength(), 2);

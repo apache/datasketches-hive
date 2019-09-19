@@ -27,6 +27,7 @@ import com.yahoo.sketches.quantiles.DoublesSketch;
   + " A value of 1 will return the min value (normalized rank of 0.0)."
   + " A value of 2 will return the min and the max value (ranks 0.0 amd 1.0)."
   + " A value of 3 will return the min, the median and the max value (ranks 0.0, 0.5, and 1.0), etc.")
+@SuppressWarnings("javadoc")
 public class GetQuantilesFromDoublesSketchUDF extends UDF {
 
   /**

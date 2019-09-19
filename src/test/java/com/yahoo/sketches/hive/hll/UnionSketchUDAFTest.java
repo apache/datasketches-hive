@@ -30,6 +30,7 @@ import com.yahoo.memory.Memory;
 import com.yahoo.sketches.hll.HllSketch;
 import com.yahoo.sketches.hll.TgtHllType;
 
+@SuppressWarnings("javadoc")
 public class UnionSketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -130,17 +131,17 @@ public class UnionSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
-  
+
       State state = (State) eval.getNewAggregationBuffer();
-  
+
       HllSketch sketch1 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch1.update(1);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.toCompactByteArray())});
-  
+
       HllSketch sketch2 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch2.update(2);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.toCompactByteArray())});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -162,21 +163,21 @@ public class UnionSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
-  
+
       final int lgK = 10;
       final TgtHllType hllType = TgtHllType.HLL_6;
       State state = (State) eval.getNewAggregationBuffer();
-  
+
       HllSketch sketch1 = new HllSketch(lgK, hllType);
       sketch1.update(1);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.toCompactByteArray()),
           new IntWritable(lgK), new Text(hllType.toString())});
-  
+
       HllSketch sketch2 = new HllSketch(lgK, hllType);
       sketch2.update(2);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.toCompactByteArray()),
           new IntWritable(lgK), new Text(hllType.toString())});
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -199,9 +200,9 @@ public class UnionSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {structInspector});
       DataToSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
-  
+
       State state = (State) eval.getNewAggregationBuffer();
-  
+
       HllSketch sketch1 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch1.update(1);
       eval.merge(state, Arrays.asList(
@@ -209,7 +210,7 @@ public class UnionSketchUDAFTest {
         new Text(SketchEvaluator.DEFAULT_HLL_TYPE.toString()),
         new BytesWritable(sketch1.toCompactByteArray()))
       );
-  
+
       HllSketch sketch2 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch2.update(2);
       eval.merge(state, Arrays.asList(
@@ -217,7 +218,7 @@ public class UnionSketchUDAFTest {
         new Text(SketchEvaluator.DEFAULT_HLL_TYPE.toString()),
         new BytesWritable(sketch2.toCompactByteArray()))
       );
-  
+
       Object result = eval.terminatePartial(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof List);
@@ -229,7 +230,7 @@ public class UnionSketchUDAFTest {
       Assert.assertEquals(resultSketch.getLgConfigK(), SketchEvaluator.DEFAULT_LG_K);
       Assert.assertEquals(resultSketch.getTgtHllType(), SketchEvaluator.DEFAULT_HLL_TYPE);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -244,9 +245,9 @@ public class UnionSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {structInspector});
       DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
-  
+
       State state = (State) eval.getNewAggregationBuffer();
-  
+
       HllSketch sketch1 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch1.update(1);
       eval.merge(state, Arrays.asList(
@@ -254,7 +255,7 @@ public class UnionSketchUDAFTest {
         new Text(SketchEvaluator.DEFAULT_HLL_TYPE.toString()),
         new BytesWritable(sketch1.toCompactByteArray()))
       );
-  
+
       HllSketch sketch2 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch2.update(2);
       eval.merge(state, Arrays.asList(
@@ -262,7 +263,7 @@ public class UnionSketchUDAFTest {
         new Text(SketchEvaluator.DEFAULT_HLL_TYPE.toString()),
         new BytesWritable(sketch2.toCompactByteArray()))
       );
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -279,23 +280,23 @@ public class UnionSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
-  
+
       State state = (State) eval.getNewAggregationBuffer();
-  
+
       HllSketch sketch1 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch1.update(1);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.toCompactByteArray())});
-  
+
       HllSketch sketch2 = new HllSketch(SketchEvaluator.DEFAULT_LG_K);
       sketch2.update(2);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.toCompactByteArray())});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
       HllSketch resultSketch = HllSketch.heapify(Memory.wrap(((BytesWritable) result).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);
@@ -309,21 +310,21 @@ public class UnionSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new UnionSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToSketchUDAFTest.checkFinalResultInspector(resultInspector);
-  
+
       final int lgK = 4;
       final TgtHllType hllType = TgtHllType.HLL_6;
       State state = (State) eval.getNewAggregationBuffer();
-  
+
       HllSketch sketch1 = new HllSketch(lgK, hllType);
       sketch1.update(1);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.toCompactByteArray()),
           new IntWritable(lgK), new Text(hllType.toString())});
-  
+
       HllSketch sketch2 = new HllSketch(lgK, hllType);
       sketch2.update(2);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.toCompactByteArray()),
           new IntWritable(lgK), new Text(hllType.toString())});
-  
+
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
@@ -331,7 +332,7 @@ public class UnionSketchUDAFTest {
       Assert.assertEquals(resultSketch.getLgConfigK(), lgK);
       Assert.assertEquals(resultSketch.getTgtHllType(), hllType);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
-  
+
       eval.reset(state);
       result = eval.terminate(state);
       Assert.assertNull(result);

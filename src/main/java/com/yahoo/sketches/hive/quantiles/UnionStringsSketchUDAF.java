@@ -15,6 +15,7 @@ import com.yahoo.sketches.ArrayOfStringsSerDe;
 @Description(name = "Union", value = "_FUNC_(sketch) - "
     + "Returns an ItemsSketch<String> in a serialized form as a binary blob."
     + " Input values must also be serialized sketches.")
+@SuppressWarnings("javadoc")
 public class UnionStringsSketchUDAF extends UnionItemsSketchUDAF<String> {
 
   @Override

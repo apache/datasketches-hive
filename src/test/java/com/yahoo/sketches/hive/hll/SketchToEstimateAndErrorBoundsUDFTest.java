@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.yahoo.sketches.hll.HllSketch;
 
+@SuppressWarnings("javadoc")
 public class SketchToEstimateAndErrorBoundsUDFTest {
 
   @Test

@@ -12,6 +12,7 @@ import com.yahoo.memory.Memory;
 import com.yahoo.sketches.hll.HllSketch;
 import com.yahoo.sketches.hll.TgtHllType;
 
+@SuppressWarnings("javadoc")
 public class UnionSketchUDFTest {
 
   @Test

@@ -14,6 +14,7 @@ import com.yahoo.sketches.tuple.UpdatableSketchBuilder;
 import com.yahoo.sketches.tuple.DoubleSummary;
 import com.yahoo.sketches.tuple.DoubleSummaryFactory;
 
+@SuppressWarnings("javadoc")
 public class DoubleSummarySketchToPercentileUDFTest {
 
   @Test
@@ -24,7 +25,7 @@ public class DoubleSummarySketchToPercentileUDFTest {
 
   @Test
   public void emptySketch() {
-    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
     Double result = new DoubleSummarySketchToPercentileUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()), 0.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result, Double.NaN);
@@ -32,10 +33,14 @@ public class DoubleSummarySketchToPercentileUDFTest {
 
   @Test
   public void normalCase() {
-    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<Double, DoubleSummary>(new DoubleSummaryFactory()).build();
+    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
     int iterations = 100000;
-    for (int i = 0; i < iterations; i++) sketch.update(i, (double) i);
-    for (int i = 0; i < iterations; i++) sketch.update(i, (double) i);
+    for (int i = 0; i < iterations; i++) {
+      sketch.update(i, (double) i);
+    }
+    for (int i = 0; i < iterations; i++) {
+      sketch.update(i, (double) i);
+    }
     Double result = new DoubleSummarySketchToPercentileUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()), 50.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result, iterations, iterations * 0.02);

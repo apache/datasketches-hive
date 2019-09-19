@@ -27,6 +27,7 @@ import com.yahoo.sketches.ArrayOfItemsSerDe;
 import com.yahoo.sketches.ArrayOfStringsSerDe;
 import com.yahoo.sketches.frequencies.ItemsSketch;
 
+@SuppressWarnings("javadoc")
 public class GetFrequentItemsFromStringsSketchUDTFTest {
 
   static final ObjectInspector binaryInspector =
@@ -97,7 +98,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
     @SuppressWarnings("deprecation")
     ObjectInspector resultInspector = func.initialize(inspectors);
     checkResultInspector(resultInspector);
-    ItemsSketch<String> sketch = new ItemsSketch<String>(8);
+    ItemsSketch<String> sketch = new ItemsSketch<>(8);
     sketch.update("1", 10);
     sketch.update("2");
     sketch.update("3");
@@ -153,7 +154,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
   }
 
   private static class MockCollector implements Collector {
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
 
     @Override
     public void collect(Object object) throws HiveException {

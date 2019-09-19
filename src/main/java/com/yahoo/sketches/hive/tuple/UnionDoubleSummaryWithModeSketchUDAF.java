@@ -45,6 +45,7 @@ import com.yahoo.sketches.tuple.SummarySetOperations;
     + " the estimation of uniques. The default number is defined in the sketches-core library"
     + " and at the time of this writing was 4096 (about 3% error)."
     + " Summary mode must be one of: 'Sum', 'Min', 'Max'")
+@SuppressWarnings("javadoc")
 public class UnionDoubleSummaryWithModeSketchUDAF extends UnionSketchUDAF {
 
   @Override
@@ -86,13 +87,13 @@ public class UnionDoubleSummaryWithModeSketchUDAF extends UnionSketchUDAF {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       final ObjectInspector resultInspector = super.init(mode, inspectors);
-      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
         if (inspectors.length > 2) {
           summaryModeInspector_ = (PrimitiveObjectInspector) inspectors[2];
         }
       }
-      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
+      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
         // intermediate results need to include the nominal number of entries and the summary mode
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SUMMARY_MODE_FIELD, SKETCH_FIELD),

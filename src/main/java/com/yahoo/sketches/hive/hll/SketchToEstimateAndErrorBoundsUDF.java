@@ -21,6 +21,7 @@ import com.yahoo.sketches.hll.HllSketch;
     extended = "Returns an estimate of distinct count and error bounds from a given HllSketch."
     + " Optional kappa is a number of standard deviations from the mean: 1, 2 or 3 (default 2)."
     + " The result is three double values: estimate, lower bound and upper bound.")
+@SuppressWarnings("javadoc")
 public class SketchToEstimateAndErrorBoundsUDF extends UDF {
 
   private static final int DEFAULT_KAPPA = 2;

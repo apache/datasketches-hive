@@ -16,6 +16,7 @@ import com.yahoo.sketches.hll.HllSketch;
     name = "SketchToString",
     value = "_FUNC_(sketch)",
     extended = "Returns an human-readable summary of a given HllSketch.")
+@SuppressWarnings("javadoc")
 public class SketchToStringUDF extends UDF {
 
   /**

@@ -43,6 +43,7 @@ public abstract class UnionItemsSketchUDAF<T> extends AbstractGenericUDAFResolve
 
   abstract GenericUDAFEvaluator createEvaluator();
 
+  @SuppressWarnings("javadoc")
   public static class UnionItemsSketchEvaluator<T> extends ItemsEvaluator<T> {
 
     UnionItemsSketchEvaluator(final ArrayOfItemsSerDe<T> serDe) {

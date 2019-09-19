@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 import com.yahoo.memory.Memory;
 import com.yahoo.sketches.kll.KllFloatsSketch;
 
+@SuppressWarnings("javadoc")
 public class DataToSketchUDAFTest {
 
   static final ObjectInspector floatInspector =
@@ -92,11 +93,11 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkResultInspector(resultInspector);
-  
+
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new FloatWritable(1) });
       eval.iterate(state, new Object[] { new FloatWritable(2) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(200, false));
@@ -113,11 +114,11 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       checkResultInspector(resultInspector);
-  
+
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new FloatWritable(1), new IntWritable(400) });
       eval.iterate(state, new Object[] { new FloatWritable(2), new IntWritable(400) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
@@ -134,17 +135,17 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL2, new ObjectInspector[] {binaryInspector});
       checkResultInspector(resultInspector);
-  
+
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
-  
+
       KllFloatsSketch sketch1 = new KllFloatsSketch();
       sketch1.update(1);
       eval.merge(state, new BytesWritable(sketch1.toByteArray()));
-  
+
       KllFloatsSketch sketch2 = new KllFloatsSketch();
       sketch2.update(2);
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
@@ -160,17 +161,17 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.FINAL, new ObjectInspector[] {binaryInspector});
       checkResultInspector(resultInspector);
-  
+
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
-  
+
       KllFloatsSketch sketch1 = new KllFloatsSketch(400); // to check if K is preserved
       sketch1.update(1);
       eval.merge(state, new BytesWritable(sketch1.toByteArray()));
-  
+
       KllFloatsSketch sketch2 = new KllFloatsSketch(400);
       sketch2.update(2);
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
@@ -188,11 +189,11 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkResultInspector(resultInspector);
-  
+
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new FloatWritable(1) });
       eval.iterate(state, new Object[] { new FloatWritable(2) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(200, false));
@@ -209,11 +210,11 @@ public class DataToSketchUDAFTest {
     try (GenericUDAFEvaluator eval = new DataToSketchUDAF().getEvaluator(info)) {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       checkResultInspector(resultInspector);
-  
+
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
       eval.iterate(state, new Object[] { new FloatWritable(1), new IntWritable(400) });
       eval.iterate(state, new Object[] { new FloatWritable(2), new IntWritable(400) });
-  
+
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));

@@ -14,6 +14,7 @@ import com.yahoo.sketches.SketchesArgumentException;
 import com.yahoo.sketches.quantiles.DoublesSketch;
 import com.yahoo.sketches.quantiles.UpdateDoublesSketch;
 
+@SuppressWarnings("javadoc")
 public class GetQuantilesFromDoublesSketchUDFTest {
 
   @Test

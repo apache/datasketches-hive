@@ -15,6 +15,7 @@ import com.yahoo.sketches.theta.Sketch;
 import com.yahoo.sketches.theta.Sketches;
 import com.yahoo.sketches.theta.UpdateSketch;
 
+@SuppressWarnings("javadoc")
 public class ExcludeSketchUDFTest {
 
   @Test
