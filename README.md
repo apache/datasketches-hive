@@ -1,27 +1,100 @@
-[![][travis img]][travis] [![][coveralls img]][coveralls] [![][mavenbadge img]][mavenbadge] [![][versioneye img]][versioneye]
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+[![Build Status](https://travis-ci.org/apache/incubator-datasketches-hive.svg?branch=master)](https://travis-ci.org/apache/incubator-datasketches-hive)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-hive/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-hive)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/incubator-datasketches-hive.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-hive/context:java)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/incubator-datasketches-hive.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-hive/alerts/)
+[![Coverage Status](https://coveralls.io/repos/github/apache/incubator-datasketches-hive/badge.svg?branch=master&service=github)](https://coveralls.io/github/apache/incubator-datasketches-hive?branch=master)
+
 
 =================
 
-# Sketch UDFs for Hive 
+# DataSketches UDF Adaptors for Hive 
+Please refer to our [website](https://datasketches.github.io) for more comprehensive information about the various sketching algorithms and how to use them.
 
-## [Documentation](https://datasketches.github.io)
+## Documentation and Feedback
 
-## [Latest Release](https://github.com/DataSketches/sketches-hive/releases)
+### [DataSketches Library Website](https://datasketches.github.io/)
 
-## [Comments](https://groups.google.com/forum/#!forum/sketches-user)
+### [Java Core Overview](https://datasketches.github.io/docs/TheChallenge.html)
 
-Depends on sketches-core.
+### [Hadoop Hive UDFs](https://datasketches.github.io/docs/Theta/ThetaHiveUDFs.html)
 
-See [Hadoop Hive UDF's](http://datasketches.github.io/docs/Theta/ThetaHiveUDFs.html)
+### [Java Core Javadocs](https://datasketches.github.io/api/core/snapshot/apidocs/index.html)
 
-[travis]:https://travis-ci.org//DataSketches/sketches-hive/builds?branch=master
-[travis img]:https://secure.travis-ci.org/DataSketches/sketches-hive.svg?branch=master
+### [Hive UDFs](https://datasketches.github.io/api/hive/snapshot/apidocs/index.html)
 
-[coveralls]:https://coveralls.io/github/DataSketches/sketches-hive?branch=master
-[coveralls img]:https://coveralls.io/repos/github/DataSketches/sketches-hive/badge.svg?branch=master
+### [Forum](https://groups.google.com/forum/#!forum/sketches-user)
 
-[mavenbadge]:https://search.maven.org/#search|gav|1|g%3A%22com.yahoo.datasketches%22%20AND%20a%3A%22sketches-hive%22
-[mavenbadge img]:https://maven-badges.herokuapp.com/maven-central/com.yahoo.datasketches/sketches-hive/badge.svg
+## Downloading Latest Release
+__NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory 
+    must qualify as Java identifiers. In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements.
+    
+This is required by the Oracle Java Specification in order to ensure location-independent 
+    access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-[versioneye]:https://www.versioneye.com/user/projects/587fd639e25f59002c91bcd7
-[versioneye img]:https://www.versioneye.com/user/projects/587fd639e25f59002c91bcd7/badge.svg?style=flat
+### [Zip File from Apache Archive](http://archive.apache.org/dist/incubator/datasketches/hive/)
+
+### [Jar Files from Maven Central](https://repository.apache.org/content/repositories/releases/org/apache/datasketches/datasketches-hive/)
+
+### [GitHub](https://github.com/apache/incubator-datasketches-hive/releases)
+
+## Build Instructions
+
+### JDK8 is Required Compiler
+This DataSketches component is pure Java and you must compile using JDK 8.
+
+### Recommended Build Tool
+The DataSketches-java component structured as a Maven project and Maven is the recommended Build Tool.
+
+There are two types of tests: normal unit tests and tests run by the strict profile.  
+
+To run normal unit tests:
+
+    $ mvn clean test
+    
+To run the strict profile tests:
+
+    $ mvn clean test -P strict
+
+To install jars built from the downloaded source:
+
+    $ mvn clean install -DskipTests=true
+    
+This will create the following jars:
+
+* datasketches-hive-X.Y.Z-incubating.jar The compiled main class files.
+* datasketches-hive-X.Y.Z-incubating-tests.jar The compiled test class files.
+* datasketches-hive-X.Y.Z-incubating-sources.jar The main source files.
+* datasketches-hive-X.Y.Z-incubating-test-sources.jar The test source files
+* datasketches-hive-X.Y.Z-incubating-javadoc.jar  The compressed Javadocs.
+
+### Dependencies
+
+#### Run-time
+This has the following top-level dependencies:
+
+* org.apache.datasketches : datasketches-java
+* org.apache.hive : hive-exec
+* org.apache.hadoop : hadoop-common
+* org.apache.hadoop : hadoop-mapreduce-client-core
+
+#### Testing
+See the pom.xml file for test dependencies.
