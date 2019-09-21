@@ -158,7 +158,7 @@ public class UnionArrayOfDoublesSketchUDAFTest {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToArrayOfDoublesSketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
-      final int nomNumEntries = 8;
+      final int nomNumEntries = 16;
       final int numValues = 2;
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
 
@@ -303,7 +303,7 @@ public class UnionArrayOfDoublesSketchUDAFTest {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToArrayOfDoublesSketchUDAFTest.checkFinalResultInspector(resultInspector);
 
-      final int nomNumEntries = 8;
+      final int nomNumEntries = 16;
       final int numValues = 2;
       ArrayOfDoublesState state = (ArrayOfDoublesState) eval.getNewAggregationBuffer();
 

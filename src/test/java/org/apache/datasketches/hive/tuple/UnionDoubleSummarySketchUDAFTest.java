@@ -148,7 +148,7 @@ public class UnionDoubleSummarySketchUDAFTest {
       ObjectInspector resultInspector = eval.init(Mode.PARTIAL1, inspectors);
       DataToDoubleSummarySketchUDAFTest.checkIntermediateResultInspector(resultInspector);
 
-      final int nomNumEntries = 8;
+      final int nomNumEntries = 16;
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
@@ -294,7 +294,7 @@ public class UnionDoubleSummarySketchUDAFTest {
       ObjectInspector resultInspector = eval.init(Mode.COMPLETE, inspectors);
       DataToDoubleSummarySketchUDAFTest.checkFinalResultInspector(resultInspector);
 
-      final int nomNumEntries = 8;
+      final int nomNumEntries = 16;
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
