@@ -25,13 +25,13 @@ jdk:
  - oraclejdk8
 
 install:
- - mvn install -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true  | egrep -v "(^\[INFO\]|^Downloading|^Downloaded)"
+ - mvn clean install -q -Dmaven.javadoc.skip=true -Dsource.skip=true -DskipTests=true -Dgpg.skip=true 
 
 script:
- - mvn clean compile test -Dgpg.skip=true  | egrep -v "(^\[INFO\]|^Downloading|^Downloaded)"
+ - mvn clean compile test -q -Dgpg.skip=true 
 
 after_success: 
-  - mvn clean test jacoco:report coveralls:report -DrepoToken=$coveralls_token  | egrep -v "(^\[INFO\]|^Downloading|^Downloaded)"
+  - mvn clean test jacoco:report coveralls:report -q -DrepoToken=$coveralls_token
 
 notifications:
   email: false
