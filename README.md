@@ -98,3 +98,11 @@ This has the following top-level dependencies:
 
 #### Testing
 See the pom.xml file for test dependencies.
+
+## Resources
+
+### [Issues for datasketches-hive](https://github.com/apache/incubator-datasketches-hive/issues)
+
+### [Forum](https://groups.google.com/forum/#!forum/sketches-user)
+
+### [Dev mailing list](dev@datasketches.apache.org)
