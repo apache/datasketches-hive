@@ -23,25 +23,22 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/incubator-datasketches-hive.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-hive/alerts/)
 [![Coverage Status](https://coveralls.io/repos/github/apache/incubator-datasketches-hive/badge.svg?branch=master&service=github)](https://coveralls.io/github/apache/incubator-datasketches-hive?branch=master)
 
-
 =================
 
-# DataSketches UDF Adaptors for Hive 
+# DataSketches UDF/UDAF Adaptors for Hive 
 Please refer to our [website](https://datasketches.github.io) for more comprehensive information about the various sketching algorithms and how to use them.
 
-## Documentation and Feedback
+## Documentation
 
 ### [DataSketches Library Website](https://datasketches.github.io/)
 
 ### [Java Core Overview](https://datasketches.github.io/docs/TheChallenge.html)
 
-### [Hadoop Hive UDFs](https://datasketches.github.io/docs/Theta/ThetaHiveUDFs.html)
-
 ### [Java Core Javadocs](https://datasketches.github.io/api/core/snapshot/apidocs/index.html)
 
-### [Hive UDFs](https://datasketches.github.io/api/hive/snapshot/apidocs/index.html)
+### [Hadoop Hive UDFs](https://datasketches.github.io/docs/Theta/ThetaHiveUDFs.html)
 
-### [Forum](https://groups.google.com/forum/#!forum/sketches-user)
+### [Hive UDFs](https://datasketches.github.io/api/hive/snapshot/apidocs/index.html)
 
 ## Downloading Latest Release
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory 
@@ -69,7 +66,7 @@ There are two types of tests: normal unit tests and tests run by the strict prof
 To run normal unit tests:
 
     $ mvn clean test
-    
+
 To run the strict profile tests:
 
     $ mvn clean test -P strict
@@ -77,7 +74,7 @@ To run the strict profile tests:
 To install jars built from the downloaded source:
 
     $ mvn clean install -DskipTests=true
-    
+
 This will create the following jars:
 
 * datasketches-hive-X.Y.Z-incubating.jar The compiled main class files.
