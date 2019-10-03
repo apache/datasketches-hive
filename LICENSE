@@ -176,6 +176,8 @@
 
    END OF TERMS AND CONDITIONS
 
+
+
 APPENDIX A: How to apply the Apache License to your work.
 
     To apply the Apache License to your work, attach the following
@@ -186,7 +188,7 @@ APPENDIX A: How to apply the Apache License to your work.
     file or class name and description of purpose be included on the
     same "printed page" as the copyright notice for easier
     identification within third-party archives.
-    ---------------------------------------------
+    -------------------------------------------------------------
     Copyright [yyyy] [name of copyright owner]
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -200,7 +202,9 @@ APPENDIX A: How to apply the Apache License to your work.
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-    ---------------------------------------------
+    -------------------------------------------------------------
+
+
 
 APPENDIX B: Additional licenses relevant to Apache DataSketches-hive (INCUBATING):
     (none)

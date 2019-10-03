@@ -49,24 +49,6 @@ under the License.
   </Match>
 -->
 
-  <!-- Intentionally set to null to throw an exception during test -->
-<!--
-  <Match>
-    <Bug pattern="NP_NULL_PARAM_DEREF_NONVIRTUAL" />
-    <Class name="com.yahoo.sketches.tuple.SerializerDeserializerTest" />
-    <Method name="deserializeFromMemoryUsupportedClass" />
-  </Match>
--->
-  <!-- False positive.  FindBugs complains if DQS_RESIZE_THRESHOLD == REBUILD_THRESHOLD, 
-       but this allows us to tune these constants for different sketches. -->
-<!--
-  <Match>
-    <Bug pattern="DB_DUPLICATE_BRANCHES" />
-    <Class name="com.yahoo.sketches.theta.DirectQuickSelectSketch" />
-    <Method name="setHashTableThreshold" />
-  </Match>
--->
-
 <!--
      <Match>
        <Class name="com.foobar.ClassNotToBeAnalyzed" />
