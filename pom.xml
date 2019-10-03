@@ -28,7 +28,7 @@ under the License.
   </parent>
   <groupId>org.apache.datasketches</groupId>
   <artifactId>datasketches-hive</artifactId>
-  <version>1.0.0-incubating-SNAPSHOT</version>
+  <version>1.1.0-incubating-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <description>Hive adaptors for the DataSketches library.</description>
   <url>https://datasketches.apache.org/</url>
