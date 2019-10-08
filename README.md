@@ -25,7 +25,7 @@
 
 =================
 
-# DataSketches UDF/UDAF Adaptors for Hive 
+# DataSketches UDF/UDAF Adaptors for Apache Hive 
 Please refer to our [website](https://datasketches.github.io) for more comprehensive information about the various sketching algorithms and how to use them.
 
 ## Documentation
@@ -36,9 +36,9 @@ Please refer to our [website](https://datasketches.github.io) for more comprehen
 
 ### [Java Core Javadocs](https://datasketches.github.io/api/core/snapshot/apidocs/index.html)
 
-### [Hadoop Hive UDFs](https://datasketches.github.io/docs/Theta/ThetaHiveUDFs.html)
+### Hadoop Hive UDFs/UDAFs
+See relevant sections under the different sketch types in Java Core Overview
 
-### [Hive UDFs](https://datasketches.github.io/api/hive/snapshot/apidocs/index.html)
 
 ## Downloading Latest Release
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory 
@@ -59,7 +59,7 @@ This is required by the Oracle Java Specification in order to ensure location-in
 This DataSketches component is pure Java and you must compile using JDK 8.
 
 ### Recommended Build Tool
-The DataSketches-java component structured as a Maven project and Maven is the recommended Build Tool.
+This DataSketches component is structured as a Maven project and Maven is the recommended Build Tool.
 
 There are two types of tests: normal unit tests and tests run by the strict profile.  
 
