@@ -180,12 +180,13 @@ under the License.
       <version>${hadoop-common.version}</version>
       <scope>provided</scope>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-mapreduce-client-core</artifactId>
       <version>${hadoop-mapreduce-client-core.version}</version>
       <scope>provided</scope>
-    </dependency>
+    </dependency> -->
     <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
     
     <!-- Test Scope -->
