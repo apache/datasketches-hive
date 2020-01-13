@@ -47,15 +47,19 @@ __NOTE:__ This component accesses resource files for testing. As a result, the d
 This is required by the Oracle Java Specification in order to ensure location-independent 
     access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-### [Zip File from Apache Archive](http://archive.apache.org/dist/incubator/datasketches/hive/)
+### [Zip File from www.apache.org/dist](http://www.apache.org/dist/incubator/datasketches/hive/)
 
 ### [Jar Files from Maven Central](https://repository.apache.org/content/repositories/releases/org/apache/datasketches/datasketches-hive/)
 
 ### [GitHub](https://github.com/apache/incubator-datasketches-hive/releases)
 
+## Downloading Earlier Releases
+
+### [Zip File from archive.apache.org/dist](http://archive.apache.org/dist/incubator/datasketches/hive/)
+
 ## Build Instructions
 
-### JDK8 is Required Compiler
+### JDK8 is required to compile
 This DataSketches component is pure Java and you must compile using JDK 8.
 
 ### Recommended Build Tool
