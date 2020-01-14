@@ -26,19 +26,18 @@
 =================
 
 # DataSketches UDF/UDAF Adaptors for Apache Hive 
-Please refer to our [website](https://datasketches.github.io) for more comprehensive information about the various sketching algorithms and how to use them.
+Please refer to our [website](https://datasketches.apache.org) for more comprehensive information about the various sketching algorithms and how to use them.
 
 ## Documentation
 
-### [DataSketches Library Website](https://datasketches.github.io/)
+### [DataSketches Library Website](https://datasketches.apache.org/)
 
-### [Java Core Overview](https://datasketches.github.io/docs/TheChallenge.html)
+### [Java Core Overview](https://datasketches.apache.org/docs/TheChallenge.html)
 
-### [Java Core Javadocs](https://datasketches.github.io/api/core/snapshot/apidocs/index.html)
+### [Java Core Javadocs](https://datasketches.apache.org/api/java/snapshot/apidocs/index.html)
 
 ### Hadoop Hive UDFs/UDAFs
 See relevant sections under the different sketch types in Java Core Overview
-
 
 ## Downloading Latest Release
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory 
