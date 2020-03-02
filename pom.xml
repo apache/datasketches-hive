@@ -401,6 +401,38 @@ under the License.
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.apache.datasketches:datasketches-java</include>
+                  <include>org.apache.datasketches:datasketches-memory</include>
+                </includes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.datasketches</pattern>
+                  <shadedPattern>shaded.org.apache.datasketches</shadedPattern>
+                  <excludes>
+                    <exclude>org.apache.datasketches.hive.**</exclude>
+                  </excludes>
+                </relocation>
+              </relocations>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>with-shaded-core</shadedClassifierName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>
