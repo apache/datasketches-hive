@@ -22,6 +22,9 @@ package org.apache.datasketches.hive.hll;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.hll.HllSketch;
+import org.apache.datasketches.hll.TgtHllType;
+import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -44,11 +47,7 @@ import org.apache.hadoop.io.Text;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.hll.HllSketch;
-import org.apache.datasketches.hll.TgtHllType;
-
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class DataToSketchUDAFTest {
 
   private static final ObjectInspector intInspector =

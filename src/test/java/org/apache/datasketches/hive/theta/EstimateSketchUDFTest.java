@@ -19,17 +19,15 @@
 
 package org.apache.datasketches.hive.theta;
 
+import static org.testng.AssertJUnit.assertEquals;
+
+import org.apache.datasketches.theta.CompactSketch;
+import org.apache.datasketches.theta.Sketches;
+import org.apache.datasketches.theta.UpdateSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.hive.theta.EstimateSketchUDF;
-
-import org.apache.datasketches.theta.CompactSketch;
-import org.apache.datasketches.theta.UpdateSketch;
-import org.apache.datasketches.theta.Sketches;
-import static org.testng.AssertJUnit.assertEquals;
-
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class EstimateSketchUDFTest {
 
   @Test

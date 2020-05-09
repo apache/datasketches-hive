@@ -63,6 +63,7 @@ import org.apache.hadoop.io.Text;
     + " Summary mode must be one of: 'Sum', 'Min', 'Max'")
 public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
 
+  @SuppressWarnings("resource")
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     super.getEvaluator(info);
@@ -111,13 +112,13 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       final ObjectInspector resultInspector = super.init(mode, inspectors);
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
         if (inspectors.length > 4) {
           summaryModeInspector_ = (PrimitiveObjectInspector) inspectors[4];
         }
       }
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the nominal number of entries and the summary mode
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, SUMMARY_MODE_FIELD, SKETCH_FIELD),
