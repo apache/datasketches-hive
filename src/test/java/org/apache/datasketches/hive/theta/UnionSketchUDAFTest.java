@@ -25,6 +25,10 @@ import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.theta.Sketch;
+import org.apache.datasketches.theta.Sketches;
+import org.apache.datasketches.theta.UpdateSketch;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -42,15 +46,10 @@ import org.apache.hadoop.io.LongWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.theta.Sketch;
-import org.apache.datasketches.theta.Sketches;
-import org.apache.datasketches.theta.UpdateSketch;
-
 /**
  * Unit tests for UnionSketch UDF
  */
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class UnionSketchUDAFTest {
 
   static final ObjectInspector intInspector =
@@ -154,9 +153,9 @@ public class UnionSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-      Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
-      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((LongWritable) r.get(1)).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertFalse(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
@@ -187,9 +186,9 @@ public class UnionSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), nomEntries);
-      Assert.assertEquals(((LongWritable) (r.get(1))).get(), seed);
-      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()), seed);
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), nomEntries);
+      Assert.assertEquals(((LongWritable) r.get(1)).get(), seed);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()), seed);
       Assert.assertFalse(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
@@ -227,9 +226,9 @@ public class UnionSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-      Assert.assertEquals(((LongWritable) (r.get(1))).get(), DEFAULT_UPDATE_SEED);
-      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((LongWritable) r.get(1)).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }

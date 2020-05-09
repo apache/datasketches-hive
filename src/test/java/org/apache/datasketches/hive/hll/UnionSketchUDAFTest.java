@@ -22,6 +22,9 @@ package org.apache.datasketches.hive.hll;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.hll.HllSketch;
+import org.apache.datasketches.hll.TgtHllType;
+import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -40,11 +43,7 @@ import org.apache.hadoop.io.Text;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.hll.HllSketch;
-import org.apache.datasketches.hll.TgtHllType;
-
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class UnionSketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -161,9 +160,9 @@ public class UnionSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), SketchEvaluator.DEFAULT_LG_K);
-      Assert.assertEquals(((Text) (r.get(1))).toString(), SketchEvaluator.DEFAULT_HLL_TYPE.toString());
-      HllSketch resultSketch = HllSketch.heapify(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), SketchEvaluator.DEFAULT_LG_K);
+      Assert.assertEquals(((Text) r.get(1)).toString(), SketchEvaluator.DEFAULT_HLL_TYPE.toString());
+      HllSketch resultSketch = HllSketch.heapify(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertEquals(resultSketch.getLgConfigK(), SketchEvaluator.DEFAULT_LG_K);
       Assert.assertEquals(resultSketch.getTgtHllType(), SketchEvaluator.DEFAULT_HLL_TYPE);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
@@ -197,9 +196,9 @@ public class UnionSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), lgK);
-      Assert.assertEquals(((Text) (r.get(1))).toString(), hllType.toString());
-      HllSketch resultSketch = HllSketch.heapify(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), lgK);
+      Assert.assertEquals(((Text) r.get(1)).toString(), hllType.toString());
+      HllSketch resultSketch = HllSketch.heapify(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertEquals(resultSketch.getLgConfigK(), lgK);
       Assert.assertEquals(resultSketch.getTgtHllType(), hllType);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
@@ -238,9 +237,9 @@ public class UnionSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), SketchEvaluator.DEFAULT_LG_K);
-      Assert.assertEquals(((Text) (r.get(1))).toString(), SketchEvaluator.DEFAULT_HLL_TYPE.toString());
-      HllSketch resultSketch = HllSketch.heapify(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), SketchEvaluator.DEFAULT_LG_K);
+      Assert.assertEquals(((Text) r.get(1)).toString(), SketchEvaluator.DEFAULT_HLL_TYPE.toString());
+      HllSketch resultSketch = HllSketch.heapify(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertEquals(resultSketch.getLgConfigK(), SketchEvaluator.DEFAULT_LG_K);
       Assert.assertEquals(resultSketch.getTgtHllType(), SketchEvaluator.DEFAULT_HLL_TYPE);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);

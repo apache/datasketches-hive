@@ -24,6 +24,10 @@ import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.theta.Sketch;
+import org.apache.datasketches.theta.Sketches;
+import org.apache.datasketches.theta.UpdateSketch;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
@@ -42,12 +46,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.theta.Sketch;
-import org.apache.datasketches.theta.Sketches;
-import org.apache.datasketches.theta.UpdateSketch;
-
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class IntersectSketchUDAFTest {
 
   static final ObjectInspector longInspector =
@@ -134,8 +133,8 @@ public class IntersectSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
-      Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
-      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
+      Assert.assertEquals(((LongWritable) r.get(0)).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(1)).getBytes()));
       Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
@@ -170,8 +169,8 @@ public class IntersectSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
-      Assert.assertEquals(((LongWritable) (r.get(0))).get(), seed);
-      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()), seed);
+      Assert.assertEquals(((LongWritable) r.get(0)).get(), seed);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(1)).getBytes()), seed);
       Assert.assertEquals(resultSketch.getRetainedEntries(true), 2);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
@@ -212,8 +211,8 @@ public class IntersectSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
-      Assert.assertEquals(((LongWritable) (r.get(0))).get(), DEFAULT_UPDATE_SEED);
-      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(1))).getBytes()));
+      Assert.assertEquals(((LongWritable) r.get(0)).get(), DEFAULT_UPDATE_SEED);
+      Sketch resultSketch = Sketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(1)).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }

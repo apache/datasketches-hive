@@ -21,6 +21,8 @@ package org.apache.datasketches.hive.kll;
 
 import java.util.Arrays;
 
+import org.apache.datasketches.kll.KllFloatsSketch;
+import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
@@ -36,10 +38,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.kll.KllFloatsSketch;
-
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class UnionSketchUDAFTest {
 
   static final ObjectInspector binaryInspector =

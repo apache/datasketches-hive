@@ -24,6 +24,11 @@ import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
+import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
+import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -40,13 +45,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
-
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class UnionArrayOfDoublesSketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -143,9 +142,9 @@ public class UnionArrayOfDoublesSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-      Assert.assertEquals(((IntWritable) (r.get(1))).get(), 1);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((IntWritable) r.get(1)).get(), 1);
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }
@@ -179,9 +178,9 @@ public class UnionArrayOfDoublesSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), nomNumEntries);
-      Assert.assertEquals(((IntWritable) (r.get(1))).get(), numValues);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), nomNumEntries);
+      Assert.assertEquals(((IntWritable) r.get(1)).get(), numValues);
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }
@@ -218,9 +217,9 @@ public class UnionArrayOfDoublesSketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 3);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
-      Assert.assertEquals(((IntWritable) (r.get(1))).get(), 1);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) (r.get(2))).getBytes()));
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((IntWritable) r.get(1)).get(), 1);
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
       eval.reset(state);

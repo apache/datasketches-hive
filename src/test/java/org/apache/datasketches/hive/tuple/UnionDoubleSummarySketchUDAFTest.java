@@ -24,6 +24,14 @@ import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.tuple.Sketch;
+import org.apache.datasketches.tuple.Sketches;
+import org.apache.datasketches.tuple.UpdatableSketch;
+import org.apache.datasketches.tuple.UpdatableSketchBuilder;
+import org.apache.datasketches.tuple.adouble.DoubleSummary;
+import org.apache.datasketches.tuple.adouble.DoubleSummaryDeserializer;
+import org.apache.datasketches.tuple.adouble.DoubleSummaryFactory;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -40,16 +48,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.tuple.adouble.DoubleSummary;
-import org.apache.datasketches.tuple.adouble.DoubleSummaryDeserializer;
-import org.apache.datasketches.tuple.adouble.DoubleSummaryFactory;
-import org.apache.datasketches.tuple.Sketch;
-import org.apache.datasketches.tuple.Sketches;
-import org.apache.datasketches.tuple.UpdatableSketch;
-import org.apache.datasketches.tuple.UpdatableSketchBuilder;
-
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","resource"})
 public class UnionDoubleSummarySketchUDAFTest {
 
   private static final ObjectInspector intInspector =
@@ -133,9 +132,9 @@ public class UnionDoubleSummarySketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
-          Memory.wrap(((BytesWritable) (r.get(1))).getBytes()), new DoubleSummaryDeserializer());
+          Memory.wrap(((BytesWritable) r.get(1)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }
@@ -169,9 +168,9 @@ public class UnionDoubleSummarySketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), nomNumEntries);
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), nomNumEntries);
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
-          Memory.wrap(((BytesWritable) (r.get(1))).getBytes()), new DoubleSummaryDeserializer());
+          Memory.wrap(((BytesWritable) r.get(1)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }
@@ -207,9 +206,9 @@ public class UnionDoubleSummarySketchUDAFTest {
       Assert.assertTrue(result instanceof List);
       List<?> r = (List<?>) result;
       Assert.assertEquals(r.size(), 2);
-      Assert.assertEquals(((IntWritable) (r.get(0))).get(), DEFAULT_NOMINAL_ENTRIES);
+      Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
-          Memory.wrap(((BytesWritable) (r.get(1))).getBytes()), new DoubleSummaryDeserializer());
+          Memory.wrap(((BytesWritable) r.get(1)).getBytes()), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
       eval.reset(state);
