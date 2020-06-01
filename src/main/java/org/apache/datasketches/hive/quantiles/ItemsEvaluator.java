@@ -22,6 +22,8 @@ package org.apache.datasketches.hive.quantiles;
 import java.util.Comparator;
 
 import org.apache.datasketches.ArrayOfItemsSerDe;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
@@ -80,9 +82,9 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     if (data == null) { return; }
     @SuppressWarnings("unchecked")
     final ItemsUnionState<T> state = (ItemsUnionState<T>) buf;
-    final BytesWritable serializedSketch =
-        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
-    state.update(serializedSketch.getBytes());
+    final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
+        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data));
+    state.update(serializedSketch);
   }
 
   @SuppressWarnings("deprecation")

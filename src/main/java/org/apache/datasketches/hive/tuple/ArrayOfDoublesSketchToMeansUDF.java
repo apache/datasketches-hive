@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -47,7 +47,7 @@ public class ArrayOfDoublesSketchToMeansUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
-        Memory.wrap(serializedSketch.getBytes()));
+        BytesWritableHelper.wrapAsMemory(serializedSketch));
 
     if (sketch.getRetainedEntries() < 1) {
       return null;

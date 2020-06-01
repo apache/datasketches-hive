@@ -21,6 +21,7 @@ package org.apache.datasketches.hive.theta;
 
 import java.util.Arrays;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.Sketch;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -88,10 +89,10 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
     if (!state.isInitialized()) {
       initializeState(state, partial);
     }
-    final BytesWritable serializedSketch =
+    final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
         (BytesWritable) intermediateObjectInspector.getStructFieldData(
-            partial, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD));
-    state.update(Memory.wrap(serializedSketch.getBytes()));
+            partial, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD)));
+    state.update(serializedSketch);
   }
 
   private void initializeState(final UnionState state, final Object partial) {

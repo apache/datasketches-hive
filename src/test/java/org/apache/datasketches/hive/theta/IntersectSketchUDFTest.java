@@ -21,6 +21,7 @@ package org.apache.datasketches.hive.theta;
 
 import static org.testng.AssertJUnit.assertEquals;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.annotations.Test;
 
@@ -36,7 +37,7 @@ public class IntersectSketchUDFTest  {
   public void evaluateNull() {
     IntersectSketchUDF testObject = new IntersectSketchUDF();
     BytesWritable intermResult = testObject.evaluate(null, null);
-    Memory mem = Memory.wrap(intermResult.getBytes());
+    Memory mem = BytesWritableHelper.wrapAsMemory(intermResult);
     Sketch testResult = Sketches.wrapSketch(mem);
     assertEquals(0.0, testResult.getEstimate());
   }
@@ -45,7 +46,7 @@ public class IntersectSketchUDFTest  {
   public void evaluateEmpty() {
     IntersectSketchUDF testObject = new IntersectSketchUDF();
     BytesWritable intermResult = testObject.evaluate(new BytesWritable(), new BytesWritable());
-    Memory mem = Memory.wrap(intermResult.getBytes());
+    Memory mem = BytesWritableHelper.wrapAsMemory(intermResult);
     Sketch testResult = Sketches.wrapSketch(mem);
     assertEquals(0.0, testResult.getEstimate());
   }
@@ -69,7 +70,7 @@ public class IntersectSketchUDFTest  {
 
     BytesWritable output = testObject.evaluate(input1, input2);
 
-    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()));
+    Sketch result = Sketches.wrapSketch(BytesWritableHelper.wrapAsMemory(output));
 
     assertEquals(28.0, result.getEstimate());
   }
@@ -94,7 +95,7 @@ public class IntersectSketchUDFTest  {
 
     BytesWritable output = testObject.evaluate(input1, input2, seed);
 
-    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()), seed);
+    Sketch result = Sketches.wrapSketch(BytesWritableHelper.wrapAsMemory(output), seed);
 
     assertEquals(28.0, result.getEstimate());
   }

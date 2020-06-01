@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.hive.theta;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -35,7 +36,7 @@ public class UnionSketchUDFTest {
   public void evaluateNull() {
     UnionSketchUDF testObject = new UnionSketchUDF();
     BytesWritable intermResult = testObject.evaluate(null, null);
-    Memory mem = Memory.wrap(intermResult.getBytes());
+    Memory mem = BytesWritableHelper.wrapAsMemory(intermResult);
     Sketch testResult = Sketches.wrapSketch(mem);
     Assert.assertEquals(testResult.getEstimate(), 0.0);
   }
@@ -44,7 +45,7 @@ public class UnionSketchUDFTest {
   public void testEvaluateEmpty() {
     UnionSketchUDF testObject = new UnionSketchUDF();
     BytesWritable intermResult = testObject.evaluate(new BytesWritable(), new BytesWritable());
-    Memory mem = Memory.wrap(intermResult.getBytes());
+    Memory mem = BytesWritableHelper.wrapAsMemory(intermResult);
     Sketch testResult = Sketches.wrapSketch(mem);
     Assert.assertEquals(testResult.getEstimate(), 0.0);
   }
@@ -68,7 +69,7 @@ public class UnionSketchUDFTest {
 
     BytesWritable output = testObject.evaluate(input1, input2);
 
-    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()));
+    Sketch result = Sketches.wrapSketch(BytesWritableHelper.wrapAsMemory(output));
 
     Assert.assertEquals(result.getEstimate(), 256.0);
   }
@@ -93,7 +94,7 @@ public class UnionSketchUDFTest {
 
     BytesWritable output = testObject.evaluate(input1, input2, 128, seed);
 
-    Sketch result = Sketches.wrapSketch(Memory.wrap(output.getBytes()), seed);
+    Sketch result = Sketches.wrapSketch(BytesWritableHelper.wrapAsMemory(output), seed);
 
     Assert.assertEquals(result.getEstimate(), 256.0, 256 * 0.02);
     Assert.assertTrue(result.getRetainedEntries(true) <= 128.0);

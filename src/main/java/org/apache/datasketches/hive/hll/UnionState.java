@@ -45,7 +45,7 @@ class UnionState extends State {
     switch (objectInspector.getPrimitiveCategory()) {
       case BINARY:
         union_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector)
-            .getBytes());
+            .copyBytes());
         return;
       case BYTE:
         union_.update(PrimitiveObjectInspectorUtils.getByte(data, objectInspector));

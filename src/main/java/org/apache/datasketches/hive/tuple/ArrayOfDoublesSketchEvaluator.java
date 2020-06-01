@@ -21,6 +21,7 @@ package org.apache.datasketches.hive.tuple;
 
 import java.util.Arrays;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
@@ -62,10 +63,10 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
     if (!state.isInitialized()) {
       initializeState(state, data);
     }
-    final BytesWritable serializedSketch =
+    final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
         (BytesWritable) intermediateInspector_.getStructFieldData(
-            data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
-    state.update(ArrayOfDoublesSketches.wrapSketch(Memory.wrap(serializedSketch.getBytes())));
+            data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD)));
+    state.update(ArrayOfDoublesSketches.wrapSketch(serializedSketch));
   }
 
   private void initializeState(final ArrayOfDoublesUnionState state, final Object data) {

@@ -19,8 +19,8 @@
 
 package org.apache.datasketches.hive.hll;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.hll.HllSketch;
-import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
@@ -39,7 +39,7 @@ public class SketchToStringUDF extends UDF {
    */
   public String evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
-    final HllSketch sketch = HllSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
+    final HllSketch sketch = HllSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return sketch.toString();
   }
 

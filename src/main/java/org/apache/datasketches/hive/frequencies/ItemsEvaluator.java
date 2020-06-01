@@ -21,6 +21,8 @@ package org.apache.datasketches.hive.frequencies;
 
 import org.apache.datasketches.ArrayOfItemsSerDe;
 import org.apache.datasketches.frequencies.ItemsSketch;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
+import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
@@ -65,9 +67,9 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     if (data == null) { return; }
     @SuppressWarnings("unchecked")
     final ItemsState<T> state = (ItemsState<T>) buf;
-    final BytesWritable serializedSketch =
-        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
-    state.update(serializedSketch.getBytes());
+    final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
+        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data));
+    state.update(serializedSketch);
   }
 
   @SuppressWarnings("deprecation")

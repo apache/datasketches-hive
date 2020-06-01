@@ -22,7 +22,7 @@ package org.apache.datasketches.hive.cpc;
 import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 
 import org.apache.datasketches.cpc.CpcSketch;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
@@ -42,7 +42,7 @@ public class SketchToStringUDF extends UDF {
    */
   public String evaluate(final BytesWritable serializedSketch, final long seed) {
     if (serializedSketch == null) { return null; }
-    final CpcSketch sketch = CpcSketch.heapify(Memory.wrap(serializedSketch.getBytes()), seed);
+    final CpcSketch sketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch), seed);
     return sketch.toString();
   }
 

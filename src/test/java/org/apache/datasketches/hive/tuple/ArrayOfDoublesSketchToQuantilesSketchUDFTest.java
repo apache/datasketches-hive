@@ -19,11 +19,11 @@
 
 package org.apache.datasketches.hive.tuple;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
@@ -60,7 +60,7 @@ public class ArrayOfDoublesSketchToQuantilesSketchUDFTest {
     ArrayOfDoublesUpdatableSketch sketch = new ArrayOfDoublesUpdatableSketchBuilder().build();
     BytesWritable result = new ArrayOfDoublesSketchToQuantilesSketchUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));
     Assert.assertNotNull(result);
-    DoublesSketch qs = DoublesSketch.wrap(Memory.wrap(result.getBytes()));
+    DoublesSketch qs = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(result));
     Assert.assertTrue(qs.isEmpty());
   }
 
@@ -74,7 +74,7 @@ public class ArrayOfDoublesSketchToQuantilesSketchUDFTest {
       1
     );
     Assert.assertNotNull(result);
-    DoublesSketch qs = DoublesSketch.wrap(Memory.wrap(result.getBytes()));
+    DoublesSketch qs = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(result));
     Assert.assertFalse(qs.isEmpty());
     Assert.assertEquals(qs.getMinValue(), 1.0);
     Assert.assertEquals(qs.getMaxValue(), 10.0);
@@ -92,7 +92,7 @@ public class ArrayOfDoublesSketchToQuantilesSketchUDFTest {
       k
     );
     Assert.assertNotNull(result);
-    DoublesSketch qs = DoublesSketch.wrap(Memory.wrap(result.getBytes()));
+    DoublesSketch qs = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(result));
     Assert.assertFalse(qs.isEmpty());
     Assert.assertEquals(qs.getK(), k);
     Assert.assertEquals(qs.getMinValue(), 2.0);

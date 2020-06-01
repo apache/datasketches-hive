@@ -22,8 +22,8 @@ package org.apache.datasketches.hive.hll;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.hll.HllSketch;
-import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
@@ -56,7 +56,7 @@ public class SketchToEstimateAndErrorBoundsUDF extends UDF {
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final int kappa) {
     if (serializedSketch == null) { return null; }
-    final HllSketch sketch = HllSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
+    final HllSketch sketch = HllSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return Arrays.asList(sketch.getEstimate(), sketch.getLowerBound(kappa), sketch.getUpperBound(kappa));
   }
 

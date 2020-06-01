@@ -24,7 +24,7 @@ import java.util.Arrays;
 import org.apache.datasketches.ArrayOfItemsSerDe;
 import org.apache.datasketches.ArrayOfStringsSerDe;
 import org.apache.datasketches.frequencies.ItemsSketch;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
@@ -108,7 +108,7 @@ public class DataToStringsSketchUDAFTest {
       eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b"), new IntWritable(256) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), serDe);
       Assert.assertEquals(resultSketch.getStreamLength(), 2);
       Assert.assertEquals(resultSketch.getNumActiveItems(), 2);
       Assert.assertEquals(resultSketch.getEstimate("a"), 1);
@@ -136,7 +136,7 @@ public class DataToStringsSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), serDe);
       Assert.assertEquals(resultSketch.getStreamLength(), 2);
       Assert.assertEquals(resultSketch.getNumActiveItems(), 2);
       Assert.assertEquals(resultSketch.getEstimate("a"), 1);
@@ -163,7 +163,7 @@ public class DataToStringsSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch.toByteArray(serDe)));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), serDe);
       Assert.assertEquals(resultSketch.getStreamLength(), 2);
       Assert.assertEquals(resultSketch.getNumActiveItems(), 2);
       Assert.assertEquals(resultSketch.getEstimate("a"), 1);

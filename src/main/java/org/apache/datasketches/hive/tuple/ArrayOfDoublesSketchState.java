@@ -47,7 +47,7 @@ class ArrayOfDoublesSketchState extends ArrayOfDoublesState {
     }
     switch (keyInspector.getPrimitiveCategory()) {
     case BINARY:
-      sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data[0], keyInspector).getBytes(), values);
+      sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data[0], keyInspector).copyBytes(), values);
       return;
     case BYTE:
       sketch_.update(PrimitiveObjectInspectorUtils.getByte(data[0], keyInspector), values);

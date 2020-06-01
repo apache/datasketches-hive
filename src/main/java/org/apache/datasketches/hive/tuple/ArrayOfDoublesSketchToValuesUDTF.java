@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketchIterator;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
@@ -74,7 +74,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
     final BytesWritable serializedSketch =
       (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
-        Memory.wrap(serializedSketch.getBytes()));
+        BytesWritableHelper.wrapAsMemory(serializedSketch));
     final ArrayOfDoublesSketchIterator it = sketch.iterator();
     while (it.next()) {
       forward(new Object[] { primitivesToList(it.getValues()) });

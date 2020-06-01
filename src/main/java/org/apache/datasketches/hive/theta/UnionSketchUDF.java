@@ -22,7 +22,7 @@ package org.apache.datasketches.hive.theta;
 import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Union;
 import org.apache.hadoop.hive.ql.exec.UDF;
@@ -55,11 +55,11 @@ public class UnionSketchUDF extends UDF {
     final Union union = SetOperation.builder().setSeed(seed).setNominalEntries(sketchSize).buildUnion();
 
     if ((firstSketch != null) && (firstSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
-      union.update(Memory.wrap(firstSketch.getBytes()));
+      union.update(BytesWritableHelper.wrapAsMemory(firstSketch));
     }
 
     if ((secondSketch != null) && (secondSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
-      union.update(Memory.wrap(secondSketch.getBytes()));
+      union.update(BytesWritableHelper.wrapAsMemory(secondSketch));
     }
 
     return new BytesWritable(union.getResult().toByteArray());

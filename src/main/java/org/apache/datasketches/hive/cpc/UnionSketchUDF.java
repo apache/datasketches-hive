@@ -23,7 +23,7 @@ import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 
 import org.apache.datasketches.cpc.CpcSketch;
 import org.apache.datasketches.cpc.CpcUnion;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
@@ -52,11 +52,11 @@ public class UnionSketchUDF extends UDF {
     final CpcUnion union = new CpcUnion(lgK, seed);
 
     if (firstSketch != null) {
-      union.update(CpcSketch.heapify(Memory.wrap(firstSketch.getBytes()), seed));
+      union.update(CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(firstSketch), seed));
     }
 
     if (secondSketch != null) {
-      union.update(CpcSketch.heapify(Memory.wrap(secondSketch.getBytes()), seed));
+      union.update(CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(secondSketch), seed));
     }
 
     return new BytesWritable(union.getResult().toByteArray());

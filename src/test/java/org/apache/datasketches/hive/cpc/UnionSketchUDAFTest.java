@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.datasketches.cpc.CpcSketch;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -169,7 +169,7 @@ public class UnionSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), SketchEvaluator.DEFAULT_LG_K);
       Assert.assertEquals(((LongWritable) r.get(1)).get(), DEFAULT_UPDATE_SEED);
-      CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)));
       Assert.assertEquals(resultSketch.getLgK(), SketchEvaluator.DEFAULT_LG_K);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
     }
@@ -204,7 +204,7 @@ public class UnionSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), lgK);
       Assert.assertEquals(((LongWritable) r.get(1)).get(), seed);
-      CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(((BytesWritable) r.get(2)).getBytes()), seed);
+      CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)), seed);
       Assert.assertEquals(resultSketch.getLgK(), lgK);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
     }
@@ -244,7 +244,7 @@ public class UnionSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), SketchEvaluator.DEFAULT_LG_K);
       Assert.assertEquals(((LongWritable) r.get(1)).get(), DEFAULT_UPDATE_SEED);
-      CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)));
       Assert.assertEquals(resultSketch.getLgK(), SketchEvaluator.DEFAULT_LG_K);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
 
@@ -284,7 +284,7 @@ public class UnionSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(((BytesWritable) result).getBytes()));
+      CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory((BytesWritable) result));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
     }
   }
@@ -311,7 +311,7 @@ public class UnionSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(((BytesWritable) result).getBytes()));
+      CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory((BytesWritable) result));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.01);
 
       eval.reset(state);
@@ -345,7 +345,7 @@ public class UnionSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(((BytesWritable) result).getBytes()), seed);
+      CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory((BytesWritable) result), seed);
       Assert.assertEquals(resultSketch.getLgK(), lgK);
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.03);
 

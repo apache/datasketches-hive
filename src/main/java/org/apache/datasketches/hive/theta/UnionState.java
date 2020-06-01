@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.hive.theta;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Sketch;
@@ -66,7 +67,7 @@ class UnionState extends AbstractAggregationBuffer {
   public void update(final Object value, final PrimitiveObjectInspector objectInspector) {
     switch (objectInspector.getPrimitiveCategory()) {
     case BINARY:
-      union_.update(PrimitiveObjectInspectorUtils.getBinary(value, objectInspector).getBytes());
+      union_.update(BytesWritableHelper.wrapAsMemory(PrimitiveObjectInspectorUtils.getBinary(value, objectInspector)));
       return;
     case BYTE:
       union_.update(PrimitiveObjectInspectorUtils.getByte(value, objectInspector));
