@@ -97,24 +97,4 @@ public class EstimateSketchUDFTest {
     assertEquals(128.0, testResult);
   }
 
-  @Test
-  public void evaluateRespectsByteLength() {
-    // In some instances, the BytesWritable buffer returned by getBytes() might be larger than the actual sketch bytes.
-    // getLength() should give the correct length to use.
-    //
-    // https://github.com/apache/incubator-datasketches-hive/issues/50
-
-    byte[] inputBytes = new byte[]{
-            (byte) 0x01, (byte) 0x03, (byte) 0x03, (byte) 0x00,
-            (byte) 0x00, (byte) 0x3a, (byte) 0xcc, (byte) 0x93,
-            (byte) 0x15, (byte) 0xf9, (byte) 0x7d, (byte) 0xcb,
-            (byte) 0xbd, (byte) 0x86, (byte) 0xa1, (byte) 0x05,
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
-    };
-    BytesWritable input = new BytesWritable(inputBytes, 16);
-    EstimateSketchUDF estimate = new EstimateSketchUDF();
-    Double testResult = estimate.evaluate(input);
-    assertEquals(1.0, testResult, 0.0);
-  }
 }
