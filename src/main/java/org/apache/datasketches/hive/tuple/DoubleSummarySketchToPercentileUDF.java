@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.datasketches.quantiles.UpdateDoublesSketch;
 import org.apache.datasketches.tuple.Sketch;
@@ -60,7 +60,7 @@ public class DoubleSummarySketchToPercentileUDF extends UDF {
       throw new IllegalArgumentException("percentile must be between 0 and 100");
     }
     final Sketch<DoubleSummary> sketch =
-        Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()), SUMMARY_DESERIALIZER);
+        Sketches.heapifySketch(BytesWritableHelper.wrapAsMemory(serializedSketch), SUMMARY_DESERIALIZER);
     final UpdateDoublesSketch qs = DoublesSketch.builder().setK(QUANTILES_SKETCH_K).build();
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {

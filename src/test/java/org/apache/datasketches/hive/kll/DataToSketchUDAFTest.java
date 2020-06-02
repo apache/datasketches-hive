@@ -21,8 +21,8 @@ package org.apache.datasketches.hive.kll;
 
 import java.util.Arrays;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.kll.KllFloatsSketch;
-import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
@@ -112,7 +112,7 @@ public class DataToSketchUDAFTest {
       eval.iterate(state, new Object[] { new FloatWritable(2) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
+      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(200, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1f);
@@ -133,7 +133,7 @@ public class DataToSketchUDAFTest {
       eval.iterate(state, new Object[] { new FloatWritable(2), new IntWritable(400) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
+      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1f);
@@ -160,7 +160,7 @@ public class DataToSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
+      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1f);
       Assert.assertEquals(resultSketch.getMaxValue(), 2f);
@@ -186,7 +186,7 @@ public class DataToSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
+      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1f);
@@ -208,7 +208,7 @@ public class DataToSketchUDAFTest {
       eval.iterate(state, new Object[] { new FloatWritable(2) });
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
+      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(200, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1f);
@@ -229,7 +229,7 @@ public class DataToSketchUDAFTest {
       eval.iterate(state, new Object[] { new FloatWritable(2), new IntWritable(400) });
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(Memory.wrap(bytes.getBytes()));
+      KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1f);

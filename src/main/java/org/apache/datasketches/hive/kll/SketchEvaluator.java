@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.hive.kll;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.kll.KllFloatsSketch;
 import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -69,9 +70,9 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
   public void merge(final AggregationBuffer buf, final Object data) throws HiveException {
     if (data == null) { return; }
     final SketchState state = (SketchState) buf;
-    final BytesWritable serializedSketch =
-        (BytesWritable) inputInspector_.getPrimitiveWritableObject(data);
-    state.update(KllFloatsSketch.heapify(Memory.wrap(serializedSketch.getBytes())));
+    final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
+        (BytesWritable) inputInspector_.getPrimitiveWritableObject(data));
+    state.update(KllFloatsSketch.heapify(serializedSketch));
   }
 
   @SuppressWarnings("deprecation")

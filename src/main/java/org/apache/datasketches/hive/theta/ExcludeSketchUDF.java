@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.theta;
 
 import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.theta.AnotB;
 import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Sketch;
@@ -52,12 +52,12 @@ public class ExcludeSketchUDF extends UDF {
 
     Sketch firstSketch = null;
     if (firstSketchBytes != null && firstSketchBytes.getLength() > 0) {
-      firstSketch = Sketch.wrap(Memory.wrap(firstSketchBytes.getBytes()), hashSeed);
+      firstSketch = Sketch.wrap(BytesWritableHelper.wrapAsMemory(firstSketchBytes), hashSeed);
     }
 
     Sketch secondSketch = null;
     if (secondSketchBytes != null && secondSketchBytes.getLength() > 0) {
-      secondSketch = Sketch.wrap(Memory.wrap(secondSketchBytes.getBytes()), hashSeed);
+      secondSketch = Sketch.wrap(BytesWritableHelper.wrapAsMemory(secondSketchBytes), hashSeed);
     }
 
     final AnotB anotb = SetOperation.builder().setSeed(hashSeed).buildANotB();

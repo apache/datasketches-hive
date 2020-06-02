@@ -49,8 +49,8 @@ class ItemsState<T> extends AbstractAggregationBuffer {
     sketch.update(value);
   }
 
-  void update(final byte[] serializedSketch) {
-    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(Memory.wrap(serializedSketch), serDe_);
+  void update(final Memory serializedSketch) {
+    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(serializedSketch, serDe_);
     if (sketch == null) {
       sketch = incomingSketch;
     } else {

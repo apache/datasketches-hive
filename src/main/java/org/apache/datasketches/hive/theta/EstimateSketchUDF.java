@@ -21,10 +21,13 @@ package org.apache.datasketches.hive.theta;
 
 import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.Sketch;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
+
+import java.nio.ByteOrder;
 
 /**
  * Hive estimate sketch udf. V4
@@ -56,13 +59,13 @@ public class EstimateSketchUDF extends UDF {
       return 0.0;
     }
 
-    final byte[] serializedSketch = binarySketch.getBytes();
+    final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(binarySketch);
 
-    if (serializedSketch.length <= EMPTY_SKETCH_SIZE_BYTES) {
+    if (serializedSketch.getCapacity() <= EMPTY_SKETCH_SIZE_BYTES) {
       return 0.0;
     }
 
-    return Sketch.wrap(Memory.wrap(serializedSketch), seed).getEstimate();
+    return Sketch.wrap(serializedSketch, seed).getEstimate();
   }
 
 }

@@ -19,10 +19,10 @@
 
 package org.apache.datasketches.hive.hll;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.hll.HllSketch;
 import org.apache.datasketches.hll.TgtHllType;
 import org.apache.datasketches.hll.Union;
-import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
@@ -52,11 +52,11 @@ public class UnionSketchUDF extends UDF {
     final Union union = new Union(lgK);
 
     if (firstSketch != null) {
-      union.update(HllSketch.wrap(Memory.wrap(firstSketch.getBytes())));
+      union.update(HllSketch.wrap(BytesWritableHelper.wrapAsMemory(firstSketch)));
     }
 
     if (secondSketch != null) {
-      union.update(HllSketch.wrap(Memory.wrap(secondSketch.getBytes())));
+      union.update(HllSketch.wrap(BytesWritableHelper.wrapAsMemory(secondSketch)));
     }
 
     return new BytesWritable(union.getResult(hllType).toCompactByteArray());

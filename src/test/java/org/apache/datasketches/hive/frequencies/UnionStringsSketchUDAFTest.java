@@ -24,7 +24,7 @@ import java.util.Arrays;
 import org.apache.datasketches.ArrayOfItemsSerDe;
 import org.apache.datasketches.ArrayOfStringsSerDe;
 import org.apache.datasketches.frequencies.ItemsSketch;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
@@ -102,7 +102,7 @@ public class UnionStringsSketchUDAFTest {
       eval.iterate(state, new Object[] { new BytesWritable(sketch.toByteArray(serDe)) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), serDe);
       Assert.assertEquals(resultSketch.getStreamLength(), 2);
       Assert.assertEquals(resultSketch.getNumActiveItems(), 2);
       Assert.assertEquals(resultSketch.getEstimate("a"), 1);
@@ -129,7 +129,7 @@ public class UnionStringsSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch.toByteArray(serDe)));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), serDe);
       Assert.assertEquals(resultSketch.getStreamLength(), 2);
       Assert.assertEquals(resultSketch.getNumActiveItems(), 2);
       Assert.assertEquals(resultSketch.getEstimate("a"), 1);

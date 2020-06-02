@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.List;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
@@ -51,7 +51,7 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
     if (serializedSketch == null) { return null; }
-    final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
+    final DoublesSketch sketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return Util.primitivesToList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
   }
 
@@ -63,7 +63,7 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final int number) {
     if (serializedSketch == null) { return null; }
-    final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
+    final DoublesSketch sketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
     final double[] quantiles = sketch.getQuantiles(number);
     if (quantiles == null) { return null; }
     return Util.primitivesToList(quantiles);

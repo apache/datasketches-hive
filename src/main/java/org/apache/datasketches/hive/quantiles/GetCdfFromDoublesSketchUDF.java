@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.List;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
@@ -49,7 +49,7 @@ public class GetCdfFromDoublesSketchUDF extends UDF {
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... splitPoints) {
     if (serializedSketch == null) { return null; }
-    final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
+    final DoublesSketch sketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
     final double[] cdf = sketch.getCDF(Util.objectsToPrimitives(splitPoints));
     if (cdf == null) { return null; }
     return Util.primitivesToList(cdf);

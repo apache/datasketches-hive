@@ -58,9 +58,9 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
     union.update(value);
   }
 
-  void update(final byte[] serializedSketch) {
+  void update(final Memory serializedSketch) {
     final ItemsSketch<T> incomingSketch =
-        ItemsSketch.getInstance(Memory.wrap(serializedSketch), comparator_, serDe_);
+        ItemsSketch.getInstance(serializedSketch, comparator_, serDe_);
     if (union == null) {
       union = ItemsUnion.getInstance(incomingSketch);
     } else {

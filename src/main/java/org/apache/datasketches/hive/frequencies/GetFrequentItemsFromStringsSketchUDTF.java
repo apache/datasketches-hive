@@ -24,7 +24,7 @@ import java.util.Arrays;
 import org.apache.datasketches.ArrayOfStringsSerDe;
 import org.apache.datasketches.frequencies.ErrorType;
 import org.apache.datasketches.frequencies.ItemsSketch;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
@@ -93,7 +93,7 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
     final BytesWritable serializedSketch =
         (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
-        Memory.wrap(serializedSketch.getBytes()), new ArrayOfStringsSerDe());
+        BytesWritableHelper.wrapAsMemory(serializedSketch), new ArrayOfStringsSerDe());
     ErrorType errorType = ErrorType.NO_FALSE_POSITIVES;
     if (data.length > 1) {
       errorType = ErrorType.valueOf((String) errorTypeObjectInspector.getPrimitiveJavaObject(data[1]));

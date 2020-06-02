@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.quantiles;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
@@ -37,7 +37,7 @@ public class GetNFromDoublesSketchUDF extends UDF {
    */
   public Long evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
-    final DoublesSketch sketch = DoublesSketch.wrap(Memory.wrap(serializedSketch.getBytes()));
+    final DoublesSketch sketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return sketch.getN();
   }
 

@@ -24,7 +24,7 @@ import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
 import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
@@ -171,7 +171,7 @@ public class DataToArrayOfDoublesSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
       Assert.assertEquals(((IntWritable) r.get(1)).get(), 1);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)));
       Assert.assertFalse(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
@@ -196,7 +196,7 @@ public class DataToArrayOfDoublesSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), 32);
       Assert.assertEquals(((IntWritable) r.get(1)).get(), 2);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)));
       // because of sampling probability < 1
       Assert.assertTrue(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
@@ -237,7 +237,7 @@ public class DataToArrayOfDoublesSketchUDAFTest {
       Assert.assertEquals(r.size(), 3);
       Assert.assertEquals(((IntWritable) r.get(0)).get(), DEFAULT_NOMINAL_ENTRIES);
       Assert.assertEquals(((IntWritable) r.get(1)).get(), 1);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) r.get(2)).getBytes()));
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
       eval.reset(state);
@@ -276,7 +276,7 @@ public class DataToArrayOfDoublesSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory((BytesWritable) result));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
     }
   }
@@ -297,7 +297,7 @@ public class DataToArrayOfDoublesSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory((BytesWritable) result));
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
 
       eval.reset(state);
@@ -321,7 +321,7 @@ public class DataToArrayOfDoublesSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory((BytesWritable) result));
       // because of sampling probability < 1
       Assert.assertTrue(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
@@ -348,7 +348,7 @@ public class DataToArrayOfDoublesSketchUDAFTest {
       Object result = eval.terminate(state);
       Assert.assertNotNull(result);
       Assert.assertTrue(result instanceof BytesWritable);
-      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(Memory.wrap(((BytesWritable) result).getBytes()));
+      ArrayOfDoublesSketch resultSketch = ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory((BytesWritable) result));
       Assert.assertEquals(resultSketch.getEstimate(), 10000.0, 10000 * 0.03);
       Assert.assertTrue(resultSketch.getRetainedEntries() <= 4096, "retained entries: " + resultSketch.getRetainedEntries());
 

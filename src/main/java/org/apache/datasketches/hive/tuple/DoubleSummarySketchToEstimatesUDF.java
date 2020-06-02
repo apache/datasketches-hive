@@ -22,7 +22,7 @@ package org.apache.datasketches.hive.tuple;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.Sketch;
 import org.apache.datasketches.tuple.SketchIterator;
 import org.apache.datasketches.tuple.Sketches;
@@ -56,7 +56,7 @@ public class DoubleSummarySketchToEstimatesUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
     final Sketch<DoubleSummary> sketch =
-        Sketches.heapifySketch(Memory.wrap(serializedSketch.getBytes()), SUMMARY_DESERIALIZER);
+        Sketches.heapifySketch(BytesWritableHelper.wrapAsMemory(serializedSketch), SUMMARY_DESERIALIZER);
     double sum = 0;
     final SketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {
