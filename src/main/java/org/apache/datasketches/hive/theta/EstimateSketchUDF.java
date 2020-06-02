@@ -56,7 +56,8 @@ public class EstimateSketchUDF extends UDF {
       return 0.0;
     }
 
-    final byte[] serializedSketch = binarySketch.getBytes();
+    final byte[] serializedSketch = new byte[binarySketch.getLength()];
+    System.arraycopy(binarySketch.getBytes(), 0, serializedSketch, 0, binarySketch.getLength());
 
     if (serializedSketch.length <= EMPTY_SKETCH_SIZE_BYTES) {
       return 0.0;
