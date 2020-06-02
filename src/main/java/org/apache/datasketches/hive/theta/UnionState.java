@@ -67,7 +67,7 @@ class UnionState extends AbstractAggregationBuffer {
   public void update(final Object value, final PrimitiveObjectInspector objectInspector) {
     switch (objectInspector.getPrimitiveCategory()) {
     case BINARY:
-      union_.update(BytesWritableHelper.wrapAsMemory(PrimitiveObjectInspectorUtils.getBinary(value, objectInspector)));
+      union_.update(PrimitiveObjectInspectorUtils.getBinary(value, objectInspector).copyBytes());
       return;
     case BYTE:
       union_.update(PrimitiveObjectInspectorUtils.getByte(value, objectInspector));
