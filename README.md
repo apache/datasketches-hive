@@ -39,7 +39,6 @@ See relevant sections under the different sketch types in Java Core Documentatio
 ## Build Instructions
 __NOTE:__ This component accesses resource files for testing. As a result, the directory elements of the full absolute path of the target installation directory must qualify as Java identifiers. In other words, the directory elements must not have any space characters (or non-Java identifier characters) in any of the path elements. This is required by the Oracle Java Specification in order to ensure location-independent access to resources: [See Oracle Location-Independent Access to Resources](https://docs.oracle.com/javase/8/docs/technotes/guides/lang/resources.html)
 
-
 ### JDK8 is required to compile
 This DataSketches component is pure Java and you must compile using JDK 8.
 
