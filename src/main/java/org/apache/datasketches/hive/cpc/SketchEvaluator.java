@@ -22,7 +22,7 @@ package org.apache.datasketches.hive.cpc;
 import java.util.Arrays;
 
 import org.apache.datasketches.cpc.CpcSketch;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
@@ -70,7 +70,7 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
     }
     final BytesWritable serializedSketch = (BytesWritable) intermediateInspector_.getStructFieldData(
         data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
-    state.update(CpcSketch.heapify(Memory.wrap(serializedSketch.getBytes()), state.getSeed()));
+    state.update(CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch), state.getSeed()));
   }
 
   private void initializeState(final UnionState state, final Object data) {

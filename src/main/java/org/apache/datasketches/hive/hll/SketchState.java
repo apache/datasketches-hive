@@ -44,7 +44,7 @@ class SketchState extends State {
     switch (objectInspector.getPrimitiveCategory()) {
       case BINARY:
         sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, objectInspector)
-            .getBytes());
+            .copyBytes());
         return;
       case BYTE:
         sketch_.update(PrimitiveObjectInspectorUtils.getByte(data, objectInspector));

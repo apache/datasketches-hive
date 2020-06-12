@@ -24,7 +24,7 @@ import java.util.Comparator;
 
 import org.apache.datasketches.ArrayOfItemsSerDe;
 import org.apache.datasketches.ArrayOfStringsSerDe;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
@@ -110,7 +110,7 @@ public class DataToStringsSketchUDAFTest {
       eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b") });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 128);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -132,7 +132,7 @@ public class DataToStringsSketchUDAFTest {
       eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b"), new IntWritable(256) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -161,7 +161,7 @@ public class DataToStringsSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -190,7 +190,7 @@ public class DataToStringsSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 128);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -213,7 +213,7 @@ public class DataToStringsSketchUDAFTest {
       eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b") });
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 128);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), "a");
@@ -235,7 +235,7 @@ public class DataToStringsSketchUDAFTest {
       eval.iterate(state, new Object[] { new org.apache.hadoop.io.Text("b"), new IntWritable(256) });
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(Memory.wrap(bytes.getBytes()), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), "a");

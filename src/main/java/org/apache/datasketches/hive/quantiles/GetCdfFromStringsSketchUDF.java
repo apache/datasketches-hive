@@ -23,7 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.datasketches.ArrayOfStringsSerDe;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
@@ -52,7 +52,7 @@ public class GetCdfFromStringsSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final String... splitPoints) {
     if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
-      Memory.wrap(serializedSketch.getBytes()),
+      BytesWritableHelper.wrapAsMemory(serializedSketch),
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()
     );

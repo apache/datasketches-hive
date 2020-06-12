@@ -19,11 +19,11 @@
 
 package org.apache.datasketches.hive.hll;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.hll.HllSketch;
 import org.apache.datasketches.hll.TgtHllType;
 
@@ -34,7 +34,7 @@ public class UnionSketchUDFTest {
   public void nullInputs() {
     UnionSketchUDF udf = new UnionSketchUDF();
     BytesWritable result = udf.evaluate(null, null);
-    HllSketch resultSketch = HllSketch.heapify(Memory.wrap(result.getBytes()));
+    HllSketch resultSketch = HllSketch.heapify(BytesWritableHelper.wrapAsMemory(result));
     Assert.assertTrue(resultSketch.isEmpty());
     Assert.assertEquals(resultSketch.getEstimate(), 0.0);
   }
@@ -58,7 +58,7 @@ public class UnionSketchUDFTest {
 
     BytesWritable result = udf.evaluate(input1, input2);
 
-    HllSketch resultSketch = HllSketch.heapify(Memory.wrap(result.getBytes()));
+    HllSketch resultSketch = HllSketch.heapify(BytesWritableHelper.wrapAsMemory(result));
 
     Assert.assertEquals(resultSketch.getEstimate(), 256.0, 256 * 0.01);
   }
@@ -85,7 +85,7 @@ public class UnionSketchUDFTest {
 
     BytesWritable result = udf.evaluate(input1, input2, lgK, type.toString());
 
-    HllSketch resultSketch = HllSketch.heapify(Memory.wrap(result.getBytes()));
+    HllSketch resultSketch = HllSketch.heapify(BytesWritableHelper.wrapAsMemory(result));
 
     Assert.assertEquals(resultSketch.getLgConfigK(), lgK);
     Assert.assertEquals(resultSketch.getTgtHllType(), type);

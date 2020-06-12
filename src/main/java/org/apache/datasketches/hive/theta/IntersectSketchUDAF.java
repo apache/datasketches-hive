@@ -23,6 +23,7 @@ import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 
 import java.util.Arrays;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.Intersection;
 import org.apache.datasketches.theta.SetOperation;
@@ -131,7 +132,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
       }
       final byte[] serializedSketch = (byte[]) inputObjectInspector.getPrimitiveJavaObject(data[0]);
       if (serializedSketch == null) { return; }
-      state.update(serializedSketch);
+      state.update(Memory.wrap(serializedSketch));
     }
 
     @Override
@@ -158,10 +159,10 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
         state.init(seed);
       }
 
-      final BytesWritable serializedSketch =
+      final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
           (BytesWritable) intermediateObjectInspector.getStructFieldData(
-          data, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD));
-      state.update(serializedSketch.getBytes());
+          data, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD)));
+      state.update(serializedSketch);
     }
 
     @Override
@@ -203,8 +204,8 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
         return seed_;
       }
 
-      void update(final byte[] serializedSketch) {
-        intersection_.update(Sketches.wrapSketch(Memory.wrap(serializedSketch), seed_));
+      void update(final Memory serializedSketch) {
+        intersection_.update(Sketches.wrapSketch(serializedSketch, seed_));
       }
 
       Sketch getResult() {

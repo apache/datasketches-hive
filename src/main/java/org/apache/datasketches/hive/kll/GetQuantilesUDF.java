@@ -21,8 +21,8 @@ package org.apache.datasketches.hive.kll;
 
 import java.util.List;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.kll.KllFloatsSketch;
-import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
@@ -46,7 +46,7 @@ public class GetQuantilesUDF extends UDF {
    */
   public List<Float> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
     if (serializedSketch == null) { return null; }
-    final KllFloatsSketch sketch = KllFloatsSketch.heapify(Memory.wrap(serializedSketch.getBytes()));
+    final KllFloatsSketch sketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return Util.primitivesToList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
   }
 

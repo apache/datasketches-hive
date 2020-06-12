@@ -19,6 +19,8 @@
 
 package org.apache.datasketches.hive.quantiles;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
+import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
@@ -68,9 +70,9 @@ abstract class DoublesEvaluator extends GenericUDAFEvaluator {
   public void merge(final AggregationBuffer buf, final Object data) throws HiveException {
     if (data == null) { return; }
     final DoublesUnionState state = (DoublesUnionState) buf;
-    final BytesWritable serializedSketch =
-        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data);
-    state.update(serializedSketch.getBytes());
+    final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
+        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data));
+    state.update(serializedSketch);
   }
 
   @SuppressWarnings("deprecation")

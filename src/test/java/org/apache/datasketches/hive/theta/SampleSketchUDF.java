@@ -19,6 +19,7 @@
 
 package org.apache.datasketches.hive.theta;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
@@ -55,16 +56,16 @@ public class SampleSketchUDF extends UDF {
       return null;
     }
 
-    byte[] serializedSketch = binarySketch.getBytes();
+    Memory serializedSketch = BytesWritableHelper.wrapAsMemory(binarySketch);
 
-    if (serializedSketch.length <= 8) {
+    if (serializedSketch.getCapacity() <= 8) {
       return null;
     }
 
     //  The builder will catch errors with improper sketchSize or probability
     Union union = SetOperation.builder().setP(probability).setNominalEntries(sketchSize).buildUnion();
 
-    union.update(Memory.wrap(serializedSketch)); //Union can accept Memory object directly
+    union.update(serializedSketch); //Union can accept Memory object directly
 
     Sketch intermediateSketch = union.getResult(false, null); //to CompactSketch(unordered, on-heap)
     byte[] resultSketch = intermediateSketch.toByteArray();

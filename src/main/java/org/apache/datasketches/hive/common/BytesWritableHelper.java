@@ -17,28 +17,23 @@
  * under the License.
  */
 
-package org.apache.datasketches.hive.quantiles;
+package org.apache.datasketches.hive.common;
 
-import org.apache.datasketches.hive.common.BytesWritableHelper;
-import org.apache.datasketches.quantiles.DoublesSketch;
-import org.apache.hadoop.hive.ql.exec.Description;
-import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.io.BytesWritable;
 
-@Description(name = "GetK", value = "_FUNC_(sketch)",
-extended = " Returns parameter K from a given DoublesSketch sketch.")
-@SuppressWarnings("javadoc")
-public class GetKFromDoublesSketchUDF extends UDF {
+import java.nio.ByteOrder;
 
-  /**
-   * Returns parameter K from a given sketch
-   * @param serializedSketch serialized sketch
-   * @return parameter K
-   */
-  public Integer evaluate(final BytesWritable serializedSketch) {
-    if (serializedSketch == null) { return null; }
-    final DoublesSketch sketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
-    return sketch.getK();
-  }
-
+/**
+ * Provides a helper class to simplify frequent operations on BytesWritable.
+ */
+public class BytesWritableHelper {
+    /**
+     * Wraps BytesWritable with a read-only Memory interface, without copying the underlying data.
+     * @param bw Input BytesWritable object
+     * @return Read-only Memory wrapping the input BytesWritable
+     */
+    public static Memory wrapAsMemory(BytesWritable bw) {
+        return Memory.wrap(bw.getBytes(), 0, bw.getLength(), ByteOrder.nativeOrder());
+    }
 }

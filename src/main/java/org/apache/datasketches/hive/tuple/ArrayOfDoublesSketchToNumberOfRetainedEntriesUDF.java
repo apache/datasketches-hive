@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -42,7 +42,7 @@ public class ArrayOfDoublesSketchToNumberOfRetainedEntriesUDF extends UDF {
   public Integer evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
-        Memory.wrap(serializedSketch.getBytes()));
+        BytesWritableHelper.wrapAsMemory(serializedSketch));
     return sketch.getRetainedEntries();
   }
 

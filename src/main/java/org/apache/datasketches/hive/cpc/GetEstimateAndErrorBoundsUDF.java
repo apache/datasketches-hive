@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.datasketches.cpc.CpcSketch;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
@@ -70,7 +70,7 @@ public class GetEstimateAndErrorBoundsUDF extends UDF {
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final int kappa, final long seed) {
     if (serializedSketch == null) { return null; }
-    final CpcSketch sketch = CpcSketch.heapify(Memory.wrap(serializedSketch.getBytes()), seed);
+    final CpcSketch sketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch), seed);
     return Arrays.asList(sketch.getEstimate(), sketch.getLowerBound(kappa), sketch.getUpperBound(kappa));
   }
 

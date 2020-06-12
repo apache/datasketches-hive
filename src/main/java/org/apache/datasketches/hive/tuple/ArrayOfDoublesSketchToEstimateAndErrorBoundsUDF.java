@@ -22,7 +22,7 @@ package org.apache.datasketches.hive.tuple;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -47,7 +47,7 @@ public class ArrayOfDoublesSketchToEstimateAndErrorBoundsUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
-        Memory.wrap(serializedSketch.getBytes()));
+        BytesWritableHelper.wrapAsMemory(serializedSketch));
     return Arrays.asList(sketch.getEstimate(), sketch.getLowerBound(2), sketch.getUpperBound(2));
   }
 

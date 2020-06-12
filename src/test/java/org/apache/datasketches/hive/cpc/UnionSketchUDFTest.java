@@ -19,11 +19,11 @@
 
 package org.apache.datasketches.hive.cpc;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.cpc.CpcSketch;
 
 @SuppressWarnings("javadoc")
@@ -33,7 +33,7 @@ public class UnionSketchUDFTest {
   public void nullInputs() {
     UnionSketchUDF udf = new UnionSketchUDF();
     BytesWritable result = udf.evaluate(null, null);
-    CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(result.getBytes()));
+    CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(result));
     Assert.assertTrue(resultSketch.isEmpty());
     Assert.assertEquals(resultSketch.getEstimate(), 0.0);
   }
@@ -57,7 +57,7 @@ public class UnionSketchUDFTest {
 
     BytesWritable result = udf.evaluate(input1, input2);
 
-    CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(result.getBytes()));
+    CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(result));
 
     Assert.assertEquals(resultSketch.getEstimate(), 256.0, 256 * 0.02);
   }
@@ -83,7 +83,7 @@ public class UnionSketchUDFTest {
 
     BytesWritable result = udf.evaluate(input1, input2, lgK);
 
-    CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(result.getBytes()));
+    CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(result));
 
     Assert.assertEquals(resultSketch.getLgK(), lgK);
     Assert.assertEquals(resultSketch.getEstimate(), 256.0, 256 * 0.02);
@@ -111,7 +111,7 @@ public class UnionSketchUDFTest {
 
     BytesWritable result = udf.evaluate(input1, input2, lgK, seed);
 
-    CpcSketch resultSketch = CpcSketch.heapify(Memory.wrap(result.getBytes()), seed);
+    CpcSketch resultSketch = CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(result), seed);
 
     Assert.assertEquals(resultSketch.getLgK(), lgK);
     Assert.assertEquals(resultSketch.getEstimate(), 256.0, 256 * 0.02);

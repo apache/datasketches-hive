@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.datasketches.quantiles.DoublesSketchBuilder;
 import org.apache.datasketches.quantiles.UpdateDoublesSketch;
@@ -74,7 +74,7 @@ public class ArrayOfDoublesSketchToQuantilesSketchUDF extends UDF {
       final int k) {
     if (serializedSketch == null) { return null; }
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
-        Memory.wrap(serializedSketch.getBytes()));
+        BytesWritableHelper.wrapAsMemory(serializedSketch));
     if (column < 1) {
       throw new IllegalArgumentException("Column number must be greater than zero. Received: "
           + column);

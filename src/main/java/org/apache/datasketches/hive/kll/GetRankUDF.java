@@ -19,8 +19,8 @@
 
 package org.apache.datasketches.hive.kll;
 
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.kll.KllFloatsSketch;
-import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
@@ -40,7 +40,7 @@ public class GetRankUDF extends UDF {
    */
   public Double evaluate(final BytesWritable serializedSketch, final float value) {
     if (serializedSketch == null) { return null; }
-    final KllFloatsSketch sketch = KllFloatsSketch.heapify(Memory.wrap(serializedSketch.getBytes()));
+    final KllFloatsSketch sketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return sketch.getRank(value);
   }
 

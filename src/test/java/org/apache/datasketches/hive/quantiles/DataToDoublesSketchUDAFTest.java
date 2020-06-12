@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.Arrays;
 
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.datasketches.quantiles.UpdateDoublesSketch;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -113,7 +113,7 @@ public class DataToDoublesSketchUDAFTest {
       eval.iterate(state, new Object[] { new DoubleWritable(2.0) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
+      DoublesSketch resultSketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getK(), 128);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -134,7 +134,7 @@ public class DataToDoublesSketchUDAFTest {
       eval.iterate(state, new Object[] { new DoubleWritable(2.0), new IntWritable(256) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
+      DoublesSketch resultSketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getK(), 256);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -161,7 +161,7 @@ public class DataToDoublesSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
+      DoublesSketch resultSketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1.0);
       Assert.assertEquals(resultSketch.getMaxValue(), 2.0);
@@ -187,7 +187,7 @@ public class DataToDoublesSketchUDAFTest {
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
+      DoublesSketch resultSketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getK(), 256);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -209,7 +209,7 @@ public class DataToDoublesSketchUDAFTest {
       eval.iterate(state, new Object[] { new DoubleWritable(2.0) });
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
+      DoublesSketch resultSketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getK(), 128);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1.0);
@@ -230,7 +230,7 @@ public class DataToDoublesSketchUDAFTest {
       eval.iterate(state, new Object[] { new DoubleWritable(2.0), new IntWritable(256) });
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      DoublesSketch resultSketch = DoublesSketch.wrap(Memory.wrap(bytes.getBytes()));
+      DoublesSketch resultSketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getK(), 256);
       Assert.assertEquals(resultSketch.getRetainedItems(), 2);
       Assert.assertEquals(resultSketch.getMinValue(), 1.0);

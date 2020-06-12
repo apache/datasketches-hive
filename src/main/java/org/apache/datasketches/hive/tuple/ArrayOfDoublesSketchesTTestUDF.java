@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
-import org.apache.datasketches.memory.Memory;
+import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -50,9 +50,9 @@ public class ArrayOfDoublesSketchesTTestUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketchA, final BytesWritable serializedSketchB) {
     if ((serializedSketchA == null) || (serializedSketchB == null)) { return null; }
     final ArrayOfDoublesSketch sketchA =
-        ArrayOfDoublesSketches.wrapSketch(Memory.wrap(serializedSketchA.getBytes()));
+        ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory(serializedSketchA));
     final ArrayOfDoublesSketch sketchB =
-        ArrayOfDoublesSketches.wrapSketch(Memory.wrap(serializedSketchB.getBytes()));
+        ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory(serializedSketchB));
 
     if (sketchA.getNumValues() != sketchB.getNumValues()) {
       throw new IllegalArgumentException("Both sketches must have the same number of values");
