@@ -27,8 +27,6 @@ import org.apache.datasketches.theta.Sketch;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
-import java.nio.ByteOrder;
-
 /**
  * Hive estimate sketch udf. V4
  *

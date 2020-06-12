@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.tuple.Sketch;
 import org.apache.datasketches.tuple.SketchIterator;
 import org.apache.datasketches.tuple.Sketches;

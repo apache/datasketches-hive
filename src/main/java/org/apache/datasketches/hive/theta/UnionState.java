@@ -19,7 +19,6 @@
 
 package org.apache.datasketches.hive.theta;
 
-import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Sketch;
@@ -46,8 +45,8 @@ class UnionState extends AbstractAggregationBuffer {
   }
 
   public void init(final int nominalEntries, final float samplingProbability, final long seed) {
-    this.nominalEntries_ = nominalEntries;
-    this.seed_ = seed;
+    nominalEntries_ = nominalEntries;
+    seed_ = seed;
     union_ = SetOperation.builder().setNominalEntries(nominalEntries).setP(samplingProbability)
         .setSeed(seed).buildUnion();
   }
