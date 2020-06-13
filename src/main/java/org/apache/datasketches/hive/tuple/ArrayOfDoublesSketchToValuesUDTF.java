@@ -43,6 +43,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
 
   PrimitiveObjectInspector inputObjectInspector;
 
+  @SuppressWarnings("deprecation")
   @Override
   public StructObjectInspector initialize(final ObjectInspector[] inspectors) throws UDFArgumentException {
     if (inspectors.length != 1) {
@@ -70,7 +71,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
 
   @Override
   public void process(final Object[] data) throws HiveException {
-    if ((data == null) || (data[0] == null)) { return; }
+    if (data == null || data[0] == null) { return; }
     final BytesWritable serializedSketch =
       (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(

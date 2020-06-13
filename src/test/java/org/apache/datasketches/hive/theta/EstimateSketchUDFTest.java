@@ -27,7 +27,7 @@ import org.apache.datasketches.theta.UpdateSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.annotations.Test;
 
-@SuppressWarnings({"javadoc","resource"})
+@SuppressWarnings({"javadoc"})
 public class EstimateSketchUDFTest {
 
   @Test
