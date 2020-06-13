@@ -19,10 +19,10 @@
 
 package org.apache.datasketches.hive.common;
 
+import java.nio.ByteOrder;
+
 import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.io.BytesWritable;
-
-import java.nio.ByteOrder;
 
 /**
  * Provides a helper class to simplify frequent operations on BytesWritable.
@@ -33,7 +33,7 @@ public class BytesWritableHelper {
      * @param bw Input BytesWritable object
      * @return Read-only Memory wrapping the input BytesWritable
      */
-    public static Memory wrapAsMemory(BytesWritable bw) {
+    public static Memory wrapAsMemory(final BytesWritable bw) {
         return Memory.wrap(bw.getBytes(), 0, bw.getLength(), ByteOrder.nativeOrder());
     }
 }

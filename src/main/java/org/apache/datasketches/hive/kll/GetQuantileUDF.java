@@ -43,7 +43,8 @@ public class GetQuantileUDF extends UDF {
    */
   public Float evaluate(final BytesWritable serializedSketch, final double fraction) {
     if (serializedSketch == null) { return null; }
-    final KllFloatsSketch sketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
+    final KllFloatsSketch sketch =
+        KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return sketch.getQuantile(fraction);
   }
 

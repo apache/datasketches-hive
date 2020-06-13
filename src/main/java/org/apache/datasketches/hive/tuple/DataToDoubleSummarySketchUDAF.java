@@ -71,9 +71,9 @@ public class DataToDoubleSummarySketchUDAF extends DataToSketchUDAF {
     private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =
         new DoubleSummaryDeserializer();
     private static final SummaryFactory<DoubleSummary> SUMMARY_FACTORY =
-        new DoubleSummaryFactory();
+        new DoubleSummaryFactory(DoubleSummary.Mode.Sum);
     private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS =
-        new DoubleSummarySetOperations();
+        new DoubleSummarySetOperations(DoubleSummary.Mode.Sum);
 
     @Override
     protected SummaryDeserializer<DoubleSummary> getSummaryDeserializer() {

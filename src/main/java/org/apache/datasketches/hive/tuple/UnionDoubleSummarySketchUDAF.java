@@ -57,7 +57,7 @@ public class UnionDoubleSummarySketchUDAF extends UnionSketchUDAF {
     private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =
         new DoubleSummaryDeserializer();
     private static final SummarySetOperations<DoubleSummary> SUMMARY_SET_OPS =
-        new DoubleSummarySetOperations();
+        new DoubleSummarySetOperations(DoubleSummary.Mode.Sum);
 
     @Override
     protected SummaryDeserializer<DoubleSummary> getSummaryDeserializer() {

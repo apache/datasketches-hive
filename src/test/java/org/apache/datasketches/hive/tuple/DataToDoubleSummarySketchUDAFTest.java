@@ -206,14 +206,16 @@ public class DataToDoubleSummarySketchUDAFTest {
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch1 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch1.update(1, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
 
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch2 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch2.update(2, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),
@@ -248,14 +250,16 @@ public class DataToDoubleSummarySketchUDAFTest {
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch1 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch1.update(1, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
 
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch2 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch2.update(2, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),

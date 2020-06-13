@@ -19,14 +19,13 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import org.apache.hadoop.io.BytesWritable;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import org.apache.datasketches.tuple.UpdatableSketch;
 import org.apache.datasketches.tuple.UpdatableSketchBuilder;
 import org.apache.datasketches.tuple.adouble.DoubleSummary;
 import org.apache.datasketches.tuple.adouble.DoubleSummaryFactory;
+import org.apache.hadoop.io.BytesWritable;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class DoubleSummarySketchToPercentileUDFTest {
@@ -39,7 +38,8 @@ public class DoubleSummarySketchToPercentileUDFTest {
 
   @Test
   public void emptySketch() {
-    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+    UpdatableSketch<Double, DoubleSummary> sketch =
+        new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
     Double result = new DoubleSummarySketchToPercentileUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()), 0.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result, Double.NaN);
@@ -47,7 +47,8 @@ public class DoubleSummarySketchToPercentileUDFTest {
 
   @Test
   public void normalCase() {
-    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+    UpdatableSketch<Double, DoubleSummary> sketch =
+        new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
     int iterations = 100000;
     for (int i = 0; i < iterations; i++) {
       sketch.update(i, (double) i);

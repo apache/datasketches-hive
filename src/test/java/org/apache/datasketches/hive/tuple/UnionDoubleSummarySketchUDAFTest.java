@@ -119,11 +119,11 @@ public class UnionDoubleSummarySketchUDAFTest {
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch1.update(1, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
 
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch2.update(2, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
 
@@ -152,13 +152,15 @@ public class UnionDoubleSummarySketchUDAFTest {
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
       UpdatableSketch<Double, DoubleSummary> sketch1 =
-          new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum))
+            .setNominalEntries(nomNumEntries).build();
       sketch1.update(1, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray()),
           new IntWritable(nomNumEntries)});
 
       UpdatableSketch<Double, DoubleSummary> sketch2 =
-          new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum))
+            .setNominalEntries(nomNumEntries).build();
       sketch2.update(2, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray()),
           new IntWritable(nomNumEntries)});
@@ -187,14 +189,16 @@ public class UnionDoubleSummarySketchUDAFTest {
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch1 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch1.update(1, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
 
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch2 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch2.update(2, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),
@@ -229,14 +233,16 @@ public class UnionDoubleSummarySketchUDAFTest {
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch1 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch1.update(1, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),
         new BytesWritable(sketch1.compact().toByteArray()))
       );
 
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch2 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch2.update(2, 1.0);
       eval.merge(state, Arrays.asList(
         new IntWritable(DEFAULT_NOMINAL_ENTRIES),
@@ -264,11 +270,13 @@ public class UnionDoubleSummarySketchUDAFTest {
       @SuppressWarnings("unchecked")
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
-      UpdatableSketch<Double, DoubleSummary> sketch1 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch1 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch1.update(1, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray())});
 
-      UpdatableSketch<Double, DoubleSummary> sketch2 = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+      UpdatableSketch<Double, DoubleSummary> sketch2 =
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
       sketch2.update(2, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray())});
 
@@ -298,13 +306,15 @@ public class UnionDoubleSummarySketchUDAFTest {
       State<DoubleSummary> state = (State<DoubleSummary>) eval.getNewAggregationBuffer();
 
       UpdatableSketch<Double, DoubleSummary> sketch1 =
-          new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum))
+            .setNominalEntries(nomNumEntries).build();
       sketch1.update(1, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch1.compact().toByteArray()),
           new IntWritable(nomNumEntries)});
 
       UpdatableSketch<Double, DoubleSummary> sketch2 =
-          new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).setNominalEntries(nomNumEntries).build();
+          new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum))
+            .setNominalEntries(nomNumEntries).build();
       sketch2.update(2, 1.0);
       eval.iterate(state, new Object[] {new BytesWritable(sketch2.compact().toByteArray()),
           new IntWritable(nomNumEntries)});

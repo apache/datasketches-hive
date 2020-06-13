@@ -21,14 +21,13 @@ package org.apache.datasketches.hive.tuple;
 
 import java.util.List;
 
-import org.apache.hadoop.io.BytesWritable;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import org.apache.datasketches.tuple.UpdatableSketch;
 import org.apache.datasketches.tuple.UpdatableSketchBuilder;
 import org.apache.datasketches.tuple.adouble.DoubleSummary;
 import org.apache.datasketches.tuple.adouble.DoubleSummaryFactory;
+import org.apache.hadoop.io.BytesWritable;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class DoubleSummarySketchToEstimatesUDFTest {
@@ -41,7 +40,8 @@ public class DoubleSummarySketchToEstimatesUDFTest {
 
   @Test
   public void emptySketch() {
-    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+    UpdatableSketch<Double, DoubleSummary> sketch =
+        new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
     List<Double> result = new DoubleSummarySketchToEstimatesUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 2);
@@ -51,7 +51,8 @@ public class DoubleSummarySketchToEstimatesUDFTest {
 
   @Test
   public void normalCase() {
-    UpdatableSketch<Double, DoubleSummary> sketch = new UpdatableSketchBuilder<>(new DoubleSummaryFactory()).build();
+    UpdatableSketch<Double, DoubleSummary> sketch =
+        new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
     sketch.update(1, 1.0);
     sketch.update(2, 1.0);
     List<Double> result = new DoubleSummarySketchToEstimatesUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));

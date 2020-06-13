@@ -46,7 +46,8 @@ public class GetQuantilesUDF extends UDF {
    */
   public List<Float> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
     if (serializedSketch == null) { return null; }
-    final KllFloatsSketch sketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
+    final KllFloatsSketch sketch =
+        KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return Util.primitivesToList(sketch.getQuantiles(Util.objectsToPrimitives(fractions)));
   }
 

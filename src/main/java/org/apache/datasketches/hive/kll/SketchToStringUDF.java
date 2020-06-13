@@ -37,7 +37,8 @@ public class SketchToStringUDF extends UDF {
    */
   public String evaluate(final BytesWritable serializedSketch) {
     if (serializedSketch == null) { return null; }
-    final KllFloatsSketch sketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
+    final KllFloatsSketch sketch =
+        KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return sketch.toString();
   }
 

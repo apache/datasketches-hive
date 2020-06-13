@@ -27,13 +27,13 @@
  *
  * <p>There are two sets of Hive UDFs: one for generic Tuple sketch with an example
  * implementation for DoubleSummay, and another one for a specialized ArrayOfDoublesSketch.
- * 
- * <p> The generic implementation is in the form of abstract classes DataToSketchUDAF and
+ *
+ * <p>The generic implementation is in the form of abstract classes DataToSketchUDAF and
  * UnionSketchUDAF to be specialized for particular types of Summary.
  * An example implementation for DoubleSumamry is provided: DataToDoubleSummarySketchUDAF and
  * UnionDoubleSummarySketchUDAF, as well as UDFs to obtain the results from sketches:
  * DoubleSumamrySketchToEstimatesUDF and DoubleSummarySketchToPercentileUDF.
- * 
+ *
  * <p>UDFs for ArrayOfDoublesSketch: DataToArrayOfDoublesSketchUDAF, UnionArrayOfDoublesSketchUDAF,
  * ArrayOfDoublesSketchToEstimatesUDF, ArrayOfDoublesSketchToValuesUDTF.
  *

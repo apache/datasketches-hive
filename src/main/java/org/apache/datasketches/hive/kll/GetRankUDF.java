@@ -40,7 +40,8 @@ public class GetRankUDF extends UDF {
    */
   public Double evaluate(final BytesWritable serializedSketch, final float value) {
     if (serializedSketch == null) { return null; }
-    final KllFloatsSketch sketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
+    final KllFloatsSketch sketch =
+        KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
     return sketch.getRank(value);
   }
 

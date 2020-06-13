@@ -49,7 +49,8 @@ public class GetPmfUDF extends UDF {
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Float... splitPoints) {
     if (serializedSketch == null) { return null; }
-    final KllFloatsSketch sketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
+    final KllFloatsSketch sketch =
+        KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
     final double[] pmf = sketch.getPMF(Util.objectsToPrimitives(splitPoints));
     if (pmf == null) { return null; }
     return Util.primitivesToList(pmf);
