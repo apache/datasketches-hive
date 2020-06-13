@@ -30,7 +30,7 @@ under the License.
   
   <!-- UNIQUE FOR THIS JAVA COMPONENT -->
   <artifactId>datasketches-hive</artifactId>
-  <version>1.1.0-incubating-SNAPSHOT</version>
+  <version>1.2.0-incubating-SNAPSHOT</version>
   <description>Apache Hive adaptors for the DataSketches library.</description>
   <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
   
