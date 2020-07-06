@@ -51,7 +51,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + "> SELECT UnionSketch(sketch) FROM src;\n"
     + "The return value is a binary blob that can be operated on by other sketch related functions."
     + " The lgK parameter controls the sketch size and rlative error expected from the sketch."
-    + " It is optional an must be from 4 to 21. The default is 12, which is expected to yield errors"
+    + " It is optional and must be from 4 to 21. The default is 12, which is expected to yield errors"
     + " of roughly +-3% in the estimation of uniques with 95% confidence."
     + " The target type parameter is optional and must be 'HLL_4', 'HLL_6' or 'HLL_8'."
     + " The default is 'HLL_4'")
@@ -129,7 +129,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
 
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         inputInspector_ = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
           lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
@@ -142,7 +142,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateInspector_ = (StandardStructObjectInspector) parameters[0];
       }
 
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the lgK and the target HLL type
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(LG_K_FIELD, HLL_TYPE_FIELD, SKETCH_FIELD),
