@@ -21,11 +21,10 @@ package org.apache.datasketches.hive.kll;
 
 import java.util.List;
 
+import org.apache.datasketches.kll.KllFloatsSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.kll.KllFloatsSketch;
 
 @SuppressWarnings("javadoc")
 public class GetQuantilesUDFTest {
@@ -56,9 +55,9 @@ public class GetQuantilesUDFTest {
     final List<Float> result = new GetQuantilesUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0, 0.5, 1.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
-    Assert.assertEquals(result.get(0), 1f);
-    Assert.assertEquals(result.get(1), 2f);
-    Assert.assertEquals(result.get(2), 3f);
+    Assert.assertEquals((double)result.get(0), 1f);
+    Assert.assertEquals((double)result.get(1), 2f);
+    Assert.assertEquals((double)result.get(2), 3f);
   }
 
 }

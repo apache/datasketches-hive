@@ -21,13 +21,12 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.List;
 
-import org.apache.hadoop.io.BytesWritable;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import org.apache.datasketches.SketchesArgumentException;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.datasketches.quantiles.UpdateDoublesSketch;
+import org.apache.hadoop.io.BytesWritable;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class GetQuantilesFromDoublesSketchUDFTest {
@@ -58,9 +57,9 @@ public class GetQuantilesFromDoublesSketchUDFTest {
     List<Double> result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0, 0.5, 1.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
-    Assert.assertEquals(result.get(0), 1.0);
-    Assert.assertEquals(result.get(1), 2.0);
-    Assert.assertEquals(result.get(2), 3.0);
+    Assert.assertEquals((double)result.get(0), 1.0);
+    Assert.assertEquals((double)result.get(1), 2.0);
+    Assert.assertEquals((double)result.get(2), 3.0);
   }
 
   @Test
@@ -86,9 +85,9 @@ public class GetQuantilesFromDoublesSketchUDFTest {
     List<Double> result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 3);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
-    Assert.assertEquals(result.get(0), 1.0);
-    Assert.assertEquals(result.get(1), 2.0);
-    Assert.assertEquals(result.get(2), 3.0);
+    Assert.assertEquals((double)result.get(0), 1.0);
+    Assert.assertEquals((double)result.get(1), 2.0);
+    Assert.assertEquals((double)result.get(2), 3.0);
   }
 
 }

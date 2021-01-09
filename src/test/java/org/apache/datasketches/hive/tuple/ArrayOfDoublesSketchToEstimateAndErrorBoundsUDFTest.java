@@ -21,12 +21,11 @@ package org.apache.datasketches.hive.tuple;
 
 import java.util.List;
 
+import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
+import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
 @SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToEstimateAndErrorBoundsUDFTest {
@@ -43,9 +42,9 @@ public class ArrayOfDoublesSketchToEstimateAndErrorBoundsUDFTest {
     List<Double> result = new ArrayOfDoublesSketchToEstimateAndErrorBoundsUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
-    Assert.assertEquals(result.get(0), 0.0);
-    Assert.assertEquals(result.get(1), 0.0);
-    Assert.assertEquals(result.get(2), 0.0);
+    Assert.assertEquals((double)result.get(0), 0.0);
+    Assert.assertEquals((double)result.get(1), 0.0);
+    Assert.assertEquals((double)result.get(2), 0.0);
   }
 
   @Test
@@ -56,9 +55,9 @@ public class ArrayOfDoublesSketchToEstimateAndErrorBoundsUDFTest {
     List<Double> result = new ArrayOfDoublesSketchToEstimateAndErrorBoundsUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
-    Assert.assertEquals(result.get(0), 2.0);
-    Assert.assertEquals(result.get(1), 2.0);
-    Assert.assertEquals(result.get(2), 2.0);
+    Assert.assertEquals((double)result.get(0), 2.0);
+    Assert.assertEquals((double)result.get(1), 2.0);
+    Assert.assertEquals((double)result.get(2), 2.0);
   }
 
   @Test

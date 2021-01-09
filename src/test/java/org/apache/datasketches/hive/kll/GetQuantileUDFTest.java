@@ -19,11 +19,10 @@
 
 package org.apache.datasketches.hive.kll;
 
+import org.apache.datasketches.kll.KllFloatsSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.kll.KllFloatsSketch;
 
 @SuppressWarnings("javadoc")
 public class GetQuantileUDFTest {
@@ -42,7 +41,7 @@ public class GetQuantileUDFTest {
     sketch.update(3);
     final Float result = new GetQuantileUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
     Assert.assertNotNull(result);
-    Assert.assertEquals(result, 2f);
+    Assert.assertEquals((double)result, 2f);
   }
 
 }

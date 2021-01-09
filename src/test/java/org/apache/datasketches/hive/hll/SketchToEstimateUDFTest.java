@@ -19,11 +19,10 @@
 
 package org.apache.datasketches.hive.hll;
 
+import org.apache.datasketches.hll.HllSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.hll.HllSketch;
 
 @SuppressWarnings("javadoc")
 public class SketchToEstimateUDFTest {
@@ -39,7 +38,7 @@ public class SketchToEstimateUDFTest {
     HllSketch sketch = new HllSketch(10);
     Double result = new SketchToEstimateUDF().evaluate(new BytesWritable(sketch.toCompactByteArray()));
     Assert.assertNotNull(result);
-    Assert.assertEquals(result, 0.0);
+    Assert.assertEquals((double)result, 0.0);
   }
 
   @Test

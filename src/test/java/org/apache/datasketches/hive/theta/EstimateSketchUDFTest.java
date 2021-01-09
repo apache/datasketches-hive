@@ -99,11 +99,11 @@ public class EstimateSketchUDFTest {
 
   @Test
   public void evaluateRespectsByteLength() {
-    // From Issue 50: https://github.com/apache/incubator-datasketches-hive/issues/50
-    // In some instances, the BytesWritable buffer returned by getBytes() might be larger than the actual sketch bytes.
-    // getLength() should give the correct length to use.
+    // From Issue 50: https://github.com/apache/datasketches-hive/issues/50
+    // In some instances, the BytesWritable buffer returned by getBytes() might be larger than the
+    // actual sketch bytes. getLength() should give the correct length to use.
     //
-    // https://github.com/apache/incubator-datasketches-hive/issues/50
+    // https://github.com/apache/datasketches-hive/issues/50
     byte[] inputBytes = new byte[]{
         (byte) 0x01, (byte) 0x03, (byte) 0x03, (byte) 0x00,
         (byte) 0x00, (byte) 0x3a, (byte) 0xcc, (byte) 0x93,

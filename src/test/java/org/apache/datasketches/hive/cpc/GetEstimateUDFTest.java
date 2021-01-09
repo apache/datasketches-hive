@@ -19,11 +19,10 @@
 
 package org.apache.datasketches.hive.cpc;
 
+import org.apache.datasketches.cpc.CpcSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.cpc.CpcSketch;
 
 @SuppressWarnings("javadoc")
 public class GetEstimateUDFTest {
@@ -39,7 +38,7 @@ public class GetEstimateUDFTest {
     final CpcSketch sketch = new CpcSketch(12);
     final Double result = new GetEstimateUDF().evaluate(new BytesWritable(sketch.toByteArray()));
     Assert.assertNotNull(result);
-    Assert.assertEquals(result, 0.0);
+    Assert.assertEquals((double)result, 0.0);
   }
 
   @Test

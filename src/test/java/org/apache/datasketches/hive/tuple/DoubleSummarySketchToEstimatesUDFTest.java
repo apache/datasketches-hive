@@ -45,8 +45,8 @@ public class DoubleSummarySketchToEstimatesUDFTest {
     List<Double> result = new DoubleSummarySketchToEstimatesUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 2);
-    Assert.assertEquals(result.get(0), 0.0);
-    Assert.assertEquals(result.get(1), 0.0);
+    Assert.assertEquals((double)result.get(0), 0.0);
+    Assert.assertEquals((double)result.get(1), 0.0);
   }
 
   @Test
@@ -58,8 +58,8 @@ public class DoubleSummarySketchToEstimatesUDFTest {
     List<Double> result = new DoubleSummarySketchToEstimatesUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 2);
-    Assert.assertEquals(result.get(0), 2.0);
-    Assert.assertEquals(result.get(1), 2.0);
+    Assert.assertEquals((double)result.get(0), 2.0);
+    Assert.assertEquals((double)result.get(1), 2.0);
   }
 
 }

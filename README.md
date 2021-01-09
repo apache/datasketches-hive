@@ -17,11 +17,11 @@
     under the License.
 -->
 
-[![Build Status](https://travis-ci.org/apache/incubator-datasketches-hive.svg?branch=master)](https://travis-ci.org/apache/incubator-datasketches-hive)
+[![Build Status](https://travis-ci.org/apache/datasketches-hive.svg?branch=master)](https://travis-ci.org/apache/datasketches-hive)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-hive/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.datasketches/datasketches-hive)
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/incubator-datasketches-hive.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-hive/context:java)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/incubator-datasketches-hive.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/incubator-datasketches-hive/alerts/)
-[![Coverage Status](https://coveralls.io/repos/github/apache/incubator-datasketches-hive/badge.svg?branch=master&service=github)](https://coveralls.io/github/apache/incubator-datasketches-hive?branch=master)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/apache/datasketches-hive.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-hive/context:java)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/datasketches-hive.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/apache/datasketches-hive/alerts/)
+[![Coverage Status](https://coveralls.io/repos/github/apache/datasketches-hive/badge.svg?branch=master&service=github)](https://coveralls.io/github/apache/datasketches-hive?branch=master)
 
 =================
 
@@ -80,6 +80,3 @@ This has the following top-level dependencies:
 #### Testing
 See the pom.xml file for test dependencies.
 
-----
-
-Disclaimer: Apache DataSketches is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.

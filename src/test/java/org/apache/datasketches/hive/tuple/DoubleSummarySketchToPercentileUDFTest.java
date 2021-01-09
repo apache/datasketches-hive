@@ -42,7 +42,7 @@ public class DoubleSummarySketchToPercentileUDFTest {
         new UpdatableSketchBuilder<>(new DoubleSummaryFactory(DoubleSummary.Mode.Sum)).build();
     Double result = new DoubleSummarySketchToPercentileUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()), 0.0);
     Assert.assertNotNull(result);
-    Assert.assertEquals(result, Double.NaN);
+    Assert.assertEquals((double)result, Double.NaN);
   }
 
   @Test

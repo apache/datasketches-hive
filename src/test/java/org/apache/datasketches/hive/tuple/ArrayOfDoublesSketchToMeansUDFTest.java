@@ -22,12 +22,11 @@ package org.apache.datasketches.hive.tuple;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
+import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
 @SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToMeansUDFTest {
@@ -52,7 +51,7 @@ public class ArrayOfDoublesSketchToMeansUDFTest {
     List<Double> result = new ArrayOfDoublesSketchToMeansUDF().evaluate(new BytesWritable(sketch.compact().toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 1);
-    Assert.assertEquals(result.get(0), 1.0);
+    Assert.assertEquals((double)result.get(0), 1.0);
   }
 
   @Test

@@ -21,11 +21,10 @@ package org.apache.datasketches.hive.kll;
 
 import java.util.List;
 
+import org.apache.datasketches.kll.KllFloatsSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.kll.KllFloatsSketch;
 
 @SuppressWarnings("javadoc")
 public class GetCdfUDFTest {
@@ -45,7 +44,7 @@ public class GetCdfUDFTest {
     List<Double> result = new GetCdfUDF().evaluate(new BytesWritable(sketch.toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 1);
-    Assert.assertEquals(result.get(0), 1.0);
+    Assert.assertEquals((double)result.get(0), 1.0);
   }
 
   @Test
@@ -65,10 +64,10 @@ public class GetCdfUDFTest {
     List<Double> result = new GetCdfUDF().evaluate(new BytesWritable(sketch.toByteArray()), 1f, 3f, 4f);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 4);
-    Assert.assertEquals(result.get(0), 0.0);
-    Assert.assertEquals(result.get(1), 0.5);
-    Assert.assertEquals(result.get(2), 0.75);
-    Assert.assertEquals(result.get(3), 1.0);
+    Assert.assertEquals((double)result.get(0), 0.0);
+    Assert.assertEquals((double)result.get(1), 0.5);
+    Assert.assertEquals((double)result.get(2), 0.75);
+    Assert.assertEquals((double)result.get(3), 1.0);
   }
 
 }

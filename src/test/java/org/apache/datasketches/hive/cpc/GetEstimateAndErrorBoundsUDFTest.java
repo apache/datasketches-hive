@@ -21,11 +21,10 @@ package org.apache.datasketches.hive.cpc;
 
 import java.util.List;
 
+import org.apache.datasketches.cpc.CpcSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.cpc.CpcSketch;
 
 @SuppressWarnings("javadoc")
 public class GetEstimateAndErrorBoundsUDFTest {
@@ -42,9 +41,9 @@ public class GetEstimateAndErrorBoundsUDFTest {
     final List<Double> result = new GetEstimateAndErrorBoundsUDF().evaluate(new BytesWritable(sketch.toByteArray()));
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
-    Assert.assertEquals(result.get(0), 0.0);
-    Assert.assertEquals(result.get(1), 0.0);
-    Assert.assertEquals(result.get(2), 0.0);
+    Assert.assertEquals((double)result.get(0), 0.0);
+    Assert.assertEquals((double)result.get(1), 0.0);
+    Assert.assertEquals((double)result.get(2), 0.0);
   }
 
   @Test

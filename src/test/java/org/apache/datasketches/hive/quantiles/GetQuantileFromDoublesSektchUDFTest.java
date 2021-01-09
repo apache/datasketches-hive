@@ -19,12 +19,11 @@
 
 package org.apache.datasketches.hive.quantiles;
 
+import org.apache.datasketches.quantiles.DoublesSketch;
+import org.apache.datasketches.quantiles.UpdateDoublesSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.quantiles.DoublesSketch;
-import org.apache.datasketches.quantiles.UpdateDoublesSketch;
 
 @SuppressWarnings("javadoc")
 public class GetQuantileFromDoublesSektchUDFTest {
@@ -43,7 +42,7 @@ public class GetQuantileFromDoublesSektchUDFTest {
     sketch.update(3);
     Double result = new GetQuantileFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
     Assert.assertNotNull(result);
-    Assert.assertEquals(result, 2.0);
+    Assert.assertEquals((double)result, 2.0);
   }
 
 }
