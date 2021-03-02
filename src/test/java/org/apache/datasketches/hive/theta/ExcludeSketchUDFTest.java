@@ -20,44 +20,38 @@
 package org.apache.datasketches.hive.theta;
 
 import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
+import static org.testng.Assert.fail;
 import static org.testng.AssertJUnit.assertEquals;
 
+import org.apache.datasketches.SketchesArgumentException;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
-import org.apache.hadoop.io.BytesWritable;
-import org.testng.annotations.Test;
-
-import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.Sketch;
 import org.apache.datasketches.theta.Sketches;
 import org.apache.datasketches.theta.UpdateSketch;
+import org.apache.hadoop.io.BytesWritable;
+import org.testng.annotations.Test;
 
 @SuppressWarnings("javadoc")
 public class ExcludeSketchUDFTest {
 
+  @SuppressWarnings("unused")
   @Test
   public void evaluateNull() {
     ExcludeSketchUDF testObject = new ExcludeSketchUDF();
-
-    BytesWritable intermResult = testObject.evaluate(null, null);
-
-    Memory mem = BytesWritableHelper.wrapAsMemory(intermResult);
-
-    Sketch testResult = Sketches.wrapSketch(mem);
-
-    assertEquals(0.0, testResult.getEstimate());
+    try {
+      BytesWritable intermResult = testObject.evaluate(null, null);
+      fail();
+    } catch (SketchesArgumentException e) {}
   }
 
+  @SuppressWarnings("unused")
   @Test
-  public void evaluateEmpty() {
+  public void evaluateEmpty() { //Current impl is more restrictive than it needs to be.
     ExcludeSketchUDF testObject = new ExcludeSketchUDF();
-
-    BytesWritable intermResult = testObject.evaluate(new BytesWritable(), new BytesWritable());
-
-    Memory mem = BytesWritableHelper.wrapAsMemory(intermResult);
-
-    Sketch testResult = Sketches.wrapSketch(mem);
-
-    assertEquals(0.0, testResult.getEstimate());
+    try {
+      BytesWritable intermResult = testObject.evaluate(new BytesWritable(), new BytesWritable());
+      fail();
+    } catch (SketchesArgumentException e) {}
   }
 
   @Test

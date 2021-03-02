@@ -34,11 +34,11 @@ class UnionState<S extends Summary> extends State<S> {
 
   void init(final int nominalNumEntries, final SummarySetOperations<S> summarySetOps) {
     super.init(nominalNumEntries);
-    union_ = new Union<S>(nominalNumEntries, summarySetOps);
+    union_ = new Union<>(nominalNumEntries, summarySetOps);
   }
 
   void update(final Sketch<S> sketch) {
-    union_.update(sketch);
+    union_.union(sketch);
   }
 
   @Override

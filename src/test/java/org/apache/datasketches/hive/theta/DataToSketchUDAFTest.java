@@ -214,7 +214,7 @@ public class DataToSketchUDAFTest {
       // check if seed is correct in the result
       Union union = SetOperation.builder().setSeed(seed).buildUnion();
       // this must fail if the seed is incompatible
-      union.update(resultSketch);
+      union.union(resultSketch);
     }
   }
 

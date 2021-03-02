@@ -93,7 +93,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
           seedObjectInspector = (PrimitiveObjectInspector) parameters[1];
@@ -102,7 +102,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateObjectInspector = (StandardStructObjectInspector) parameters[0];
       }
 
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the seed
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(SEED_FIELD, SKETCH_FIELD),
@@ -205,7 +205,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
       }
 
       void update(final Memory serializedSketch) {
-        intersection_.update(Sketches.wrapSketch(serializedSketch, seed_));
+        intersection_.intersect(Sketches.wrapSketch(serializedSketch, seed_));
       }
 
       Sketch getResult() {

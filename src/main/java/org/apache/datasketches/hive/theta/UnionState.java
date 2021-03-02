@@ -60,7 +60,7 @@ class UnionState extends AbstractAggregationBuffer {
   }
 
   public void update(final Memory mem) {
-    union_.update(mem);
+    union_.union(mem);
   }
 
   public void update(final Object value, final PrimitiveObjectInspector objectInspector) {

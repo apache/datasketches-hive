@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesUpdatableSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesUpdatableSketchBuilder;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -32,16 +34,13 @@ import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
 @SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToValuesUDTFTest {
@@ -104,8 +103,8 @@ public class ArrayOfDoublesSketchToValuesUDTFTest {
     func.process(new Object[] {new BytesWritable(sketch.toByteArray())});
     Assert.assertEquals(collector.list.size(), 2);
     Assert.assertEquals(((Object[]) collector.list.get(0)).length, 1);
-    Assert.assertEquals(((List<Double>) ((Object[]) collector.list.get(0))[0]), Arrays.asList(1.0, 2.0));
-    Assert.assertEquals(((List<Double>) ((Object[]) collector.list.get(1))[0]), Arrays.asList(1.0, 2.0));
+    Assert.assertEquals((List<Double>) ((Object[]) collector.list.get(0))[0], Arrays.asList(1.0, 2.0));
+    Assert.assertEquals((List<Double>) ((Object[]) collector.list.get(1))[0], Arrays.asList(1.0, 2.0));
   }
 
   private static void checkResultInspector(ObjectInspector resultInspector) {

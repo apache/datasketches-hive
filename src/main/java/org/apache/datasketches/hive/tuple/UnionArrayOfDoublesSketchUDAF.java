@@ -24,7 +24,7 @@ import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
 import java.util.Arrays;
 
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
@@ -91,7 +91,7 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       super.init(mode, inspectors);
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
         sketchInspector_ = (PrimitiveObjectInspector) inspectors[0];
         if (inspectors.length > 1) {
@@ -105,7 +105,7 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateInspector_ = (StructObjectInspector) inspectors[0];
       }
 
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the the nominal number of entries and number of values
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_NUM_ENTRIES_FIELD, NUM_VALUES_FIELD, SKETCH_FIELD),

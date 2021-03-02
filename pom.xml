@@ -21,6 +21,7 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -30,17 +31,14 @@ under the License.
   </parent>
 
   <groupId>org.apache.datasketches</groupId>
-
-  <!-- UNIQUE FOR THIS JAVA COMPONENT -->
   <artifactId>datasketches-hive</artifactId>
   <version>1.2.0-SNAPSHOT</version>
-  <description>Apache Hive adaptors for the DataSketches library.</description>
-  <!-- END: UNIQUE FOR THIS JAVA COMPONENT -->
-
-  <url>https://datasketches.apache.org/</url>
+  <packaging>jar</packaging>
+  
   <name>${project.artifactId}</name>
+  <description>Apache Hive adaptors for the DataSketches library.</description>
+  <url>https://datasketches.apache.org/</url>
   <inceptionYear>2015</inceptionYear>
-  <packaging>jar</packaging> <!-- jar is the default -->
 
   <mailingLists>
     <mailingList>
@@ -85,7 +83,7 @@ under the License.
 
   <properties>
     <!-- UNIQUE FOR THIS JAVA COMPONENT -->
-    <datasketches-java.version>1.3.0-incubating</datasketches-java.version>
+    <datasketches-java.version>2.0.0</datasketches-java.version>
     <hive-exec.version>2.3.4</hive-exec.version>
     <hadoop-common.version>2.8.5</hadoop-common.version>
     <slf4j-simple.version>1.7.30</slf4j-simple.version>
@@ -95,7 +93,7 @@ under the License.
     <testng.version>7.1.0</testng.version>
 
     <!-- System-wide properties -->
-    <maven.version>3.0.0</maven.version>
+    <maven.version>3.5.0</maven.version>
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -105,8 +103,11 @@ under the License.
     <project.build.resourceEncoding>${charset.encoding}</project.build.resourceEncoding>
     <project.reporting.outputEncoding>${charset.encoding}</project.reporting.outputEncoding>
 
-    <!-- org.codehaus.plexus used for strict profile testing-->
-    <plexus-compiler-javac-errorprone.version>2.8.8</plexus-compiler-javac-errorprone.version>
+    <!-- org.codehaus plugins -->
+    <!-- used for strict profile testing-->
+    <plexus-compiler-javac-errorprone.version>2.8.5</plexus-compiler-javac-errorprone.version>
+    <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
+
     <!--  Maven Plugins -->
     <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version> <!-- overrides parent -->
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version> <!-- overrides parent -->
@@ -124,6 +125,7 @@ under the License.
     <!-- org.jacoco Maven Plugins -->
     <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
     <!-- org.eluder Maven Plugins -->
+    <coveralls-repo-token></coveralls-repo-token>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     <!-- other -->
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
@@ -209,6 +211,13 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-maven-plugin.version}</version>
+        </plugin>
+
         <plugin>
           <!-- We want to deploy the artifacts to a staging location for perusal -->
           <!-- Apache Parent pom: apache-release profile -->
@@ -220,12 +229,14 @@ under the License.
             <!-- see maven-install-plugin -->
           </configuration>
         </plugin>
+
         <plugin>
           <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${maven-release-plugin.version}</version>
         </plugin>
+
         <plugin>
           <!-- Extends Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
@@ -234,18 +245,21 @@ under the License.
           <executions>
             <execution>
               <id>default-jar</id>
+              <phase>package</phase>
               <goals>
                 <goal>jar</goal>
               </goals>
             </execution>
             <execution>
               <id>default-test-jar</id>
+              <phase>package</phase>
               <goals>
                 <goal>test-jar</goal>
               </goals>
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
@@ -263,6 +277,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
@@ -293,6 +308,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.rat</groupId>
@@ -312,13 +328,16 @@ under the License.
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
               <!-- rat uses .gitignore for excludes by default -->
+              <exclude>**/*.yaml</exclude>
+              <exclude>**/*.yml</exclude>
+              <exclude>**/.*</exclude>
               <exclude>**/test/resources/**/*.txt</exclude>
-              <exclude>.asf.yaml</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
             </excludes>
           </configuration>
         </plugin>
+
         <plugin>
           <!-- Extends Apache Parent pom, apache-release profile -->
           <groupId>org.apache.maven.plugins</groupId>
@@ -341,6 +360,7 @@ under the License.
             </execution>
           </executions>
         </plugin>
+
         <plugin>
           <!-- Apache Parent pom, pluginManagement-->
           <groupId>org.apache.maven.plugins</groupId>
@@ -352,6 +372,7 @@ under the License.
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
+
         <plugin>
           <!-- Generates code coverage report from website. -->
           <groupId>org.jacoco</groupId>
@@ -359,22 +380,30 @@ under the License.
           <version>${jacoco-maven-plugin.version}</version>
           <executions>
             <execution>
-              <id>prepare-agent</id>
+              <id>default-prepare-agent</id>
               <goals>
                 <goal>prepare-agent</goal>
               </goals>
             </execution>
+            <execution>
+              <id>default-report</id>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>  
           </executions>
         </plugin>
+
         <plugin>
           <!-- Submit code coverage report to Coveralls.io. -->
           <groupId>org.eluder.coveralls</groupId>
           <artifactId>coveralls-maven-plugin</artifactId>
           <version>${coveralls-maven-plugin.version}</version>
           <configuration>
-            <!-- Since we use Travis CI we do not have to put a Coveralls token here. -->
+            <repoToken>${coveralls-repo-token}</repoToken>
           </configuration>
         </plugin>
+
       </plugins>
     </pluginManagement>
     <plugins>

@@ -20,13 +20,12 @@
 package org.apache.datasketches.hive.theta;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
-import org.apache.hadoop.hive.ql.exec.UDF;
-import org.apache.hadoop.io.BytesWritable;
-
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Sketch;
 import org.apache.datasketches.theta.Union;
+import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.io.BytesWritable;
 
 /**
  * Hive estimate sketch UDF.
@@ -65,7 +64,7 @@ public class SampleSketchUDF extends UDF {
     //  The builder will catch errors with improper sketchSize or probability
     Union union = SetOperation.builder().setP(probability).setNominalEntries(sketchSize).buildUnion();
 
-    union.update(serializedSketch); //Union can accept Memory object directly
+    union.union(serializedSketch); //Union can accept Memory object directly
 
     Sketch intermediateSketch = union.getResult(false, null); //to CompactSketch(unordered, on-heap)
     byte[] resultSketch = intermediateSketch.toByteArray();

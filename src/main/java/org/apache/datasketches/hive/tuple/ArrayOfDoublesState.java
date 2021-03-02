@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
 abstract class ArrayOfDoublesState extends AbstractAggregationBuffer {

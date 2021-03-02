@@ -41,7 +41,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
 /**
- * Hive UDAF to create an HllSketch from raw data.
+ * Hive UDAF to create an CPCSketch from raw data.
+ *
+ * <p><b>Note</b> Strings as raw data values are encoded as a UTF-16 VARCHAR
+ * prior to being submitted to the sketch. If the user requires a different
+ * encoding for cross-platform compatibility, it is recommended that these values be encoded prior
+ * to being submitted and then typed as a BINARY byte[].</p>
  */
 @Description(
     name = "dataToSketch",
@@ -51,7 +56,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + "> SELECT dataToSketch(val, 12) FROM src;\n"
     + "The return value is a binary blob that can be operated on by other sketch related functions."
     + " The lgK parameter controls the sketch size and rlative error expected from the sketch."
-    + " It is optional an must be from 4 to 26. The default is 11, which is expected to yield errors"
+    + " It is optional and must be from 4 to 26. The default is 11, which is expected to yield errors"
     + " of roughly +-1.5% in the estimation of uniques with 95% confidence."
     + " The seed parameter is optional")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
@@ -119,7 +124,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       // Different State is used for the iterate phase and the merge phase.
       // SketchState is more space-efficient, so let's use SketchState if possible.
-      if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) { // iterate() will be used
+      if (mode_ == Mode.PARTIAL1 || mode_ == Mode.COMPLETE) { // iterate() will be used
         return new SketchState();
       }
       return new UnionState();
@@ -137,7 +142,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
       mode_ = mode;
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
         inputInspector_ = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
@@ -151,7 +156,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
         intermediateInspector_ = (StructObjectInspector) parameters[0];
       }
 
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the lgK and the target HLL type
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(LG_K_FIELD, SEED_FIELD, SKETCH_FIELD),

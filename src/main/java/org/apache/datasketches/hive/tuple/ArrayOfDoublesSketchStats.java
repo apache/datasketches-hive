@@ -20,8 +20,8 @@
 package org.apache.datasketches.hive.tuple;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketchIterator;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketchIterator;
 
 class ArrayOfDoublesSketchStats {
 

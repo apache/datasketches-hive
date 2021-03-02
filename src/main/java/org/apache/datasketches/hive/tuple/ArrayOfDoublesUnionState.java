@@ -19,9 +19,9 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import org.apache.datasketches.tuple.ArrayOfDoublesSetOperationBuilder;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesUnion;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSetOperationBuilder;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesUnion;
 
 class ArrayOfDoublesUnionState extends ArrayOfDoublesState {
 
@@ -39,7 +39,7 @@ class ArrayOfDoublesUnionState extends ArrayOfDoublesState {
   }
 
   void update(final ArrayOfDoublesSketch sketch) {
-    union_.update(sketch);
+    union_.union(sketch);
   }
 
   @Override

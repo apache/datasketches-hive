@@ -41,6 +41,11 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 
 /**
  * Hive UDAF to create an HllSketch from raw data.
+ *
+ * <p><b>Note</b> Strings as raw data values are encoded as a UTF-16 VARCHAR
+ * prior to being submitted to the sketch. If the user requires a different
+ * encoding for cross-platform compatibility, it is recommended that these values be encoded prior
+ * to being submitted and then typed as a BINARY byte[].</p>
  */
 @Description(
     name = "dataToSketch",

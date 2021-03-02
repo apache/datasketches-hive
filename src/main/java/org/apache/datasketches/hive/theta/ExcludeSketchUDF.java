@@ -61,8 +61,7 @@ public class ExcludeSketchUDF extends UDF {
     }
 
     final AnotB anotb = SetOperation.builder().setSeed(hashSeed).buildANotB();
-    anotb.update(firstSketch, secondSketch);
-    final byte[] excludeSketchBytes = anotb.getResult().toByteArray();
+    final byte[] excludeSketchBytes = anotb.aNotB(firstSketch, secondSketch).toByteArray();
     final BytesWritable result = new BytesWritable();
     result.set(excludeSketchBytes, 0, excludeSketchBytes.length);
     return result;
