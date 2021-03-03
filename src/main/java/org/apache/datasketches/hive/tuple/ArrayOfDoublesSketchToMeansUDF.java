@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;

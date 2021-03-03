@@ -106,6 +106,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
     func.initialize(inspectors);
   }
 
+  @SuppressWarnings("synthetic-access")
   @Test
   public void normalCase() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector, stringInspector };
@@ -173,7 +174,7 @@ public class GetFrequentItemsFromStringsSketchUDTFTest {
 
     @Override
     public void collect(Object object) throws HiveException {
-      list.add(object);
+      this.list.add(object);
     }
 
   }

@@ -59,9 +59,7 @@ public class IntersectSketchUDF extends UDF {
     }
 
     final Intersection intersect = SetOperation.builder().setSeed(hashSeed).buildIntersection();
-    intersect.update(firstSketch);
-    intersect.update(secondSketch);
-    return new BytesWritable(intersect.getResult().toByteArray());
+    return new BytesWritable(intersect.intersect(firstSketch, secondSketch).toByteArray());
   }
 
   /**

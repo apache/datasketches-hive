@@ -31,39 +31,39 @@ class ItemsState<T> extends AbstractAggregationBuffer {
   private ItemsSketch<T> sketch;
 
   ItemsState(final ArrayOfItemsSerDe<T> serDe) {
-    serDe_ = serDe;
+    this.serDe_ = serDe;
   }
 
   // initializing maxMapSize is needed for building sketches using update(value)
   // not needed for merging sketches using update(sketch)
   void init(final int maxMapSize) {
-    maxMapSize_ = maxMapSize;
-    sketch = new ItemsSketch<>(maxMapSize_);
+    this.maxMapSize_ = maxMapSize;
+    this.sketch = new ItemsSketch<>(this.maxMapSize_);
   }
 
   boolean isInitialized() {
-    return sketch != null;
+    return this.sketch != null;
   }
 
   void update(final T value) {
-    sketch.update(value);
+    this.sketch.update(value);
   }
 
   void update(final Memory serializedSketch) {
-    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(serializedSketch, serDe_);
-    if (sketch == null) {
-      sketch = incomingSketch;
+    final ItemsSketch<T> incomingSketch = ItemsSketch.getInstance(serializedSketch, this.serDe_);
+    if (this.sketch == null) {
+      this.sketch = incomingSketch;
     } else {
-      sketch.merge(incomingSketch);
+      this.sketch.merge(incomingSketch);
     }
   }
 
   public ItemsSketch<T> getResult() {
-    return sketch;
+    return this.sketch;
   }
 
   void reset() {
-    sketch = null;
+    this.sketch = null;
   }
 
 }

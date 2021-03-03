@@ -33,36 +33,36 @@ class DoublesUnionState extends AbstractAggregationBuffer {
   void init(final int k) {
     final DoublesUnionBuilder unionBuilder = DoublesUnion.builder();
     if (k > 0) { unionBuilder.setMaxK(k); }
-    union = unionBuilder.build();
+    this.union = unionBuilder.build();
   }
 
   boolean isInitialized() {
-    return union != null;
+    return this.union != null;
   }
 
   void update(final double value) {
-    if (union == null) {
-      union = DoublesUnion.builder().build();
+    if (this.union == null) {
+      this.union = DoublesUnion.builder().build();
     }
-    union.update(value);
+    this.union.update(value);
   }
 
   void update(final Memory serializedSketch) {
     final DoublesSketch incomingSketch = DoublesSketch.wrap(serializedSketch);
-    if (union == null) {
-      union = DoublesUnion.heapify(incomingSketch);
+    if (this.union == null) {
+      this.union = DoublesUnion.heapify(incomingSketch);
     } else {
-      union.update(incomingSketch);
+      this.union.update(incomingSketch);
     }
   }
 
   public DoublesSketch getResult() {
-    if (union == null) { return null; }
-    return union.getResultAndReset();
+    if (this.union == null) { return null; }
+    return this.union.getResultAndReset();
   }
 
   void reset() {
-    union = null;
+    this.union = null;
   }
 
 }

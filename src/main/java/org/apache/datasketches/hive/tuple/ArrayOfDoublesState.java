@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;
 
 abstract class ArrayOfDoublesState extends AbstractAggregationBuffer {
@@ -28,16 +28,16 @@ abstract class ArrayOfDoublesState extends AbstractAggregationBuffer {
   private int numValues_;
 
   void init(final int numNominalEntries, final int numValues) {
-    nominalNumEntries_ = numNominalEntries;
-    numValues_ = numValues;
+    this.nominalNumEntries_ = numNominalEntries;
+    this.numValues_ = numValues;
   }
 
   int getNominalNumEntries() {
-    return nominalNumEntries_;
+    return this.nominalNumEntries_;
   }
 
   int getNumValues() {
-    return numValues_;
+    return this.numValues_;
   }
 
   abstract ArrayOfDoublesSketch getResult();

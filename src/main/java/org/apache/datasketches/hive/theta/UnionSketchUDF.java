@@ -54,12 +54,12 @@ public class UnionSketchUDF extends UDF {
 
     final Union union = SetOperation.builder().setSeed(seed).setNominalEntries(sketchSize).buildUnion();
 
-    if ((firstSketch != null) && (firstSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
-      union.update(BytesWritableHelper.wrapAsMemory(firstSketch));
+    if (firstSketch != null && firstSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES) {
+      union.union(BytesWritableHelper.wrapAsMemory(firstSketch));
     }
 
-    if ((secondSketch != null) && (secondSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES)) {
-      union.update(BytesWritableHelper.wrapAsMemory(secondSketch));
+    if (secondSketch != null && secondSketch.getLength() >= EMPTY_SKETCH_SIZE_BYTES) {
+      union.union(BytesWritableHelper.wrapAsMemory(secondSketch));
     }
 
     return new BytesWritable(union.getResult().toByteArray());

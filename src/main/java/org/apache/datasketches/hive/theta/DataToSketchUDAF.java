@@ -41,6 +41,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 
+/**
+ * <p><b>Note</b> Strings as raw data values are encoded as a UTF-16 VARCHAR
+ * prior to being submitted to the sketch. If the user requires a different
+ * encoding for cross-platform compatibility, it is recommended that these values be encoded prior
+ * to being submitted and then typed as a BINARY byte[].</p>
+ */
 @Description(
     name = "dataToSketch",
     value = "_FUNC_(expr, size, prob, seed) - "
@@ -141,24 +147,24 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
 
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
-        inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+        this.inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
+          this.nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          samplingProbabilityObjectInspector = (PrimitiveObjectInspector) parameters[2];
+          this.samplingProbabilityObjectInspector = (PrimitiveObjectInspector) parameters[2];
         }
         if (parameters.length > 3) {
-          seedObjectInspector = (PrimitiveObjectInspector) parameters[3];
+          this.seedObjectInspector = (PrimitiveObjectInspector) parameters[3];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
-        intermediateObjectInspector = (StructObjectInspector) parameters[0];
+        this.intermediateObjectInspector = (StructObjectInspector) parameters[0];
       }
 
-      if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
+      if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
         // intermediate results need to include the the nominal number of entries and the seed
         return ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList(NOMINAL_ENTRIES_FIELD, SEED_FIELD, SKETCH_FIELD),
@@ -190,22 +196,22 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      state.update(parameters[0], inputObjectInspector);
+      state.update(parameters[0], this.inputObjectInspector);
     }
 
     private void initializeState(final UnionState state, final Object[] parameters) {
       int sketchSize = DEFAULT_NOMINAL_ENTRIES;
-      if (nominalEntriesObjectInspector != null) {
-        sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);
+      if (this.nominalEntriesObjectInspector != null) {
+        sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.nominalEntriesObjectInspector);
       }
       float samplingProbability = UnionState.DEFAULT_SAMPLING_PROBABILITY;
-      if (samplingProbabilityObjectInspector != null) {
+      if (this.samplingProbabilityObjectInspector != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(parameters[2],
-            samplingProbabilityObjectInspector);
+            this.samplingProbabilityObjectInspector);
       }
       long seed = DEFAULT_UPDATE_SEED;
-      if (seedObjectInspector != null) {
-        seed = PrimitiveObjectInspectorUtils.getLong(parameters[3], seedObjectInspector);
+      if (this.seedObjectInspector != null) {
+        seed = PrimitiveObjectInspectorUtils.getLong(parameters[3], this.seedObjectInspector);
       }
       state.init(sketchSize, samplingProbability, seed);
     }

@@ -90,16 +90,16 @@ public abstract class UnionEvaluator extends GenericUDAFEvaluator {
       initializeState(state, partial);
     }
     final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
-        (BytesWritable) intermediateObjectInspector.getStructFieldData(
-            partial, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD)));
+        (BytesWritable) this.intermediateObjectInspector.getStructFieldData(
+            partial, this.intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD)));
     state.update(serializedSketch);
   }
 
   private void initializeState(final UnionState state, final Object partial) {
-    final int nominalEntries = ((IntWritable) intermediateObjectInspector.getStructFieldData(
-        partial, intermediateObjectInspector.getStructFieldRef(NOMINAL_ENTRIES_FIELD))).get();
-    final long seed = ((LongWritable) intermediateObjectInspector.getStructFieldData(
-        partial, intermediateObjectInspector.getStructFieldRef(SEED_FIELD))).get();
+    final int nominalEntries = ((IntWritable) this.intermediateObjectInspector.getStructFieldData(
+        partial, this.intermediateObjectInspector.getStructFieldRef(NOMINAL_ENTRIES_FIELD))).get();
+    final long seed = ((LongWritable) this.intermediateObjectInspector.getStructFieldData(
+        partial, this.intermediateObjectInspector.getStructFieldRef(SEED_FIELD))).get();
     state.init(nominalEntries, seed);
   }
 

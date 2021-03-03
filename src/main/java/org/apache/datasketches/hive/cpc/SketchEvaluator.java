@@ -61,23 +61,24 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
   }
 
   @Override
-  public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object data)
+  @SuppressWarnings("deprecation")
+  public void merge(final AggregationBuffer buf, final Object data)
       throws HiveException {
     if (data == null) { return; }
     final UnionState state = (UnionState) buf;
     if (!state.isInitialized()) {
       initializeState(state, data);
     }
-    final BytesWritable serializedSketch = (BytesWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
+    final BytesWritable serializedSketch = (BytesWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
     state.update(CpcSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch), state.getSeed()));
   }
 
   private void initializeState(final UnionState state, final Object data) {
-    final int lgK = ((IntWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(LG_K_FIELD))).get();
-    final long seed = ((LongWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(SEED_FIELD))).get();
+    final int lgK = ((IntWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(LG_K_FIELD))).get();
+    final long seed = ((LongWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(SEED_FIELD))).get();
     state.init(lgK, seed);
   }
 

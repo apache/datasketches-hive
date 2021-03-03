@@ -117,16 +117,16 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       super.init(mode, parameters);
 
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
-        inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+        this.inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
+          this.nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          seedObjectInspector = (PrimitiveObjectInspector) parameters[2];
+          this.seedObjectInspector = (PrimitiveObjectInspector) parameters[2];
         }
       } else {
         // mode = partial2 || final
-        intermediateObjectInspector = (StandardStructObjectInspector) parameters[0];
+        this.intermediateObjectInspector = (StandardStructObjectInspector) parameters[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -160,19 +160,19 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      final byte[] serializedSketch = (byte[]) inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
+      final byte[] serializedSketch = (byte[]) this.inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
       if (serializedSketch == null) { return; }
       state.update(Memory.wrap(serializedSketch));
     }
 
     private void initializeState(final UnionState state, final Object[] parameters) {
       int nominalEntries = DEFAULT_NOMINAL_ENTRIES;
-      if (nominalEntriesObjectInspector != null) {
-        nominalEntries = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);
+      if (this.nominalEntriesObjectInspector != null) {
+        nominalEntries = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.nominalEntriesObjectInspector);
       }
       long seed = DEFAULT_UPDATE_SEED;
-      if (seedObjectInspector != null) {
-        seed = PrimitiveObjectInspectorUtils.getLong(parameters[2], seedObjectInspector);
+      if (this.seedObjectInspector != null) {
+        seed = PrimitiveObjectInspectorUtils.getLong(parameters[2], this.seedObjectInspector);
       }
       state.init(nominalEntries, seed);
     }

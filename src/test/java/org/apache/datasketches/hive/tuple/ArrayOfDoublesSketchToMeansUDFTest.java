@@ -22,8 +22,8 @@ package org.apache.datasketches.hive.tuple;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesUpdatableSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesUpdatableSketchBuilder;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;

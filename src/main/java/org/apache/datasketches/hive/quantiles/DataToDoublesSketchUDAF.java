@@ -61,11 +61,11 @@ public class DataToDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
       if (data[0] == null) { return; }
       final DoublesUnionState state = (DoublesUnionState) buf;
-      if (!state.isInitialized() && (kObjectInspector != null)) {
-        final int k = PrimitiveObjectInspectorUtils.getInt(data[1], kObjectInspector);
+      if (!state.isInitialized() && (this.kObjectInspector != null)) {
+        final int k = PrimitiveObjectInspectorUtils.getInt(data[1], this.kObjectInspector);
         state.init(k);
       }
-      final double value = (double) inputObjectInspector.getPrimitiveJavaObject(data[0]);
+      final double value = (double) this.inputObjectInspector.getPrimitiveJavaObject(data[0]);
       state.update(value);
     }
 

@@ -70,16 +70,16 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
     if (!state.isInitialized()) {
       initializeState(state, data);
     }
-    final BytesWritable serializedSketch = (BytesWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
+    final BytesWritable serializedSketch = (BytesWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
     state.update(HllSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch)));
   }
 
   private void initializeState(final UnionState state, final Object data) {
-    final int lgK = ((IntWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(LG_K_FIELD))).get();
-    final TgtHllType type = TgtHllType.valueOf(((Text) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(HLL_TYPE_FIELD))).toString());
+    final int lgK = ((IntWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(LG_K_FIELD))).get();
+    final TgtHllType type = TgtHllType.valueOf(((Text) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(HLL_TYPE_FIELD))).toString());
     state.init(lgK, type);
   }
 

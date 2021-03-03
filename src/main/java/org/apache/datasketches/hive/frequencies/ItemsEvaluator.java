@@ -37,13 +37,13 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
   protected PrimitiveObjectInspector inputObjectInspector;
 
   ItemsEvaluator(final ArrayOfItemsSerDe<T> serDe) {
-    serDe_ = serDe;
+    this.serDe_ = serDe;
   }
 
   @Override
   public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
     super.init(mode, parameters);
-    inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+    this.inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
     return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveCategory.BINARY);
   }
 
@@ -68,7 +68,7 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     @SuppressWarnings("unchecked")
     final ItemsState<T> state = (ItemsState<T>) buf;
     final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
-        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data));
+        (BytesWritable) this.inputObjectInspector.getPrimitiveWritableObject(data));
     state.update(serializedSketch);
   }
 
@@ -79,13 +79,13 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     final ItemsState<T> state = (ItemsState<T>) buf;
     final ItemsSketch<T> resultSketch = state.getResult();
     if (resultSketch == null) { return null; }
-    return new BytesWritable(resultSketch.toByteArray(serDe_));
+    return new BytesWritable(resultSketch.toByteArray(this.serDe_));
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-    return new ItemsState<>(serDe_);
+    return new ItemsState<>(this.serDe_);
   }
 
 }

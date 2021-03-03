@@ -41,21 +41,21 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
   protected PrimitiveObjectInspector kObjectInspector;
 
   ItemsEvaluator(final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
-    comparator_ = comparator;
-    serDe_ = serDe;
+    this.comparator_ = comparator;
+    this.serDe_ = serDe;
   }
 
   @Override
   public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
     super.init(mode, parameters);
-    inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+    this.inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
 
     // Parameters:
     // In PARTIAL1 and COMPLETE mode, the parameters are original data.
     // In PARTIAL2 and FINAL mode, the parameters are partial aggregations.
     if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
       if (parameters.length > 1) {
-        kObjectInspector = (PrimitiveObjectInspector) parameters[1];
+        this.kObjectInspector = (PrimitiveObjectInspector) parameters[1];
       }
     }
 
@@ -83,7 +83,7 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     @SuppressWarnings("unchecked")
     final ItemsUnionState<T> state = (ItemsUnionState<T>) buf;
     final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
-        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data));
+        (BytesWritable) this.inputObjectInspector.getPrimitiveWritableObject(data));
     state.update(serializedSketch);
   }
 
@@ -94,13 +94,13 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
     final ItemsUnionState<T> state = (ItemsUnionState<T>) buf;
     final ItemsSketch<T> resultSketch = state.getResult();
     if (resultSketch == null) { return null; }
-    return new BytesWritable(resultSketch.toByteArray(serDe_));
+    return new BytesWritable(resultSketch.toByteArray(this.serDe_));
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-    return new ItemsUnionState<T>(comparator_, serDe_);
+    return new ItemsUnionState<>(this.comparator_, this.serDe_);
   }
 
 }

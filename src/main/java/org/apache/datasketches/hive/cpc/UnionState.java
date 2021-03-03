@@ -28,28 +28,28 @@ class UnionState extends State {
 
   @Override
   boolean isInitialized() {
-    return union_ != null;
+    return this.union_ != null;
   }
 
   @Override
   void init(final int lgK, final long seed) {
     super.init(lgK, seed);
-    union_ = new CpcUnion(lgK, seed);
+    this.union_ = new CpcUnion(lgK, seed);
   }
 
   void update(final CpcSketch sketch) {
-    union_.update(sketch);
+    this.union_.update(sketch);
   }
 
   @Override
   CpcSketch getResult() {
-    if (union_ == null) { return null; }
-    return union_.getResult();
+    if (this.union_ == null) { return null; }
+    return this.union_.getResult();
   }
 
   @Override
   void reset() {
-    union_ = null;
+    this.union_ = null;
   }
 
 }

@@ -25,8 +25,8 @@ import java.util.List;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
@@ -48,7 +48,7 @@ public class ArrayOfDoublesSketchesTTestUDF extends UDF {
    * @return list of p-values
    */
   public List<Double> evaluate(final BytesWritable serializedSketchA, final BytesWritable serializedSketchB) {
-    if ((serializedSketchA == null) || (serializedSketchB == null)) { return null; }
+    if (serializedSketchA == null || serializedSketchB == null) { return null; }
     final ArrayOfDoublesSketch sketchA =
         ArrayOfDoublesSketches.wrapSketch(BytesWritableHelper.wrapAsMemory(serializedSketchA));
     final ArrayOfDoublesSketch sketchB =
@@ -59,7 +59,7 @@ public class ArrayOfDoublesSketchesTTestUDF extends UDF {
     }
 
     // If the sketches contain fewer than 2 values, the p-value can't be calculated
-    if ((sketchA.getRetainedEntries() < 2) || (sketchB.getRetainedEntries() < 2)) {
+    if (sketchA.getRetainedEntries() < 2 || sketchB.getRetainedEntries() < 2) {
       return null;
     }
 

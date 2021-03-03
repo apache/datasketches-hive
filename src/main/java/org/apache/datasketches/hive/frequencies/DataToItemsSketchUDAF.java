@@ -84,7 +84,7 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       // In PARTIAL2 and FINAL mode, the parameters are just partial aggregations.
       if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         if (parameters.length > 1) {
-          maxMapSizeObjectInspector = (PrimitiveObjectInspector) parameters[1];
+          this.maxMapSizeObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }
       }
 
@@ -98,10 +98,10 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       @SuppressWarnings("unchecked")
       final ItemsState<T> state = (ItemsState<T>) buf;
       if (!state.isInitialized()) {
-        final int maxMapSize = PrimitiveObjectInspectorUtils.getInt(data[1], maxMapSizeObjectInspector);
+        final int maxMapSize = PrimitiveObjectInspectorUtils.getInt(data[1], this.maxMapSizeObjectInspector);
         state.init(maxMapSize);
       }
-      state.update(extractValue(data[0], inputObjectInspector));
+      state.update(extractValue(data[0], this.inputObjectInspector));
     }
 
     public abstract T extractValue(final Object data, final ObjectInspector objectInspector)

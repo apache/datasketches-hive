@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketchIterator;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketchIterator;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -53,10 +53,10 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
       throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
           + inspectors[0].getCategory().name() + " was recieved");
     }
-    inputObjectInspector = (PrimitiveObjectInspector) inspectors[0];
-    if (inputObjectInspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
+    this.inputObjectInspector = (PrimitiveObjectInspector) inspectors[0];
+    if (this.inputObjectInspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
       throw new UDFArgumentTypeException(0, "Binary value expected as the first argument, but "
-          + inputObjectInspector.getPrimitiveCategory().name() + " was recieved");
+          + this.inputObjectInspector.getPrimitiveCategory().name() + " was recieved");
     }
 
     return ObjectInspectorFactory.getStandardStructObjectInspector(
@@ -73,7 +73,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
   public void process(final Object[] data) throws HiveException {
     if (data == null || data[0] == null) { return; }
     final BytesWritable serializedSketch =
-      (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
+      (BytesWritable) this.inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ArrayOfDoublesSketch sketch = ArrayOfDoublesSketches.wrapSketch(
         BytesWritableHelper.wrapAsMemory(serializedSketch));
     final ArrayOfDoublesSketchIterator it = sketch.iterator();

@@ -41,6 +41,11 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 
 /**
  * Hive UDAF to create an HllSketch from raw data.
+ *
+ * <p><b>Note</b> Strings as raw data values are encoded as a UTF-16 VARCHAR
+ * prior to being submitted to the sketch. If the user requires a different
+ * encoding for cross-platform compatibility, it is recommended that these values be encoded prior
+ * to being submitted and then typed as a BINARY byte[].</p>
  */
 @Description(
     name = "dataToSketch",
@@ -123,7 +128,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       // so the mode_ was null. A solution was implemented to have UnionState, which can work
       // in both cases, but SketchState is more space-efficient.
       // HLL sketch is about compactness, so let's use SketchState if possible.
-      if (mode_ == Mode.PARTIAL1 || mode_ == Mode.COMPLETE) { // iterate() will be used
+      if (this.mode_ == Mode.PARTIAL1 || this.mode_ == Mode.COMPLETE) { // iterate() will be used
         return new SketchState();
       }
       return new UnionState();
@@ -140,19 +145,19 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
-      mode_ = mode;
+      this.mode_ = mode;
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
-        inputInspector_ = (PrimitiveObjectInspector) parameters[0];
+        this.inputInspector_ = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
+          this.lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          hllTypeInspector_ = (PrimitiveObjectInspector) parameters[2];
+          this.hllTypeInspector_ = (PrimitiveObjectInspector) parameters[2];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
-        intermediateInspector_ = (StructObjectInspector) parameters[0];
+        this.intermediateInspector_ = (StructObjectInspector) parameters[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -187,17 +192,17 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      state.update(parameters[0], inputInspector_);
+      state.update(parameters[0], this.inputInspector_);
     }
 
     private void initializeState(final State state, final Object[] parameters) {
       int lgK = DEFAULT_LG_K;
-      if (lgKInspector_ != null) {
-        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], lgKInspector_);
+      if (this.lgKInspector_ != null) {
+        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.lgKInspector_);
       }
       TgtHllType type = DEFAULT_HLL_TYPE;
-      if (hllTypeInspector_ != null) {
-        type = TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], hllTypeInspector_));
+      if (this.hllTypeInspector_ != null) {
+        type = TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], this.hllTypeInspector_));
       }
       state.init(lgK, type);
     }

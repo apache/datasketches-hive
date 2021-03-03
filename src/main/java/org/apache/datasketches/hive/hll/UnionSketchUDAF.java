@@ -130,16 +130,16 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       super.init(mode, parameters);
 
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
-        inputInspector_ = (PrimitiveObjectInspector) parameters[0];
+        this.inputInspector_ = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
+          this.lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          hllTypeInspector_ = (PrimitiveObjectInspector) parameters[2];
+          this.hllTypeInspector_ = (PrimitiveObjectInspector) parameters[2];
         }
       } else {
         // mode = partial2 || final
-        intermediateInspector_ = (StandardStructObjectInspector) parameters[0];
+        this.intermediateInspector_ = (StandardStructObjectInspector) parameters[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -173,19 +173,19 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      final byte[] serializedSketch = (byte[]) inputInspector_.getPrimitiveJavaObject(parameters[0]);
+      final byte[] serializedSketch = (byte[]) this.inputInspector_.getPrimitiveJavaObject(parameters[0]);
       if (serializedSketch == null) { return; }
       state.update(HllSketch.wrap(Memory.wrap(serializedSketch)));
     }
 
     private void initializeState(final UnionState state, final Object[] parameters) {
       int lgK = DEFAULT_LG_K;
-      if (lgKInspector_ != null) {
-        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], lgKInspector_);
+      if (this.lgKInspector_ != null) {
+        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.lgKInspector_);
       }
       TgtHllType type = DEFAULT_HLL_TYPE;
-      if (hllTypeInspector_ != null) {
-        type = TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], hllTypeInspector_));
+      if (this.hllTypeInspector_ != null) {
+        type = TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], this.hllTypeInspector_));
       }
       state.init(lgK, type);
     }

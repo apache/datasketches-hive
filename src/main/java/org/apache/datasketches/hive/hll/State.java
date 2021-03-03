@@ -30,16 +30,16 @@ abstract class State extends AbstractAggregationBuffer {
   private TgtHllType type_;
 
   void init(final int lgK, final TgtHllType type) {
-    lgK_ = lgK;
-    type_ = type;
+    this.lgK_ = lgK;
+    this.type_ = type;
   }
 
   int getLgK() {
-    return lgK_;
+    return this.lgK_;
   }
 
   TgtHllType getType() {
-    return type_;
+    return this.type_;
   }
 
   abstract boolean isInitialized();

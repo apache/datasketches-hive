@@ -19,12 +19,11 @@
 
 package org.apache.datasketches.hive.tuple;
 
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesUpdatableSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesUpdatableSketchBuilder;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesUpdatableSketchBuilder;
 
 @SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToNumberOfRetainedEntriesUDFTest {

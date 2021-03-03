@@ -38,14 +38,14 @@ abstract class DoublesEvaluator extends GenericUDAFEvaluator {
   @Override
   public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
     super.init(mode, parameters);
-    inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+    this.inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
 
     // Parameters:
     // In PARTIAL1 and COMPLETE mode, the parameters are original data.
     // In PARTIAL2 and FINAL mode, the parameters are partial aggregations.
     if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
       if (parameters.length > 1) {
-        kObjectInspector = (PrimitiveObjectInspector) parameters[1];
+        this.kObjectInspector = (PrimitiveObjectInspector) parameters[1];
       }
     }
 
@@ -71,7 +71,7 @@ abstract class DoublesEvaluator extends GenericUDAFEvaluator {
     if (data == null) { return; }
     final DoublesUnionState state = (DoublesUnionState) buf;
     final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
-        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data));
+        (BytesWritable) this.inputObjectInspector.getPrimitiveWritableObject(data));
     state.update(serializedSketch);
   }
 

@@ -23,8 +23,8 @@ import java.util.Arrays;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketch;
-import org.apache.datasketches.tuple.ArrayOfDoublesSketches;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
+import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketches;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
@@ -64,16 +64,16 @@ abstract class ArrayOfDoublesSketchEvaluator extends GenericUDAFEvaluator {
       initializeState(state, data);
     }
     final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
-        (BytesWritable) intermediateInspector_.getStructFieldData(
-            data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD)));
+        (BytesWritable) this.intermediateInspector_.getStructFieldData(
+            data, this.intermediateInspector_.getStructFieldRef(SKETCH_FIELD)));
     state.update(ArrayOfDoublesSketches.wrapSketch(serializedSketch));
   }
 
   private void initializeState(final ArrayOfDoublesUnionState state, final Object data) {
-    final int nominalNumEntries = ((IntWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(NOMINAL_NUM_ENTRIES_FIELD))).get();
-    final int numValues = ((IntWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(NUM_VALUES_FIELD))).get();
+    final int nominalNumEntries = ((IntWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(NOMINAL_NUM_ENTRIES_FIELD))).get();
+    final int numValues = ((IntWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(NUM_VALUES_FIELD))).get();
     state.init(nominalNumEntries, numValues);
   }
 

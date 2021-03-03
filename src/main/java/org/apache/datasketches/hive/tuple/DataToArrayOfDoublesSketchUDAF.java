@@ -106,31 +106,31 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
-      mode_ = mode;
+      this.mode_ = mode;
       if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
-        keyInspector_ = (PrimitiveObjectInspector) parameters[0];
-        numValues_ = 0;
-        while ((numValues_ + 1) < parameters.length) {
-          if (((PrimitiveObjectInspector) parameters[numValues_ + 1]).getPrimitiveCategory()
+        this.keyInspector_ = (PrimitiveObjectInspector) parameters[0];
+        this.numValues_ = 0;
+        while ((this.numValues_ + 1) < parameters.length) {
+          if (((PrimitiveObjectInspector) parameters[this.numValues_ + 1]).getPrimitiveCategory()
               != PrimitiveCategory.DOUBLE) {
             break;
           }
-          numValues_++;
+          this.numValues_++;
         }
-        valuesInspectors_ = new PrimitiveObjectInspector[numValues_];
-        for (int i = 0; i < numValues_; i++) {
-          valuesInspectors_[i] = (PrimitiveObjectInspector) parameters[i + 1];
+        this.valuesInspectors_ = new PrimitiveObjectInspector[this.numValues_];
+        for (int i = 0; i < this.numValues_; i++) {
+          this.valuesInspectors_[i] = (PrimitiveObjectInspector) parameters[i + 1];
         }
-        if (parameters.length > (numValues_ + 1)) {
-          nominalNumEntriesInspector_ = (PrimitiveObjectInspector) parameters[numValues_ + 1];
+        if (parameters.length > (this.numValues_ + 1)) {
+          this.nominalNumEntriesInspector_ = (PrimitiveObjectInspector) parameters[this.numValues_ + 1];
         }
-        if (parameters.length > (numValues_ + 2)) {
-          samplingProbabilityInspector_ = (PrimitiveObjectInspector) parameters[numValues_ + 2];
+        if (parameters.length > (this.numValues_ + 2)) {
+          this.samplingProbabilityInspector_ = (PrimitiveObjectInspector) parameters[this.numValues_ + 2];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
-        intermediateInspector_ = (StructObjectInspector) parameters[0];
+        this.intermediateInspector_ = (StructObjectInspector) parameters[0];
       }
 
       if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
@@ -156,27 +156,27 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
       if (!state.isInitialized()) {
         initializeState(state, data);
       }
-      state.update(data, keyInspector_, valuesInspectors_);
+      state.update(data, this.keyInspector_, this.valuesInspectors_);
     }
 
     private void initializeState(final ArrayOfDoublesSketchState state, final Object[] data) {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
-      if (nominalNumEntriesInspector_ != null) {
+      if (this.nominalNumEntriesInspector_ != null) {
         nominalNumEntries =
-            PrimitiveObjectInspectorUtils.getInt(data[numValues_ + 1], nominalNumEntriesInspector_);
+            PrimitiveObjectInspectorUtils.getInt(data[this.numValues_ + 1], this.nominalNumEntriesInspector_);
       }
       float samplingProbability = DEFAULT_SAMPLING_PROBABILITY;
-      if (samplingProbabilityInspector_ != null) {
-        samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[numValues_ + 2],
-            samplingProbabilityInspector_);
+      if (this.samplingProbabilityInspector_ != null) {
+        samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[this.numValues_ + 2],
+            this.samplingProbabilityInspector_);
       }
-      state.init(nominalNumEntries, samplingProbability, numValues_);
+      state.init(nominalNumEntries, samplingProbability, this.numValues_);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      if ((mode_ == Mode.PARTIAL1) || (mode_ == Mode.COMPLETE)) {
+      if ((this.mode_ == Mode.PARTIAL1) || (this.mode_ == Mode.COMPLETE)) {
         return new ArrayOfDoublesSketchState();
       }
       return new ArrayOfDoublesUnionState();

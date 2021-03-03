@@ -28,11 +28,11 @@ abstract class State<S extends Summary> extends AbstractAggregationBuffer {
   private int nominalNumEntries_;
 
   void init(final int nominalNumEntries) {
-    nominalNumEntries_ = nominalNumEntries;
+    this.nominalNumEntries_ = nominalNumEntries;
   }
 
   int getNominalNumEntries() {
-    return nominalNumEntries_;
+    return this.nominalNumEntries_;
   }
 
   abstract Sketch<S> getResult();

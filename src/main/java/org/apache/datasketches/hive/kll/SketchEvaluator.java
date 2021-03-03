@@ -38,14 +38,14 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
   @Override
   public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
     super.init(mode, parameters);
-    inputInspector_ = (PrimitiveObjectInspector) parameters[0];
+    this.inputInspector_ = (PrimitiveObjectInspector) parameters[0];
 
     // Parameters:
     // In PARTIAL1 and COMPLETE mode, the parameters are original data.
     // In PARTIAL2 and FINAL mode, the parameters are partial aggregations.
     if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
       if (parameters.length > 1) {
-        kInspector_ = (PrimitiveObjectInspector) parameters[1];
+        this.kInspector_ = (PrimitiveObjectInspector) parameters[1];
       }
     }
 
@@ -71,7 +71,7 @@ abstract class SketchEvaluator extends GenericUDAFEvaluator {
     if (data == null) { return; }
     final SketchState state = (SketchState) buf;
     final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
-        (BytesWritable) inputInspector_.getPrimitiveWritableObject(data));
+        (BytesWritable) this.inputInspector_.getPrimitiveWritableObject(data));
     state.update(KllFloatsSketch.heapify(serializedSketch));
   }
 

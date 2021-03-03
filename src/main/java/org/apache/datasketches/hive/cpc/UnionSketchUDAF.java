@@ -130,16 +130,16 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       super.init(mode, parameters);
 
       if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
-        inputInspector_ = (PrimitiveObjectInspector) parameters[0];
+        this.inputInspector_ = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
+          this.lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          seedInspector_ = (PrimitiveObjectInspector) parameters[2];
+          this.seedInspector_ = (PrimitiveObjectInspector) parameters[2];
         }
       } else {
         // mode = partial2 || final
-        intermediateInspector_ = (StandardStructObjectInspector) parameters[0];
+        this.intermediateInspector_ = (StandardStructObjectInspector) parameters[0];
       }
 
       if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
@@ -173,19 +173,19 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      final byte[] serializedSketch = (byte[]) inputInspector_.getPrimitiveJavaObject(parameters[0]);
+      final byte[] serializedSketch = (byte[]) this.inputInspector_.getPrimitiveJavaObject(parameters[0]);
       if (serializedSketch == null) { return; }
       state.update(CpcSketch.heapify(Memory.wrap(serializedSketch), state.getSeed()));
     }
 
     private void initializeState(final UnionState state, final Object[] parameters) {
       int lgK = DEFAULT_LG_K;
-      if (lgKInspector_ != null) {
-        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], lgKInspector_);
+      if (this.lgKInspector_ != null) {
+        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.lgKInspector_);
       }
       long seed = DEFAULT_UPDATE_SEED;
-      if (seedInspector_ != null) {
-        seed = PrimitiveObjectInspectorUtils.getLong(parameters[2], seedInspector_);
+      if (this.seedInspector_ != null) {
+        seed = PrimitiveObjectInspectorUtils.getLong(parameters[2], this.seedInspector_);
       }
       state.init(lgK, seed);
     }
