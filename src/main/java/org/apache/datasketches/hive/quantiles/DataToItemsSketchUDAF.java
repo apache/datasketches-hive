@@ -66,11 +66,11 @@ public abstract class DataToItemsSketchUDAF<T> extends AbstractGenericUDAFResolv
       if (data[0] == null) { return; }
       @SuppressWarnings("unchecked")
       final ItemsUnionState<T> state = (ItemsUnionState<T>) buf;
-      if (!state.isInitialized() && (kObjectInspector != null)) {
-        final int k = PrimitiveObjectInspectorUtils.getInt(data[1], kObjectInspector);
+      if (!state.isInitialized() && (this.kObjectInspector != null)) {
+        final int k = PrimitiveObjectInspectorUtils.getInt(data[1], this.kObjectInspector);
         state.init(k);
       }
-      state.update(extractValue(data[0], inputObjectInspector));
+      state.update(extractValue(data[0], this.inputObjectInspector));
     }
 
     public abstract T extractValue(final Object data, final ObjectInspector objectInspector)

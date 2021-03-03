@@ -30,12 +30,12 @@ class ArrayOfDoublesSketchState extends ArrayOfDoublesState {
   private ArrayOfDoublesUpdatableSketch sketch_;
 
   boolean isInitialized() {
-    return sketch_ != null;
+    return this.sketch_ != null;
   }
 
   void init(final int nominalNumEntries, final float samplingProbability, final int numValues) {
     super.init(nominalNumEntries, numValues);
-    sketch_ = new ArrayOfDoublesUpdatableSketchBuilder().setNominalEntries(nominalNumEntries)
+    this.sketch_ = new ArrayOfDoublesUpdatableSketchBuilder().setNominalEntries(nominalNumEntries)
         .setSamplingProbability(samplingProbability).setNumberOfValues(numValues).build();
   }
 
@@ -47,25 +47,25 @@ class ArrayOfDoublesSketchState extends ArrayOfDoublesState {
     }
     switch (keyInspector.getPrimitiveCategory()) {
     case BINARY:
-      sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data[0], keyInspector).copyBytes(), values);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data[0], keyInspector).copyBytes(), values);
       return;
     case BYTE:
-      sketch_.update(PrimitiveObjectInspectorUtils.getByte(data[0], keyInspector), values);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getByte(data[0], keyInspector), values);
       return;
     case DOUBLE:
-      sketch_.update(PrimitiveObjectInspectorUtils.getDouble(data[0], keyInspector), values);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getDouble(data[0], keyInspector), values);
       return;
     case FLOAT:
-      sketch_.update(PrimitiveObjectInspectorUtils.getFloat(data[0], keyInspector), values);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getFloat(data[0], keyInspector), values);
       return;
     case INT:
-      sketch_.update(PrimitiveObjectInspectorUtils.getInt(data[0], keyInspector), values);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getInt(data[0], keyInspector), values);
       return;
     case LONG:
-      sketch_.update(PrimitiveObjectInspectorUtils.getLong(data[0], keyInspector), values);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getLong(data[0], keyInspector), values);
       return;
     case STRING:
-      sketch_.update(PrimitiveObjectInspectorUtils.getString(data[0], keyInspector), values);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getString(data[0], keyInspector), values);
       return;
     default:
       throw new IllegalArgumentException(
@@ -76,16 +76,16 @@ class ArrayOfDoublesSketchState extends ArrayOfDoublesState {
 
   @Override
   ArrayOfDoublesSketch getResult() {
-    if (sketch_ == null) { return null; }
+    if (this.sketch_ == null) { return null; }
     // assumes that it is called once at the end of processing
     // since trimming to nominal number of entries is expensive
-    sketch_.trim();
-    return sketch_.compact();
+    this.sketch_.trim();
+    return this.sketch_.compact();
   }
 
   @Override
   void reset() {
-    sketch_ = null;
+    this.sketch_ = null;
   }
 
 }

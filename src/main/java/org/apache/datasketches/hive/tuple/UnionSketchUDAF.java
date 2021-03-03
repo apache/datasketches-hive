@@ -91,13 +91,13 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       super.init(mode, inspectors);
       if ((mode == Mode.PARTIAL1) || (mode == Mode.COMPLETE)) {
         // input is original data
-        sketchInspector_ = (PrimitiveObjectInspector) inspectors[0];
+        this.sketchInspector_ = (PrimitiveObjectInspector) inspectors[0];
         if (inspectors.length > 1) {
-          nominalNumEntriesInspector_ = (PrimitiveObjectInspector) inspectors[1];
+          this.nominalNumEntriesInspector_ = (PrimitiveObjectInspector) inspectors[1];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
-        intermediateInspector_ = (StructObjectInspector) inspectors[0];
+        this.intermediateInspector_ = (StructObjectInspector) inspectors[0];
       }
 
       if ((mode == Mode.PARTIAL1) || (mode == Mode.PARTIAL2)) {
@@ -123,15 +123,15 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, data);
       }
-      final byte[] serializedSketch = (byte[]) sketchInspector_.getPrimitiveJavaObject(data[0]);
+      final byte[] serializedSketch = (byte[]) this.sketchInspector_.getPrimitiveJavaObject(data[0]);
       if (serializedSketch == null) { return; }
       state.update(Sketches.heapifySketch(Memory.wrap(serializedSketch), getSummaryDeserializer()));
     }
 
     protected void initializeState(final UnionState<S> state, final Object[] data) {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
-      if (nominalNumEntriesInspector_ != null) {
-        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[1], nominalNumEntriesInspector_);
+      if (this.nominalNumEntriesInspector_ != null) {
+        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[1], this.nominalNumEntriesInspector_);
       }
       state.init(nominalNumEntries, getSummarySetOperationsForIterate(data));
     }

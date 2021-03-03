@@ -28,29 +28,29 @@ class ArrayOfDoublesUnionState extends ArrayOfDoublesState {
   private ArrayOfDoublesUnion union_;
 
   boolean isInitialized() {
-    return union_ != null;
+    return this.union_ != null;
   }
 
   @Override
   void init(final int nominalNumEntries, final int numValues) {
     super.init(nominalNumEntries, numValues);
-    union_ = new ArrayOfDoublesSetOperationBuilder()
+    this.union_ = new ArrayOfDoublesSetOperationBuilder()
         .setNominalEntries(nominalNumEntries).setNumberOfValues(numValues).buildUnion();
   }
 
   void update(final ArrayOfDoublesSketch sketch) {
-    union_.union(sketch);
+    this.union_.union(sketch);
   }
 
   @Override
   ArrayOfDoublesSketch getResult() {
-    if (union_ == null) { return null; }
-    return union_.getResult();
+    if (this.union_ == null) { return null; }
+    return this.union_.getResult();
   }
 
   @Override
   void reset() {
-    union_ = null;
+    this.union_ = null;
   }
 
 }

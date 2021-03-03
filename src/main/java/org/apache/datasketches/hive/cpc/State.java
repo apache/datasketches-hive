@@ -28,16 +28,16 @@ abstract class State extends AbstractAggregationBuffer {
   private long seed_;
 
   void init(final int lgK, final long seed) {
-    lgK_ = lgK;
-    seed_ = seed;
+    this.lgK_ = lgK;
+    this.seed_ = seed;
   }
 
   int getLgK() {
-    return lgK_;
+    return this.lgK_;
   }
 
   long getSeed() {
-    return seed_;
+    return this.seed_;
   }
 
   abstract boolean isInitialized();

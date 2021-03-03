@@ -88,7 +88,7 @@ public class ArrayOfDoublesSketchToValuesUDTFTest {
      func.initialize(inspectors);
    }
 
-  @SuppressWarnings({ "deprecation", "unchecked" })
+  @SuppressWarnings({ "deprecation", "unchecked", "synthetic-access" })
   @Test
   public void normalCase() throws Exception {
     ObjectInspector[] inspectors = new ObjectInspector[] { binaryInspector };
@@ -124,7 +124,7 @@ public class ArrayOfDoublesSketchToValuesUDTFTest {
 
     @Override
     public void collect(Object object) throws HiveException {
-      list.add(object);
+      this.list.add(object);
     }
 
   }

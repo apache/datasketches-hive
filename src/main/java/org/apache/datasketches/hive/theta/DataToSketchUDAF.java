@@ -149,19 +149,19 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
-        inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+        this.inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
+          this.nominalEntriesObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          samplingProbabilityObjectInspector = (PrimitiveObjectInspector) parameters[2];
+          this.samplingProbabilityObjectInspector = (PrimitiveObjectInspector) parameters[2];
         }
         if (parameters.length > 3) {
-          seedObjectInspector = (PrimitiveObjectInspector) parameters[3];
+          this.seedObjectInspector = (PrimitiveObjectInspector) parameters[3];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
-        intermediateObjectInspector = (StructObjectInspector) parameters[0];
+        this.intermediateObjectInspector = (StructObjectInspector) parameters[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -196,22 +196,22 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      state.update(parameters[0], inputObjectInspector);
+      state.update(parameters[0], this.inputObjectInspector);
     }
 
     private void initializeState(final UnionState state, final Object[] parameters) {
       int sketchSize = DEFAULT_NOMINAL_ENTRIES;
-      if (nominalEntriesObjectInspector != null) {
-        sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], nominalEntriesObjectInspector);
+      if (this.nominalEntriesObjectInspector != null) {
+        sketchSize = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.nominalEntriesObjectInspector);
       }
       float samplingProbability = UnionState.DEFAULT_SAMPLING_PROBABILITY;
-      if (samplingProbabilityObjectInspector != null) {
+      if (this.samplingProbabilityObjectInspector != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(parameters[2],
-            samplingProbabilityObjectInspector);
+            this.samplingProbabilityObjectInspector);
       }
       long seed = DEFAULT_UPDATE_SEED;
-      if (seedObjectInspector != null) {
-        seed = PrimitiveObjectInspectorUtils.getLong(parameters[3], seedObjectInspector);
+      if (this.seedObjectInspector != null) {
+        seed = PrimitiveObjectInspectorUtils.getLong(parameters[3], this.seedObjectInspector);
       }
       state.init(sketchSize, samplingProbability, seed);
     }

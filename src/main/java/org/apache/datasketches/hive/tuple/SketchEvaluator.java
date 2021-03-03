@@ -91,16 +91,16 @@ abstract class SketchEvaluator<S extends Summary> extends GenericUDAFEvaluator {
       initializeState(state, data);
     }
     final BytesWritable serializedSketch =
-        (BytesWritable) intermediateInspector_.getStructFieldData(
-            data, intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
+        (BytesWritable) this.intermediateInspector_.getStructFieldData(
+            data, this.intermediateInspector_.getStructFieldRef(SKETCH_FIELD));
     state.update(Sketches.heapifySketch(
         BytesWritableHelper.wrapAsMemory(serializedSketch),
         getSummaryDeserializer()));
   }
 
   protected void initializeState(final UnionState<S> state, final Object data) {
-    final int nominalNumEntries = ((IntWritable) intermediateInspector_.getStructFieldData(
-        data, intermediateInspector_.getStructFieldRef(NOMINAL_NUM_ENTRIES_FIELD))).get();
+    final int nominalNumEntries = ((IntWritable) this.intermediateInspector_.getStructFieldData(
+        data, this.intermediateInspector_.getStructFieldRef(NOMINAL_NUM_ENTRIES_FIELD))).get();
     state.init(nominalNumEntries, getSummarySetOperationsForMerge(data));
   }
 

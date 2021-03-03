@@ -32,38 +32,38 @@ class SketchState<U, S extends UpdatableSummary<U>> extends State<S> {
   private UpdatableSketch<U, S> sketch_;
 
   boolean isInitialized() {
-    return sketch_ != null;
+    return this.sketch_ != null;
   }
 
   void init(final int nominalNumEntries, final float samplingProbability,
       final SummaryFactory<S> summaryFactory) {
     super.init(nominalNumEntries);
-    sketch_ = new UpdatableSketchBuilder<U, S>(summaryFactory).setNominalEntries(nominalNumEntries)
+    this.sketch_ = new UpdatableSketchBuilder<>(summaryFactory).setNominalEntries(nominalNumEntries)
         .setSamplingProbability(samplingProbability).build();
   }
 
   void update(final Object data, final PrimitiveObjectInspector keyObjectInspector, final U value) {
     switch (keyObjectInspector.getPrimitiveCategory()) {
     case BINARY:
-      sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, keyObjectInspector).copyBytes(), value);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, keyObjectInspector).copyBytes(), value);
       return;
     case BYTE:
-      sketch_.update(PrimitiveObjectInspectorUtils.getByte(data, keyObjectInspector), value);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getByte(data, keyObjectInspector), value);
       return;
     case DOUBLE:
-      sketch_.update(PrimitiveObjectInspectorUtils.getDouble(data, keyObjectInspector), value);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getDouble(data, keyObjectInspector), value);
       return;
     case FLOAT:
-      sketch_.update(PrimitiveObjectInspectorUtils.getFloat(data, keyObjectInspector), value);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getFloat(data, keyObjectInspector), value);
       return;
     case INT:
-      sketch_.update(PrimitiveObjectInspectorUtils.getInt(data, keyObjectInspector), value);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getInt(data, keyObjectInspector), value);
       return;
     case LONG:
-      sketch_.update(PrimitiveObjectInspectorUtils.getLong(data, keyObjectInspector), value);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getLong(data, keyObjectInspector), value);
       return;
     case STRING:
-      sketch_.update(PrimitiveObjectInspectorUtils.getString(data, keyObjectInspector), value);
+      this.sketch_.update(PrimitiveObjectInspectorUtils.getString(data, keyObjectInspector), value);
       return;
     default:
       throw new IllegalArgumentException(
@@ -74,16 +74,16 @@ class SketchState<U, S extends UpdatableSummary<U>> extends State<S> {
 
   @Override
   Sketch<S> getResult() {
-    if (sketch_ == null) { return null; }
+    if (this.sketch_ == null) { return null; }
     // assumes that it is called once at the end of processing
     // since trimming to nominal number of entries is expensive
-    sketch_.trim();
-    return sketch_.compact();
+    this.sketch_.trim();
+    return this.sketch_.compact();
   }
 
   @Override
   void reset() {
-    sketch_ = null;
+    this.sketch_ = null;
   }
 
 }

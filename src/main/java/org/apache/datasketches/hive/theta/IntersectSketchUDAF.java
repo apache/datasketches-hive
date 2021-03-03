@@ -94,12 +94,12 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
-        inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
+        this.inputObjectInspector = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          seedObjectInspector = (PrimitiveObjectInspector) parameters[1];
+          this.seedObjectInspector = (PrimitiveObjectInspector) parameters[1];
         }
       } else {
-        intermediateObjectInspector = (StandardStructObjectInspector) parameters[0];
+        this.intermediateObjectInspector = (StandardStructObjectInspector) parameters[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -125,12 +125,12 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
       final IntersectionState state = (IntersectionState) buf;
       if (!state.isInitialized()) {
         long seed = DEFAULT_UPDATE_SEED;
-        if (seedObjectInspector != null) {
-          seed = PrimitiveObjectInspectorUtils.getLong(data[1], seedObjectInspector);
+        if (this.seedObjectInspector != null) {
+          seed = PrimitiveObjectInspectorUtils.getLong(data[1], this.seedObjectInspector);
         }
         state.init(seed);
       }
-      final byte[] serializedSketch = (byte[]) inputObjectInspector.getPrimitiveJavaObject(data[0]);
+      final byte[] serializedSketch = (byte[]) this.inputObjectInspector.getPrimitiveJavaObject(data[0]);
       if (serializedSketch == null) { return; }
       state.update(Memory.wrap(serializedSketch));
     }
@@ -154,14 +154,14 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
       if (data == null) { return; }
       final IntersectionState state = (IntersectionState) buf;
       if (!state.isInitialized()) {
-        final long seed = ((LongWritable) intermediateObjectInspector.getStructFieldData(
-            data, intermediateObjectInspector.getStructFieldRef(SEED_FIELD))).get();
+        final long seed = ((LongWritable) this.intermediateObjectInspector.getStructFieldData(
+            data, this.intermediateObjectInspector.getStructFieldRef(SEED_FIELD))).get();
         state.init(seed);
       }
 
       final Memory serializedSketch = BytesWritableHelper.wrapAsMemory(
-          (BytesWritable) intermediateObjectInspector.getStructFieldData(
-          data, intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD)));
+          (BytesWritable) this.intermediateObjectInspector.getStructFieldData(
+          data, this.intermediateObjectInspector.getStructFieldRef(SKETCH_FIELD)));
       state.update(serializedSketch);
     }
 
@@ -192,29 +192,29 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
       private Intersection intersection_;
 
       boolean isInitialized() {
-        return intersection_ != null;
+        return this.intersection_ != null;
       }
 
       void init(final long seed) {
-        seed_ = seed;
-        intersection_ = SetOperation.builder().setSeed(seed).buildIntersection();
+        this.seed_ = seed;
+        this.intersection_ = SetOperation.builder().setSeed(seed).buildIntersection();
       }
 
       long getSeed() {
-        return seed_;
+        return this.seed_;
       }
 
       void update(final Memory serializedSketch) {
-        intersection_.intersect(Sketches.wrapSketch(serializedSketch, seed_));
+        this.intersection_.intersect(Sketches.wrapSketch(serializedSketch, this.seed_));
       }
 
       Sketch getResult() {
-        if (intersection_ == null) { return null; }
-        return intersection_.getResult();
+        if (this.intersection_ == null) { return null; }
+        return this.intersection_.getResult();
       }
 
       void reset() {
-        intersection_ = null;
+        this.intersection_ = null;
       }
     }
   }

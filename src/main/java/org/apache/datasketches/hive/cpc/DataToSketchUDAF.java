@@ -124,7 +124,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       // Different State is used for the iterate phase and the merge phase.
       // SketchState is more space-efficient, so let's use SketchState if possible.
-      if (mode_ == Mode.PARTIAL1 || mode_ == Mode.COMPLETE) { // iterate() will be used
+      if (this.mode_ == Mode.PARTIAL1 || this.mode_ == Mode.COMPLETE) { // iterate() will be used
         return new SketchState();
       }
       return new UnionState();
@@ -141,19 +141,19 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] parameters) throws HiveException {
       super.init(mode, parameters);
-      mode_ = mode;
+      this.mode_ = mode;
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
-        inputInspector_ = (PrimitiveObjectInspector) parameters[0];
+        this.inputInspector_ = (PrimitiveObjectInspector) parameters[0];
         if (parameters.length > 1) {
-          lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
+          this.lgKInspector_ = (PrimitiveObjectInspector) parameters[1];
         }
         if (parameters.length > 2) {
-          seedInspector_ = (PrimitiveObjectInspector) parameters[2];
+          this.seedInspector_ = (PrimitiveObjectInspector) parameters[2];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
-        intermediateInspector_ = (StructObjectInspector) parameters[0];
+        this.intermediateInspector_ = (StructObjectInspector) parameters[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -181,24 +181,25 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * java.lang.Object[])
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
+    @SuppressWarnings("deprecation")
+    public void iterate(final AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
       final SketchState state = (SketchState) agg;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      state.update(parameters[0], inputInspector_);
+      state.update(parameters[0], this.inputInspector_);
     }
 
     private void initializeState(final State state, final Object[] parameters) {
       int lgK = DEFAULT_LG_K;
-      if (lgKInspector_ != null) {
-        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], lgKInspector_);
+      if (this.lgKInspector_ != null) {
+        lgK = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.lgKInspector_);
       }
       long seed = DEFAULT_UPDATE_SEED;
-      if (seedInspector_ != null) {
-        seed = PrimitiveObjectInspectorUtils.getLong(parameters[2], seedInspector_);
+      if (this.seedInspector_ != null) {
+        seed = PrimitiveObjectInspectorUtils.getLong(parameters[2], this.seedInspector_);
       }
       state.init(lgK, seed);
     }

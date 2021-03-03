@@ -112,20 +112,20 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @Override
     public ObjectInspector init(final Mode mode, final ObjectInspector[] inspectors) throws HiveException {
       super.init(mode, inspectors);
-      mode_ = mode;
+      this.mode_ = mode;
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
-        keyInspector_ = (PrimitiveObjectInspector) inspectors[0];
-        valueInspector_ = (PrimitiveObjectInspector) inspectors[1];
+        this.keyInspector_ = (PrimitiveObjectInspector) inspectors[0];
+        this.valueInspector_ = (PrimitiveObjectInspector) inspectors[1];
         if (inspectors.length > 2) {
-          nominalNumEntriesInspector_ = (PrimitiveObjectInspector) inspectors[2];
+          this.nominalNumEntriesInspector_ = (PrimitiveObjectInspector) inspectors[2];
         }
         if (inspectors.length > 3) {
-          samplingProbabilityInspector_ = (PrimitiveObjectInspector) inspectors[3];
+          this.samplingProbabilityInspector_ = (PrimitiveObjectInspector) inspectors[3];
         }
       } else {
         // input for PARTIAL2 and FINAL is the output from PARTIAL1
-        intermediateInspector_ = (StructObjectInspector) inspectors[0];
+        this.intermediateInspector_ = (StructObjectInspector) inspectors[0];
       }
 
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -151,18 +151,18 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, data);
       }
-      state.update(data[0], keyInspector_, extractValue(data[1], valueInspector_));
+      state.update(data[0], this.keyInspector_, extractValue(data[1], this.valueInspector_));
     }
 
     private void initializeState(final SketchState<U, S> state, final Object[] data) {
       int nominalNumEntries = DEFAULT_NOMINAL_ENTRIES;
-      if (nominalNumEntriesInspector_ != null) {
-        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[2], nominalNumEntriesInspector_);
+      if (this.nominalNumEntriesInspector_ != null) {
+        nominalNumEntries = PrimitiveObjectInspectorUtils.getInt(data[2], this.nominalNumEntriesInspector_);
       }
       float samplingProbability = DEFAULT_SAMPLING_PROBABILITY;
-      if (samplingProbabilityInspector_ != null) {
+      if (this.samplingProbabilityInspector_ != null) {
         samplingProbability = PrimitiveObjectInspectorUtils.getFloat(data[3],
-            samplingProbabilityInspector_);
+            this.samplingProbabilityInspector_);
       }
       state.init(nominalNumEntries, samplingProbability, getSummaryFactory(data));
     }
@@ -170,7 +170,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-      if (mode_ == Mode.PARTIAL1 || mode_ == Mode.COMPLETE) {
+      if (this.mode_ == Mode.PARTIAL1 || this.mode_ == Mode.COMPLETE) {
         return new SketchState<U, S>();
       }
       return new UnionState<S>();

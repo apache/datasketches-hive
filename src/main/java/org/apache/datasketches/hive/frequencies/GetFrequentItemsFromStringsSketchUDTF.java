@@ -58,10 +58,10 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
       throw new UDFArgumentTypeException(0, "Primitive argument expected, but "
           + inspectors[0].getCategory().name() + " was recieved");
     }
-    inputObjectInspector = (PrimitiveObjectInspector) inspectors[0];
-    if (inputObjectInspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
+    this.inputObjectInspector = (PrimitiveObjectInspector) inspectors[0];
+    if (this.inputObjectInspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
       throw new UDFArgumentTypeException(0, "Binary value expected as the first argument, but "
-          + inputObjectInspector.getPrimitiveCategory().name() + " was recieved");
+          + this.inputObjectInspector.getPrimitiveCategory().name() + " was recieved");
     }
 
     if (inspectors.length > 1) {
@@ -69,11 +69,11 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
         throw new UDFArgumentTypeException(1, "Primitive argument expected, but "
             + inspectors[1].getCategory().name() + " was recieved");
       }
-      errorTypeObjectInspector = (PrimitiveObjectInspector) inspectors[1];
-      if (errorTypeObjectInspector.getPrimitiveCategory()
+      this.errorTypeObjectInspector = (PrimitiveObjectInspector) inspectors[1];
+      if (this.errorTypeObjectInspector.getPrimitiveCategory()
           != PrimitiveObjectInspector.PrimitiveCategory.STRING) {
         throw new UDFArgumentTypeException(1, "String value expected as the first argument, but "
-            + errorTypeObjectInspector.getPrimitiveCategory().name() + " was recieved");
+            + this.errorTypeObjectInspector.getPrimitiveCategory().name() + " was recieved");
       }
     }
 
@@ -92,12 +92,12 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
   public void process(final Object[] data) throws HiveException {
     if (data == null || data[0] == null) { return; }
     final BytesWritable serializedSketch =
-        (BytesWritable) inputObjectInspector.getPrimitiveWritableObject(data[0]);
+        (BytesWritable) this.inputObjectInspector.getPrimitiveWritableObject(data[0]);
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
         BytesWritableHelper.wrapAsMemory(serializedSketch), new ArrayOfStringsSerDe());
     ErrorType errorType = ErrorType.NO_FALSE_POSITIVES;
     if (data.length > 1) {
-      errorType = ErrorType.valueOf((String) errorTypeObjectInspector.getPrimitiveJavaObject(data[1]));
+      errorType = ErrorType.valueOf((String) this.errorTypeObjectInspector.getPrimitiveJavaObject(data[1]));
     }
     final ItemsSketch.Row<String>[] result = sketch.getFrequentItems(errorType);
     for (int i = 0; i < result.length; i++) {

@@ -57,8 +57,8 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (data[0] == null) { return; }
       final SketchState state = (SketchState) buf;
       if (!state.isInitialized()) {
-        if (kInspector_ != null) {
-          state.init(PrimitiveObjectInspectorUtils.getInt(data[1], kInspector_));
+        if (this.kInspector_ != null) {
+          state.init(PrimitiveObjectInspectorUtils.getInt(data[1], this.kInspector_));
         } else {
           state.init();
         }

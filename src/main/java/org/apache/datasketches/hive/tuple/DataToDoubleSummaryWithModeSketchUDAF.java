@@ -100,7 +100,7 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
     private DoubleSummary.Mode summaryMode_;
 
     public DataToDoubleSummaryWithModeSketchEvaluator() {
-      summaryMode_ = DoubleSummary.Mode.Sum;
+      this.summaryMode_ = DoubleSummary.Mode.Sum;
     }
 
     @Override
@@ -115,7 +115,7 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
       if (mode == Mode.PARTIAL1 || mode == Mode.COMPLETE) {
         // input is original data
         if (inspectors.length > 4) {
-          summaryModeInspector_ = (PrimitiveObjectInspector) inspectors[4];
+          this.summaryModeInspector_ = (PrimitiveObjectInspector) inspectors[4];
         }
       }
       if (mode == Mode.PARTIAL1 || mode == Mode.PARTIAL2) {
@@ -134,12 +134,12 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
 
     @Override
     protected SummaryFactory<DoubleSummary> getSummaryFactory(final Object[] data) {
-      if (summaryModeInspector_ != null) {
-        summaryMode_ = DoubleSummary.Mode.valueOf(
-          PrimitiveObjectInspectorUtils.getString(data[4], summaryModeInspector_)
+      if (this.summaryModeInspector_ != null) {
+        this.summaryMode_ = DoubleSummary.Mode.valueOf(
+          PrimitiveObjectInspectorUtils.getString(data[4], this.summaryModeInspector_)
         );
       }
-      return new DoubleSummaryFactory(summaryMode_);
+      return new DoubleSummaryFactory(this.summaryMode_);
     }
 
     @Override
@@ -158,16 +158,16 @@ public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
       final byte[] bytes = intermediate.toByteArray();
       return Arrays.asList(
         new IntWritable(state.getNominalNumEntries()),
-        new Text(summaryMode_.toString()),
+        new Text(this.summaryMode_.toString()),
         new BytesWritable(bytes)
       );
     }
 
     @Override
     protected SummarySetOperations<DoubleSummary> getSummarySetOperationsForMerge(final Object data) {
-      summaryMode_ = DoubleSummary.Mode.valueOf(((Text) intermediateInspector_.getStructFieldData(
-          data, intermediateInspector_.getStructFieldRef(SUMMARY_MODE_FIELD))).toString());
-      return new DoubleSummarySetOperations(summaryMode_);
+      this.summaryMode_ = DoubleSummary.Mode.valueOf(((Text) this.intermediateInspector_.getStructFieldData(
+          data, this.intermediateInspector_.getStructFieldRef(SUMMARY_MODE_FIELD))).toString());
+      return new DoubleSummarySetOperations(this.summaryMode_);
     }
 
   }

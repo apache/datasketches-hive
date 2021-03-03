@@ -41,13 +41,13 @@ final class Util {
   }
 
   static List<Float> primitivesToList(final float[] array) {
-    final List<Float> result = new ArrayList<Float>(array.length);
+    final List<Float> result = new ArrayList<>(array.length);
     for (float item: array) { result.add(item); }
     return result;
   }
 
   static List<Double> primitivesToList(final double[] array) {
-    final List<Double> result = new ArrayList<Double>(array.length);
+    final List<Double> result = new ArrayList<>(array.length);
     for (double item: array) { result.add(item); }
     return result;
   }

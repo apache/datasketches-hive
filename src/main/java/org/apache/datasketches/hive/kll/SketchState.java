@@ -28,35 +28,35 @@ class SketchState extends AbstractAggregationBuffer {
 
   // initialization is needed in the first phase (iterate) only
   void init() {
-    state_ = new KllFloatsSketch();
+    this.state_ = new KllFloatsSketch();
   }
 
   void init(final int k) {
-    state_ = new KllFloatsSketch(k);
+    this.state_ = new KllFloatsSketch(k);
   }
 
   boolean isInitialized() {
-    return state_ != null;
+    return this.state_ != null;
   }
 
   void update(final float value) {
-    state_.update(value);
+    this.state_.update(value);
   }
 
   void update(final KllFloatsSketch sketch) {
-    if (state_ == null) {
-      state_ = sketch;
+    if (this.state_ == null) {
+      this.state_ = sketch;
     } else {
-      state_.merge(sketch);
+      this.state_.merge(sketch);
     }
   }
 
   public KllFloatsSketch getResult() {
-    return state_;
+    return this.state_;
   }
 
   void reset() {
-    state_ = null;
+    this.state_ = null;
   }
 
 }

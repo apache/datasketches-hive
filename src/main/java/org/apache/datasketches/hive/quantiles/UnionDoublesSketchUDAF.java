@@ -58,8 +58,8 @@ public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
       final DoublesUnionState state = (DoublesUnionState) buf;
       if (!state.isInitialized()) {
         int k = 0;
-        if (kObjectInspector != null) {
-          k = PrimitiveObjectInspectorUtils.getInt(data[1], kObjectInspector);
+        if (this.kObjectInspector != null) {
+          k = PrimitiveObjectInspectorUtils.getInt(data[1], this.kObjectInspector);
         }
         state.init(k);
       }
