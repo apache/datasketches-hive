@@ -202,7 +202,8 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       }
       TgtHllType type = DEFAULT_HLL_TYPE;
       if (this.hllTypeInspector_ != null) {
-        type = TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], this.hllTypeInspector_));
+        type = 
+          TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], this.hllTypeInspector_));
       }
       state.init(lgK, type);
     }

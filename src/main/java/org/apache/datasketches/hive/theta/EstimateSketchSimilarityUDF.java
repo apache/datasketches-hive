@@ -19,13 +19,13 @@
 
 package org.apache.datasketches.hive.theta;
 
+import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
+
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.theta.JaccardSimilarity;
 import org.apache.datasketches.theta.Sketch;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
-
-import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 
 /**
  * Hive estimate sketch similarity UDF.
@@ -53,7 +53,7 @@ public class EstimateSketchSimilarityUDF extends UDF {
       secondSketch = Sketch.wrap(BytesWritableHelper.wrapAsMemory(secondSketchBytes), DEFAULT_UPDATE_SEED);
     }
 
-    double[] jaccard = JaccardSimilarity.jaccard(firstSketch, secondSketch);
+    final double[] jaccard = JaccardSimilarity.jaccard(firstSketch, secondSketch);
     return jaccard[1];
   }
 }
