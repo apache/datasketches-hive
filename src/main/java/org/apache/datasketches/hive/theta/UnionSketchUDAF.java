@@ -160,7 +160,8 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      final byte[] serializedSketch = (byte[]) this.inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
+      final byte[] serializedSketch = 
+          (byte[]) this.inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
       if (serializedSketch == null) { return; }
       state.update(Memory.wrap(serializedSketch));
     }
@@ -168,7 +169,8 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     private void initializeState(final UnionState state, final Object[] parameters) {
       int nominalEntries = DEFAULT_NOMINAL_ENTRIES;
       if (this.nominalEntriesObjectInspector != null) {
-        nominalEntries = PrimitiveObjectInspectorUtils.getInt(parameters[1], this.nominalEntriesObjectInspector);
+        nominalEntries = 
+            PrimitiveObjectInspectorUtils.getInt(parameters[1], this.nominalEntriesObjectInspector);
       }
       long seed = DEFAULT_UPDATE_SEED;
       if (this.seedObjectInspector != null) {

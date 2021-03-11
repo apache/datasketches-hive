@@ -45,7 +45,8 @@ class SketchState<U, S extends UpdatableSummary<U>> extends State<S> {
   void update(final Object data, final PrimitiveObjectInspector keyObjectInspector, final U value) {
     switch (keyObjectInspector.getPrimitiveCategory()) {
     case BINARY:
-      this.sketch_.update(PrimitiveObjectInspectorUtils.getBinary(data, keyObjectInspector).copyBytes(), value);
+      this.sketch_.update(
+          PrimitiveObjectInspectorUtils.getBinary(data, keyObjectInspector).copyBytes(), value);
       return;
     case BYTE:
       this.sketch_.update(PrimitiveObjectInspectorUtils.getByte(data, keyObjectInspector), value);

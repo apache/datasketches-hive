@@ -59,7 +59,8 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
           + inspectors[0].getCategory().name() + " was recieved");
     }
     this.inputObjectInspector = (PrimitiveObjectInspector) inspectors[0];
-    if (this.inputObjectInspector.getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
+    if (this.inputObjectInspector.getPrimitiveCategory() 
+        != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
       throw new UDFArgumentTypeException(0, "Binary value expected as the first argument, but "
           + this.inputObjectInspector.getPrimitiveCategory().name() + " was recieved");
     }
