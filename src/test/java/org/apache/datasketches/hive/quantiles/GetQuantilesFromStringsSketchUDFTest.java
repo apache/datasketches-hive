@@ -100,7 +100,7 @@ public class GetQuantilesFromStringsSketchUDFTest {
 
   //Note: this exception is only caught because a bounds error was detected.
   //If a bounds error is not detected from a wrong type assignment, unexpected results could occur.
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = SketchesArgumentException.class)
   public void fractionsWrongSketchType() {
     ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
     sketch.update(1L);
@@ -112,7 +112,7 @@ public class GetQuantilesFromStringsSketchUDFTest {
 
   //Note: this exception is only caught because a bounds error was detected.
   //If a bounds error is not detected from a wrong type assignment, unexpected results could occur.
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expectedExceptions = SketchesArgumentException.class)
   public void evenlySpacedWrongSketchType() {
     ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
     sketch.update(1L);
