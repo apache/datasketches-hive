@@ -32,7 +32,7 @@ import org.apache.hadoop.io.BytesWritable;
     value = "_FUNC_(sketch)",
     extended = "Returns an estimate of unique count from a given CpcSketch."
     + " The result is a double value.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetEstimateUDF extends UDF {
 
   /**

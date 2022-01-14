@@ -31,6 +31,7 @@ import org.apache.hadoop.io.BytesWritable;
  * Hive estimate sketch udf. V4
  *
  */
+@SuppressWarnings("deprecation")
 public class EstimateSketchUDF extends UDF {
 
   private static final int EMPTY_SKETCH_SIZE_BYTES = 8;

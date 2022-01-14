@@ -32,6 +32,7 @@ import org.apache.hadoop.io.BytesWritable;
  * Hive exclude sketch UDF. (i.e. in sketch a but not in sketch b)
  *
  */
+@SuppressWarnings("deprecation")
 public class ExcludeSketchUDF extends UDF {
 
   /**

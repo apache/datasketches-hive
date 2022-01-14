@@ -57,7 +57,7 @@ import org.apache.hadoop.io.LongWritable;
     + "be operated on by the other sketch-related functions. "
     + "The seed is optional, "
     + "and using it is not recommended unless you really know why you need it.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -119,7 +119,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf,
+    public void iterate(final AggregationBuffer buf,
         final Object[] data) throws HiveException {
       if (data[0] == null) { return; }
       final IntersectionState state = (IntersectionState) buf;
@@ -136,7 +136,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public Object terminatePartial(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+    public Object terminatePartial(final AggregationBuffer buf)
         throws HiveException {
       final IntersectionState state = (IntersectionState) buf;
       final Sketch intermediate = state.getResult();
@@ -149,7 +149,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void merge(final @SuppressWarnings("deprecation") AggregationBuffer buf,
+    public void merge(final AggregationBuffer buf,
         final Object data) throws HiveException {
       if (data == null) { return; }
       final IntersectionState state = (IntersectionState) buf;
@@ -166,7 +166,7 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public Object terminate(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+    public Object terminate(final AggregationBuffer buf)
         throws HiveException {
       final IntersectionState state = (IntersectionState) buf;
       final Sketch resultSketch = state.getResult();
@@ -174,14 +174,13 @@ public class IntersectSketchUDAF extends AbstractGenericUDAFResolver {
       return new BytesWritable(resultSketch.toByteArray());
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       return new IntersectionState();
     }
 
     @Override
-    public void reset(final @SuppressWarnings("deprecation") AggregationBuffer buf)
+    public void reset(final AggregationBuffer buf)
         throws HiveException {
       final IntersectionState state = (IntersectionState) buf;
       state.reset();

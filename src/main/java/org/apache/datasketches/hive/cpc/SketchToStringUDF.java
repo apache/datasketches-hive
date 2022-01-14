@@ -31,7 +31,7 @@ import org.apache.hadoop.io.BytesWritable;
     name = "SketchToString",
     value = "_FUNC_(sketch, seed)",
     extended = "Returns a human-readable summary of a given CpcSketch.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class SketchToStringUDF extends UDF {
 
   /**

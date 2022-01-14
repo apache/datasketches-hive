@@ -39,7 +39,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " The column number is optional (the default is 1)."
     + " The parameter k is optional (the default is defined in the sketch library)."
     + " The result is a serialized quantiles sketch.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class ArrayOfDoublesSketchToQuantilesSketchUDF extends UDF {
 
   /**

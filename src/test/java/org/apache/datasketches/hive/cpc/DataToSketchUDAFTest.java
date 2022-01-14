@@ -49,7 +49,6 @@ import org.apache.hadoop.io.Text;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@SuppressWarnings({"javadoc","resource"})
 public class DataToSketchUDAFTest {
 
   private static final ObjectInspector intInspector =

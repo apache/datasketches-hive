@@ -55,6 +55,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + " It is optional an must be from 4 to 26. The default is 11, which is expected to yield errors"
     + " of roughly +-1.5% in the estimation of uniques with 95% confidence."
     + " The seed parameter is optional")
+@SuppressWarnings("deprecation")
 public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
@@ -68,6 +69,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    * @param info The parameter info to validate
    * @return The GenericUDAFEvaluator to use to compute the function.
    */
+  @SuppressWarnings("javadoc")
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
@@ -107,7 +109,6 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    */
   public static class UnionSketchUDAFEvaluator extends SketchEvaluator {
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       return new UnionState();
@@ -166,7 +167,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
      *          sketches in the form of Object passed in to be merged.
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf,
+    public void iterate(final AggregationBuffer buf,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
       final UnionState state = (UnionState) buf;

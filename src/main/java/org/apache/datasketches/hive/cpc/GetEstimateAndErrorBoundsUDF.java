@@ -37,7 +37,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " The result is three double values: estimate, lower bound and upper bound."
     + " Optional kappa is a number of standard deviations from the mean: 1, 2 or 3 (default 2)."
     + " The seed is optional. It is needed if the sketch was created with a custom seed.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetEstimateAndErrorBoundsUDF extends UDF {
 
   private static final int DEFAULT_KAPPA = 2;

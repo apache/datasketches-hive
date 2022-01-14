@@ -49,7 +49,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + " uniques. The default number is defined in the sketches-core library, and at the time of this"
     + " writing was 4096 (about 3% error)."
     + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -149,7 +149,7 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf,
+    public void iterate(final AggregationBuffer buf,
         final Object[] data) throws HiveException {
       if (data[0] == null) { return; }
       final ArrayOfDoublesSketchState state = (ArrayOfDoublesSketchState) buf;
@@ -173,7 +173,6 @@ public class DataToArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver 
       state.init(nominalNumEntries, samplingProbability, this.numValues_);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       if ((this.mode_ == Mode.PARTIAL1) || (this.mode_ == Mode.COMPLETE)) {

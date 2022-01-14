@@ -44,7 +44,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@SuppressWarnings({"javadoc","resource"})
 public class UnionSketchUDAFTest {
 
   private static final ObjectInspector intInspector =

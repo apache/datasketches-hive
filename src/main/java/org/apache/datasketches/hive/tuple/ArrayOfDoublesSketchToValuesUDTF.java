@@ -38,12 +38,10 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 
-@SuppressWarnings("javadoc")
 public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
 
   PrimitiveObjectInspector inputObjectInspector;
 
-  @SuppressWarnings("deprecation")
   @Override
   public StructObjectInspector initialize(final ObjectInspector[] inspectors) throws UDFArgumentException {
     if (inspectors.length != 1) {
@@ -54,7 +52,7 @@ public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
           + inspectors[0].getCategory().name() + " was recieved");
     }
     this.inputObjectInspector = (PrimitiveObjectInspector) inspectors[0];
-    if (this.inputObjectInspector.getPrimitiveCategory() 
+    if (this.inputObjectInspector.getPrimitiveCategory()
         != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
       throw new UDFArgumentTypeException(0, "Binary value expected as the first argument, but "
           + this.inputObjectInspector.getPrimitiveCategory().name() + " was recieved");

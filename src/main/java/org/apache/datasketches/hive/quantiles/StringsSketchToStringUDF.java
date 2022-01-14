@@ -30,7 +30,7 @@ import org.apache.hadoop.io.BytesWritable;
 
 @Description(name = "ToString", value = "_FUNC_(sketch)",
 extended = " Returns a human-readable summary of a given ItemsSketch<String>.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class StringsSketchToStringUDF extends UDF {
 
   /**

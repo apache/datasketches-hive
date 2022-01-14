@@ -52,7 +52,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.Pr
     + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)")
 public class DataToDoubleSummarySketchUDAF extends DataToSketchUDAF {
 
-  @SuppressWarnings("resource")
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     super.getEvaluator(info);

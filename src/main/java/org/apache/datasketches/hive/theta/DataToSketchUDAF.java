@@ -61,7 +61,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + "and at the time of this writing was 4096 (about 3% error)."
     + " The sampling probability is optional and must be from 0 to 1. The default is 1 (no sampling)"
     + " The seed is optional, and using it is not recommended unless you really know why you need it")
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","deprecation"})
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
@@ -189,7 +189,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * java.lang.Object[])
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
+    public void iterate(final AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
       final UnionState state = (UnionState) agg;

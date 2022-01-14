@@ -63,7 +63,6 @@ import org.apache.hadoop.io.Text;
     + " Summary mode must be one of: 'Sum', 'Min', 'Max'")
 public class DataToDoubleSummaryWithModeSketchUDAF extends DataToSketchUDAF {
 
-  @SuppressWarnings("resource")
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     super.getEvaluator(info);

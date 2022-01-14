@@ -31,6 +31,7 @@ import org.apache.hadoop.io.BytesWritable;
 /**
  * Hive union sketch UDF.
  */
+@SuppressWarnings("deprecation")
 public class UnionSketchUDF extends UDF {
 
   private static final int EMPTY_SKETCH_SIZE_BYTES = 8;

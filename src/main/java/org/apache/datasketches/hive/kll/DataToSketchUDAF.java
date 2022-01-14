@@ -35,7 +35,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
   + " Values must be of type float."
   + " Parameter k controls the accuracy and the size of the sketch."
   + " If k is ommitted, the default is used.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -56,7 +56,6 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   static class DataToSketchEvaluator extends SketchEvaluator {
 
-    @SuppressWarnings("deprecation")
     @Override
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
       if (data[0] == null) { return; }

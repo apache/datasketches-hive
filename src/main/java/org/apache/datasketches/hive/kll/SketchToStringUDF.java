@@ -27,7 +27,7 @@ import org.apache.hadoop.io.BytesWritable;
 
 @Description(name = "SketchToString", value = "_FUNC_(sketch)",
 extended = " Returns a human-readable summary of a given KllFloatsSketch.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class SketchToStringUDF extends UDF {
 
   /**

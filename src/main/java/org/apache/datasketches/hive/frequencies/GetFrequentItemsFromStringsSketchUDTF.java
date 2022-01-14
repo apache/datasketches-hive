@@ -41,13 +41,11 @@ import org.apache.hadoop.io.BytesWritable;
     + "Returns a list of frequent items in descending order by estimated frequency."
     + " Error type is optional and must be one of the following: "
     + "NO_FALSE_POSITIVES (default) or NO_FALSE_NEGATIVES.")
-@SuppressWarnings("javadoc")
 public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
 
   PrimitiveObjectInspector inputObjectInspector;
   PrimitiveObjectInspector errorTypeObjectInspector;
 
-  @SuppressWarnings("deprecation")
   @Override
   public StructObjectInspector initialize(final ObjectInspector[] inspectors) throws UDFArgumentException {
     if (inspectors.length != 1 && inspectors.length != 2) {
@@ -59,7 +57,7 @@ public class GetFrequentItemsFromStringsSketchUDTF extends GenericUDTF {
           + inspectors[0].getCategory().name() + " was recieved");
     }
     this.inputObjectInspector = (PrimitiveObjectInspector) inspectors[0];
-    if (this.inputObjectInspector.getPrimitiveCategory() 
+    if (this.inputObjectInspector.getPrimitiveCategory()
         != PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
       throw new UDFArgumentTypeException(0, "Binary value expected as the first argument, but "
           + this.inputObjectInspector.getPrimitiveCategory().name() + " was recieved");

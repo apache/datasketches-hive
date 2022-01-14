@@ -29,7 +29,7 @@ import org.apache.hadoop.io.BytesWritable;
 extended = " Returns a normalized rank of a given value from a given KllFloatsSketch."
 + " The returned rank is an approximation to the fraction of values of the distribution"
 + " that are less than the given value (mass of the distribution below the given value).")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetRankUDF extends UDF {
 
   /**

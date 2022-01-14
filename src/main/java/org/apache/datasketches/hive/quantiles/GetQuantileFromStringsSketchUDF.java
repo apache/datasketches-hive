@@ -35,7 +35,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " For example, a fraction of 0.5 corresponds to 50th percentile, which is"
     + " the median value of the distribution (the number separating the higher half"
     + " of the probability distribution from the lower half).")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetQuantileFromStringsSketchUDF extends UDF {
 
   /**
