@@ -31,6 +31,7 @@ import org.apache.hadoop.io.BytesWritable;
  * Hive estimate sketch similarity UDF.
  *
  */
+@SuppressWarnings("deprecation")
 public class EstimateSketchSimilarityUDF extends UDF {
 
   /**

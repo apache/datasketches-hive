@@ -31,7 +31,7 @@ import org.apache.hadoop.io.BytesWritable;
     value = "_FUNC_(sketch)",
     extended = "Returns the number of retained entries from a given ArrayOfDoublesSketch."
     + " The result is an integer value.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class ArrayOfDoublesSketchToNumberOfRetainedEntriesUDF extends UDF {
 
   /**

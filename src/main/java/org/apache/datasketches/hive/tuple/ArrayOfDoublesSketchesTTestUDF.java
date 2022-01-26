@@ -38,7 +38,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " The result will be N double values, where N is the number of double values kept in the"
     + " sketch per key. The resulting p-values are probabilities that differences in means are"
     + " due to chance")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class ArrayOfDoublesSketchesTTestUDF extends UDF {
 
   /**

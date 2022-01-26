@@ -36,7 +36,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " The result will be three double values:"
     + " estimate of the number of unique keys, lower bound and upper bound. The bounds are given"
     + " at 95.5% confidence.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class ArrayOfDoublesSketchToEstimateAndErrorBoundsUDF extends UDF {
 
   /**

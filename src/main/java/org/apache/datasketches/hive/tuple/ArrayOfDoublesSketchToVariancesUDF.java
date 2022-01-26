@@ -36,7 +36,7 @@ import org.apache.hadoop.io.BytesWritable;
     extended = "Returns a list of variance values from a given ArrayOfDoublesSketch."
     + " The result will be N double values, where N is the number of double values kept in the"
     + " sketch per key.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class ArrayOfDoublesSketchToVariancesUDF extends UDF {
 
   /**

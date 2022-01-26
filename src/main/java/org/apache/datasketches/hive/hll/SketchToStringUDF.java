@@ -29,7 +29,7 @@ import org.apache.hadoop.io.BytesWritable;
     name = "SketchToString",
     value = "_FUNC_(sketch)",
     extended = "Returns a human-readable summary of a given HllSketch.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class SketchToStringUDF extends UDF {
 
   /**

@@ -25,7 +25,6 @@ import org.testng.annotations.Test;
 
 import org.apache.datasketches.cpc.CpcSketch;
 
-@SuppressWarnings("javadoc")
 public class SketchToStringUDFTest {
 
   @Test

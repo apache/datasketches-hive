@@ -32,7 +32,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
     + "Returns an ItemsSketch<String> in a serialized form as a binary blob."
     + " Values must be of string type."
     + " Parameter maxMapSize controls the accuracy and the size of the sketch.")
-@SuppressWarnings("javadoc")
 public class DataToStringsSketchUDAF extends DataToItemsSketchUDAF<String> {
 
   @Override

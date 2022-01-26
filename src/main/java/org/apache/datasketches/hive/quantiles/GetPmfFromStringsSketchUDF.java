@@ -40,7 +40,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " to the fraction of the values that fell into one of those intervals."
     + " The definition of an interval is inclusive of the left split point and exclusive"
     + " of the right split point")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetPmfFromStringsSketchUDF extends UDF {
 
   /**

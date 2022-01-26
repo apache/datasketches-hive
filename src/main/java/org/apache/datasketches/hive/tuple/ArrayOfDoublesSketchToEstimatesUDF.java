@@ -38,7 +38,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " sketch per key. The first estimate is the estimate of the number of unique keys in the"
     + " original population. Next there are N estimates of the sums of the parameters in the"
     + " original population (sums of the values in the sketch scaled to the original population)")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class ArrayOfDoublesSketchToEstimatesUDF extends UDF {
 
   /**

@@ -31,7 +31,7 @@ import org.apache.hadoop.io.BytesWritable;
 @Description(name = "GetN", value = "_FUNC_(sketch)",
       extended = " Returns the total number of observed input values (stream length) "
       + "from a given ItemsSketch<String>.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetNFromStringsSketchUDF extends UDF {
 
   /**

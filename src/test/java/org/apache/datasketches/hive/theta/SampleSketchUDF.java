@@ -30,7 +30,7 @@ import org.apache.hadoop.io.BytesWritable;
 /**
  * Hive estimate sketch UDF.
  */
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class SampleSketchUDF extends UDF {
   public static final int DEFAULT_SIZE = 16384;
 

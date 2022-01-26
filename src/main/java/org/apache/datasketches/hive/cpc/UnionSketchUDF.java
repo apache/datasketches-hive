@@ -30,6 +30,7 @@ import org.apache.hadoop.io.BytesWritable;
 /**
  * Hive union sketch UDF.
  */
+@SuppressWarnings("deprecation")
 public class UnionSketchUDF extends UDF {
 
   /**

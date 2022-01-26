@@ -38,7 +38,7 @@ import org.apache.hadoop.io.BytesWritable;
   + " to the ranks of the corresponding split points (fraction of input stream values that are less"
   + " than a split point). The last value is always 1."
   + " CDF can also be viewed as a cumulative version of PMF.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetCdfFromDoublesSketchUDF extends UDF {
 
   /**

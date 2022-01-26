@@ -58,7 +58,6 @@ import org.apache.hadoop.io.Text;
     + " the estimation of uniques. The default number is defined in the sketches-core library"
     + " and at the time of this writing was 4096 (about 3% error)."
     + " Summary mode must be one of: 'Sum', 'Min', 'Max'")
-@SuppressWarnings("javadoc")
 public class UnionDoubleSummaryWithModeSketchUDAF extends UnionSketchUDAF {
 
   @Override

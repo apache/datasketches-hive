@@ -34,6 +34,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
  * This is a generic implementation to be specialized in subclasses
  * @param <T> type of item
  */
+@SuppressWarnings("deprecation")
 public abstract class UnionItemsSketchUDAF<T> extends AbstractGenericUDAFResolver {
 
   @Override
@@ -56,14 +57,12 @@ public abstract class UnionItemsSketchUDAF<T> extends AbstractGenericUDAFResolve
 
   abstract GenericUDAFEvaluator createEvaluator();
 
-  @SuppressWarnings("javadoc")
   public static class UnionItemsSketchEvaluator<T> extends ItemsEvaluator<T> {
 
     UnionItemsSketchEvaluator(final ArrayOfItemsSerDe<T> serDe) {
       super(serDe);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
       merge(buf, data[0]);

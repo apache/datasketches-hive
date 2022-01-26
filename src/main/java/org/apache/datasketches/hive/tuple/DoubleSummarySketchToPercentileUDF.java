@@ -41,7 +41,7 @@ import org.apache.hadoop.io.BytesWritable;
   + " percent. For example, 50th percentile is the median value of the"
   + " distribution (the number separating the higher half of a probability"
   + " distribution from the lower half)")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class DoubleSummarySketchToPercentileUDF extends UDF {
 
   private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =

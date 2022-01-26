@@ -45,7 +45,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
  * encoding for cross-platform compatibility, it is recommended that these values be encoded prior
  * to being submitted and then typed as a BINARY byte[].</p>
  */
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -143,7 +143,7 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data)
+    public void iterate(final AggregationBuffer buf, final Object[] data)
         throws HiveException {
       if (data[0] == null) { return; }
       @SuppressWarnings("unchecked")
@@ -167,7 +167,6 @@ public abstract class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       state.init(nominalNumEntries, samplingProbability, getSummaryFactory(data));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       if (this.mode_ == Mode.PARTIAL1 || this.mode_ == Mode.COMPLETE) {

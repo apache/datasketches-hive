@@ -27,7 +27,7 @@ import org.apache.hadoop.io.BytesWritable;
 
 @Description(name = "GetK", value = "_FUNC_(sketch)",
 extended = " Returns parameter K from a given DoublesSketch sketch.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class GetKFromDoublesSketchUDF extends UDF {
 
   /**

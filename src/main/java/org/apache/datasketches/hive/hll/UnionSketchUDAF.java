@@ -55,6 +55,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + " of roughly +-3% in the estimation of uniques with 95% confidence."
     + " The target type parameter is optional and must be 'HLL_4', 'HLL_6' or 'HLL_8'."
     + " The default is 'HLL_4'")
+@SuppressWarnings("deprecation")
 public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
@@ -68,6 +69,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    * @param info The parameter info to validate
    * @return The GenericUDAFEvaluator to use to compute the function.
    */
+  @SuppressWarnings("javadoc")
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
@@ -107,7 +109,6 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    */
   public static class UnionSketchUDAFEvaluator extends SketchEvaluator {
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       return new UnionState();
@@ -166,7 +167,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
      *          sketches in the form of Object passed in to be merged.
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf,
+    public void iterate(final AggregationBuffer buf,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
       final UnionState state = (UnionState) buf;
@@ -185,7 +186,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       }
       TgtHllType type = DEFAULT_HLL_TYPE;
       if (this.hllTypeInspector_ != null) {
-        type = 
+        type =
           TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], this.hllTypeInspector_));
       }
       state.init(lgK, type);

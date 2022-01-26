@@ -32,6 +32,7 @@ import org.apache.hadoop.io.BytesWritable;
  * Hive intersection sketch UDF.
  *
  */
+@SuppressWarnings("deprecation")
 public class IntersectSketchUDF extends UDF {
 
   /**

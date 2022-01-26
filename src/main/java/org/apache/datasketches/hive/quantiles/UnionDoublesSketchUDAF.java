@@ -33,7 +33,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 @Description(name = "Union", value = "_FUNC_(sketch) - "
     + "Returns a QuantilesSketch in a serialized form as a binary blob."
     + " Input values are also serialized sketches.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -51,7 +51,6 @@ public class UnionDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   static class UnionEvaluator extends DoublesEvaluator {
 
-    @SuppressWarnings("deprecation")
     @Override
     public void iterate(final AggregationBuffer buf, final Object[] data) throws HiveException {
       if (data[0] == null) { return; }

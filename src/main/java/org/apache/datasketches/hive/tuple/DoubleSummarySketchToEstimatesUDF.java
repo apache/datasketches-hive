@@ -42,7 +42,7 @@ import org.apache.hadoop.io.BytesWritable;
     + " original population. Next there is an estimate of the sum of the parameter in the"
     + " original population (sum of the values in the sketch scaled to the original population."
     + " This estimate assumes that the DoubleSummary was used in the Sum mode.)")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class DoubleSummarySketchToEstimatesUDF extends UDF {
 
   private static final SummaryDeserializer<DoubleSummary> SUMMARY_DESERIALIZER =

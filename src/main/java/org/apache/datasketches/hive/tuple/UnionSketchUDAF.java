@@ -43,6 +43,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 /**
  * Generic implementation to be sub-classed with a particular type of Summary
  */
+@SuppressWarnings("deprecation")
 public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -81,7 +82,6 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    */
   public abstract GenericUDAFEvaluator createEvaluator();
 
-  @SuppressWarnings("javadoc")
   public static abstract class UnionSketchEvaluator<S extends Summary> extends SketchEvaluator<S> {
 
     private PrimitiveObjectInspector sketchInspector_;
@@ -115,7 +115,7 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data)
+    public void iterate(final AggregationBuffer buf, final Object[] data)
         throws HiveException {
       if (data[0] == null) { return; }
       @SuppressWarnings("unchecked")
@@ -136,7 +136,6 @@ public abstract class UnionSketchUDAF extends AbstractGenericUDAFResolver {
       state.init(nominalNumEntries, getSummarySetOperationsForIterate(data));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       return new UnionState<S>();

@@ -59,7 +59,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + " of roughly +-3% in the estimation of uniques with 95% confidence."
     + " The target type parameter is optional and must be 'HLL_4', 'HLL_6' or 'HLL_8'."
     + " The default is 'HLL_4'")
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc","deprecation"})
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
@@ -120,7 +120,6 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
     private Mode mode_;
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       // Different State is used for the iterate phase and the merge phase.
@@ -185,7 +184,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * java.lang.Object[])
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
+    public void iterate(final AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
       final State state = (State) agg;
@@ -202,7 +201,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
       }
       TgtHllType type = DEFAULT_HLL_TYPE;
       if (this.hllTypeInspector_ != null) {
-        type = 
+        type =
           TgtHllType.valueOf(PrimitiveObjectInspectorUtils.getString(parameters[2], this.hllTypeInspector_));
       }
       state.init(lgK, type);

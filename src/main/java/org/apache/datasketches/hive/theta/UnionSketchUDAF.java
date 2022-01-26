@@ -57,6 +57,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + "The default size is defined in the sketches-core library and at the time of this writing "
     + "was 4096 (about 3% error). "
     + "The seed is optional, and using it is not recommended unless you really know why you need it")
+@SuppressWarnings("deprecation")
 public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
@@ -70,6 +71,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
    * @param info The parameter info to validate
    * @return The GenericUDAFEvaluator to use to compute the function.
    */
+  @SuppressWarnings("javadoc")
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] parameters = info.getParameterObjectInspectors();
@@ -153,14 +155,14 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
      *          sketches in the form of Object passed in to be merged.
      */
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer agg,
+    public void iterate(final AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
       final UnionState state = (UnionState) agg;
       if (!state.isInitialized()) {
         initializeState(state, parameters);
       }
-      final byte[] serializedSketch = 
+      final byte[] serializedSketch =
           (byte[]) this.inputObjectInspector.getPrimitiveJavaObject(parameters[0]);
       if (serializedSketch == null) { return; }
       state.update(Memory.wrap(serializedSketch));
@@ -169,7 +171,7 @@ public class UnionSketchUDAF extends AbstractGenericUDAFResolver {
     private void initializeState(final UnionState state, final Object[] parameters) {
       int nominalEntries = DEFAULT_NOMINAL_ENTRIES;
       if (this.nominalEntriesObjectInspector != null) {
-        nominalEntries = 
+        nominalEntries =
             PrimitiveObjectInspectorUtils.getInt(parameters[1], this.nominalEntriesObjectInspector);
       }
       long seed = DEFAULT_UPDATE_SEED;

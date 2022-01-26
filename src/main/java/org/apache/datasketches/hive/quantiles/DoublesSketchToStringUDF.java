@@ -27,7 +27,7 @@ import org.apache.hadoop.io.BytesWritable;
 
 @Description(name = "ToString", value = "_FUNC_(sketch)",
 extended = " Returns a human-readable summary of a given DoublesSketch.")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class DoublesSketchToStringUDF extends UDF {
 
   /**

@@ -52,7 +52,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + " the estimation of uniques. The default number is defined in the sketches-core library,"
     + " and at the time of this writing was 4096 (about 3% error)."
     + " The number of values is optional and must match all input sketches (defaults to 1)")
-@SuppressWarnings("javadoc")
+@SuppressWarnings("deprecation")
 public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
 
   @Override
@@ -121,7 +121,7 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
     }
 
     @Override
-    public void iterate(final @SuppressWarnings("deprecation") AggregationBuffer buf, final Object[] data)
+    public void iterate(final AggregationBuffer buf, final Object[] data)
         throws HiveException {
       if (data[0] == null) { return; }
       final ArrayOfDoublesUnionState state = (ArrayOfDoublesUnionState) buf;
@@ -145,7 +145,6 @@ public class UnionArrayOfDoublesSketchUDAF extends AbstractGenericUDAFResolver {
       state.init(nominalNumEntries, numValues);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       return new ArrayOfDoublesUnionState();

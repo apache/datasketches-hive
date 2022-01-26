@@ -59,6 +59,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     + " It is optional and must be from 4 to 26. The default is 11, which is expected to yield errors"
     + " of roughly +-1.5% in the estimation of uniques with 95% confidence."
     + " The seed parameter is optional")
+@SuppressWarnings("deprecation")
 public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
 
   /**
@@ -79,6 +80,7 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
    * @param info Parameter info to validate
    * @return The GenericUDAFEvaluator that should be used to calculate the function.
    */
+  @SuppressWarnings("javadoc")
   @Override
   public GenericUDAFEvaluator getEvaluator(final GenericUDAFParameterInfo info) throws SemanticException {
     final ObjectInspector[] inspectors = info.getParameterObjectInspectors();
@@ -114,12 +116,10 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
     return new DataToSketchEvaluator();
   }
 
-  @SuppressWarnings("javadoc") //TODO
   public static class DataToSketchEvaluator extends SketchEvaluator {
 
     private Mode mode_;
 
-    @SuppressWarnings("deprecation")
     @Override
     public AggregationBuffer getNewAggregationBuffer() throws HiveException {
       // Different State is used for the iterate phase and the merge phase.
@@ -181,7 +181,6 @@ public class DataToSketchUDAF extends AbstractGenericUDAFResolver {
      * java.lang.Object[])
      */
     @Override
-    @SuppressWarnings("deprecation")
     public void iterate(final AggregationBuffer agg,
         final Object[] parameters) throws HiveException {
       if (parameters[0] == null) { return; }
