@@ -62,7 +62,13 @@ class SketchState extends State {
         this.sketch_.update(PrimitiveObjectInspectorUtils.getLong(data, objectInspector));
         return;
       case STRING:
-        // conversion to char[] avoids costly UTF-8 encoding
+        // This gets the java String and hashes the underlying UTF-16 array. It was an early
+        //attempt at optimization, which unfortunately is different from all other String
+        //hashing in the library which assume UTF-8. This can't be changed due to all the
+        //history users have created using this current method. Users that don't want the
+        //string conversion here can either convert their strings to the underlying UTF-16
+        //and use case CHAR, or if their strings are already UTF-8, grab the underlying
+        //byte array and use the BINARY method.
         this.sketch_.update(PrimitiveObjectInspectorUtils.getString(data, objectInspector)
             .toCharArray());
         return;
