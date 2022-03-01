@@ -306,6 +306,7 @@ under the License.
               <exclude>**/test/resources/**/*.txt</exclude>
               <exclude>LICENSE</exclude>
               <exclude>NOTICE</exclude>
+              <exclude>**/git.properties</exclude>
             </excludes>
           </configuration>
         </plugin>
