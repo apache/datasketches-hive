@@ -85,7 +85,7 @@ under the License.
     <!-- UNIQUE FOR THIS JAVA COMPONENT -->
     <datasketches-java.version>3.1.0</datasketches-java.version>
     <hive-exec.version>3.1.2</hive-exec.version>
-    <hadoop-common.version>3.3.1</hadoop-common.version>
+    <hadoop-common.version>3.3.2</hadoop-common.version>
     <slf4j-simple.version>1.7.32</slf4j-simple.version>
     <!-- END:UNIQUE FOR THIS JAVA COMPONENT -->
 
