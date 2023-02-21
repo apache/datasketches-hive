@@ -25,12 +25,25 @@ import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Union;
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 /**
  * Hive union sketch UDF.
  */
+@Description(
+    name = "unionSketch",
+    value = "_FUNC_(firstSketch, secondSketch[, size[, seed]]) - Compute the union of the given "
+        + "sketches with the given size and seed",
+    extended = "The return value is a binary blob that contains a compact sketch, which can "
+        + "be operated on by the other sketch-related functions. The optional "
+        + "size must be a power of 2, and controls the relative error of the expected "
+        + "result. A size of 16384 can be expected to yeild errors of roughly +-1.5% "
+        + "in the estimation of uniques with 95% confidence. "
+        + "The default size is defined in the sketches-core library and at the time of this writing "
+        + "was 4096 (about 3% error). "
+        + "The seed is optional, and using it is not recommended unless you really know why you need it")
 @SuppressWarnings("deprecation")
 public class UnionSketchUDF extends UDF {
 

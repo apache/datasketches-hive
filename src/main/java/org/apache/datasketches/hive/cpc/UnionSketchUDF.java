@@ -24,12 +24,22 @@ import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 import org.apache.datasketches.cpc.CpcSketch;
 import org.apache.datasketches.cpc.CpcUnion;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 /**
  * Hive union sketch UDF.
  */
+@Description(
+    name = "unionSketch",
+    value = "_FUNC_(firstSketch, secondSketch[, lgK[, seed]]) - Compute the union of the given "
+        + "sketches with the given size and seed",
+    extended = "The return value is a binary blob that can be operated on by other sketch related functions."
+        + " The lgK parameter controls the sketch size and rlative error expected from the sketch."
+        + " It is optional an must be from 4 to 26. The default is 11, which is expected to yield errors"
+        + " of roughly +-1.5% in the estimation of uniques with 95% confidence."
+        + " The seed parameter is optional")
 @SuppressWarnings("deprecation")
 public class UnionSketchUDF extends UDF {
 
