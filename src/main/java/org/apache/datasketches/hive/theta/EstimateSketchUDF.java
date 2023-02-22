@@ -24,13 +24,17 @@ import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.theta.Sketch;
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 /**
  * Hive estimate sketch udf. V4
- *
  */
+@Description(
+    name = "estimateSketch",
+    value = "_FUNC_(sketch) - Return the estimate unique count of the given sketch",
+    extended = "The given sketch is a binary blob computed by other Theta Sketch UDFs")
 @SuppressWarnings("deprecation")
 public class EstimateSketchUDF extends UDF {
 

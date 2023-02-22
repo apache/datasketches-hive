@@ -27,6 +27,7 @@ import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketch;
 import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketchIterator;
 import org.apache.datasketches.tuple.arrayofdoubles.ArrayOfDoublesSketches;
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -38,6 +39,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BytesWritable;
 
+@Description(
+    name = "ArrayOfDoublesSketchToValues",
+    value = "_FUNC_(sketch) Return the list of tuple values",
+    extended = "Returns associated values of a given ArrayOfDoublesSketch as rows."
+        + " Each row will be N double values, where N is the number of double values kept in the"
+        + " sketch per key.")
 public class ArrayOfDoublesSketchToValuesUDTF extends GenericUDTF {
 
   PrimitiveObjectInspector inputObjectInspector;

@@ -25,6 +25,7 @@ import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.theta.AnotB;
 import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Sketch;
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
@@ -32,6 +33,14 @@ import org.apache.hadoop.io.BytesWritable;
  * Hive exclude sketch UDF. (i.e. in sketch a but not in sketch b)
  *
  */
+@Description(
+    name = "excludeSketch",
+    value = "_FUNC_(firstSketch, secondSketch[, seed]) - Computes the set difference, A-AND-NOT-B,"
+        + "of the given sketches",
+    extended = "The return value is a binary blob that contains a compact sketch, which can "
+        + "be operated on by the other sketch-related functions. "
+        + "The seed is optional, "
+        + "and using it is not recommended unless you really know why you need it.")
 @SuppressWarnings("deprecation")
 public class ExcludeSketchUDF extends UDF {
 
