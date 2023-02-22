@@ -51,7 +51,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
     extended = "Example:\n"
     + "> SELECT UnionSketch(sketch) FROM src;\n"
     + "The return value is a binary blob that can be operated on by other sketch related functions."
-    + " The lgK parameter controls the sketch size and rlative error expected from the sketch."
+    + " The lgK parameter controls the sketch size and relative error expected from the sketch."
     + " It is optional an must be from 4 to 26. The default is 11, which is expected to yield errors"
     + " of roughly +-1.5% in the estimation of uniques with 95% confidence."
     + " The seed parameter is optional")

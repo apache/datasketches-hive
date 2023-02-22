@@ -35,7 +35,7 @@ import org.apache.hadoop.io.BytesWritable;
     value = "_FUNC_(firstSketch, secondSketch[, lgK[, type]]) - Compute the union of the given "
         + "sketches with the given size and seed",
     extended = "The return value is a binary blob that can be operated on by other sketch related functions."
-        + " The lgK parameter controls the sketch size and rlative error expected from the sketch."
+        + " The lgK parameter controls the sketch size and relative error expected from the sketch."
         + " It is optional and must be from 4 to 21. The default is 12, which is expected to yield errors"
         + " of roughly +-3% in the estimation of uniques with 95% confidence."
         + " The target type parameter is optional and must be 'HLL_4', 'HLL_6' or 'HLL_8'."
