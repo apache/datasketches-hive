@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.theta;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import org.apache.datasketches.SketchesArgumentException;
+import org.apache.datasketches.common.SketchesArgumentException;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.theta.Sketch;
 import org.apache.datasketches.theta.Sketches;

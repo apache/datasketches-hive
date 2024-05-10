@@ -19,8 +19,8 @@
 
 package org.apache.datasketches.hive.theta;
 
-import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
-import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
+import static org.apache.datasketches.thetacommon.ThetaUtil.DEFAULT_NOMINAL_ENTRIES;
+import static org.apache.datasketches.thetacommon.ThetaUtil.DEFAULT_UPDATE_SEED;
 
 import java.util.Arrays;
 import java.util.List;
