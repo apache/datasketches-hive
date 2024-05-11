@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.Comparator;
 
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -47,6 +47,7 @@ public class GetQuantileFromStringsSketchUDF extends UDF {
   public String evaluate(final BytesWritable serializedSketch, final double fraction) {
     if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
+      String.class,
       BytesWritableHelper.wrapAsMemory(serializedSketch),
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()

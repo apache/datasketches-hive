@@ -22,7 +22,7 @@ package org.apache.datasketches.hive.quantiles;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -52,6 +52,7 @@ public class GetPmfFromStringsSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final String... splitPoints) {
     if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
+      String.class,
       BytesWritableHelper.wrapAsMemory(serializedSketch),
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()

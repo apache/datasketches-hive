@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.frequencies;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
 import org.apache.datasketches.frequencies.ItemsSketch;
 import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggregationBuffer;

@@ -28,11 +28,11 @@ class SketchState extends AbstractAggregationBuffer {
 
   // initialization is needed in the first phase (iterate) only
   void init() {
-    this.state_ = new KllFloatsSketch();
+    this.state_ = KllFloatsSketch.newHeapInstance();
   }
 
   void init(final int k) {
-    this.state_ = new KllFloatsSketch(k);
+    this.state_ = KllFloatsSketch.newHeapInstance(k);
   }
 
   boolean isInitialized() {

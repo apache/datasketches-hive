@@ -26,9 +26,9 @@ import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
-import org.apache.datasketches.ArrayOfLongsSerDe;
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfLongsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.SketchesArgumentException;
 import org.apache.datasketches.quantiles.ItemsSketch;
 

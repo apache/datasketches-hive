@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.Comparator;
 
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 
@@ -38,7 +38,7 @@ public class UnionStringsSketchUDAF extends UnionItemsSketchUDAF<String> {
   static class UnionStringsSketchEvaluator extends UnionEvaluator<String> {
 
     UnionStringsSketchEvaluator() {
-      super(Comparator.naturalOrder(), new ArrayOfStringsSerDe());
+      super(String.class, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
     }
 
   }

@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -55,6 +55,7 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
   public List<String> evaluate(final BytesWritable serializedSketch, final Double... fractions) {
     if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
+      String.class,
       BytesWritableHelper.wrapAsMemory(serializedSketch),
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()
@@ -71,11 +72,30 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
   public List<String> evaluate(final BytesWritable serializedSketch, final int number) {
     if (serializedSketch == null) { return null; }
     final ItemsSketch<String> sketch = ItemsSketch.getInstance(
+      String.class,
       BytesWritableHelper.wrapAsMemory(serializedSketch),
       Comparator.naturalOrder(),
       new ArrayOfStringsSerDe()
     );
-    final String[] quantiles = sketch.getQuantiles(number);
+
+    String[] quantiles = null;
+    if (number == 1) {
+      quantiles = new String[1];
+      quantiles[0] = sketch.getMinItem();
+    } else if (number == 2) {
+      quantiles = new String[2];
+      quantiles[0] = sketch.getMinItem();
+      quantiles[1] = sketch.getMaxItem();
+    } else if (number > 2) {
+      final double[] ranks = new double[number];
+      final double delta = 1.0 / (number - 1);
+      for (int i = 0; i < number; i++) {
+        ranks[i] = i * delta;
+      }
+      quantiles = sketch.getQuantiles(ranks);
+      quantiles[number - 1] = sketch.getMaxItem(); // to ensure the max value is exact
+    }
+
     if (quantiles == null) { return null; }
     return Arrays.asList(quantiles);
   }

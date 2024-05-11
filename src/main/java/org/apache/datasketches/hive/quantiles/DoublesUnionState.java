@@ -52,7 +52,7 @@ class DoublesUnionState extends AbstractAggregationBuffer {
     if (this.union == null) {
       this.union = DoublesUnion.heapify(incomingSketch);
     } else {
-      this.union.update(incomingSketch);
+      this.union.union(incomingSketch);
     }
   }
 

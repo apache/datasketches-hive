@@ -23,7 +23,7 @@ import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.datasketches.quantiles.UpdateDoublesSketch;
 import org.apache.datasketches.tuple.Sketch;
-import org.apache.datasketches.tuple.SketchIterator;
+import org.apache.datasketches.tuple.TupleSketchIterator;
 import org.apache.datasketches.tuple.Sketches;
 import org.apache.datasketches.tuple.SummaryDeserializer;
 import org.apache.datasketches.tuple.adouble.DoubleSummary;
@@ -62,7 +62,7 @@ public class DoubleSummarySketchToPercentileUDF extends UDF {
     final Sketch<DoubleSummary> sketch =
         Sketches.heapifySketch(BytesWritableHelper.wrapAsMemory(serializedSketch), SUMMARY_DESERIALIZER);
     final UpdateDoublesSketch qs = DoublesSketch.builder().setK(QUANTILES_SKETCH_K).build();
-    final SketchIterator<DoubleSummary> it = sketch.iterator();
+    final TupleSketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {
       qs.update(it.getSummary().getValue());
     }

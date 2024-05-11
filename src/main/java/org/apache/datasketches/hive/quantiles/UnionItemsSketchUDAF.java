@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.Comparator;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -56,8 +56,8 @@ public abstract class UnionItemsSketchUDAF<T> extends AbstractGenericUDAFResolve
 
   public static class UnionEvaluator<T> extends ItemsEvaluator<T> {
 
-    UnionEvaluator(final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
-      super(comparator, serDe);
+    UnionEvaluator(final Class<T> clazz, final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
+      super(clazz, comparator, serDe);
     }
 
     @Override

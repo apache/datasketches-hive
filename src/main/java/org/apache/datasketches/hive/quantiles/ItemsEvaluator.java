@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.Comparator;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.quantiles.ItemsSketch;
@@ -35,12 +35,14 @@ import org.apache.hadoop.io.BytesWritable;
 
 abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
 
+  private final Class<T> clazz_;
   private final Comparator<? super T> comparator_;
   private final ArrayOfItemsSerDe<T> serDe_;
   protected PrimitiveObjectInspector inputObjectInspector;
   protected PrimitiveObjectInspector kObjectInspector;
 
-  ItemsEvaluator(final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
+  ItemsEvaluator(final Class<T> clazz, final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
+    this.clazz_ = clazz;
     this.comparator_ = comparator;
     this.serDe_ = serDe;
   }
@@ -100,7 +102,7 @@ abstract class ItemsEvaluator<T> extends GenericUDAFEvaluator {
   @SuppressWarnings("deprecation")
   @Override
   public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-    return new ItemsUnionState<>(this.comparator_, this.serDe_);
+    return new ItemsUnionState<>(this.clazz_, this.comparator_, this.serDe_);
   }
 
 }

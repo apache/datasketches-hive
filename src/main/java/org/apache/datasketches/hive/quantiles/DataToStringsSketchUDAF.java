@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.Comparator;
 
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.hadoop.hive.common.type.HiveChar;
 import org.apache.hadoop.hive.common.type.HiveVarchar;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -45,7 +45,7 @@ public class DataToStringsSketchUDAF extends DataToItemsSketchUDAF<String> {
   static class DataToStringsSketchEvaluator extends DataToSketchEvaluator<String> {
 
     DataToStringsSketchEvaluator() {
-      super(Comparator.naturalOrder(), new ArrayOfStringsSerDe());
+      super(String.class, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
     }
 
     @Override

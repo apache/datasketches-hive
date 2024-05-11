@@ -22,8 +22,8 @@ package org.apache.datasketches.hive.quantiles;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;

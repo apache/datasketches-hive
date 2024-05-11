@@ -64,7 +64,25 @@ public class GetQuantilesFromDoublesSketchUDF extends UDF {
   public List<Double> evaluate(final BytesWritable serializedSketch, final int number) {
     if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
-    final double[] quantiles = sketch.getQuantiles(number);
+
+    double[] quantiles = null;
+    if (number == 1) {
+      quantiles = new double[1];
+      quantiles[0] = sketch.getMinItem();
+    } else if (number == 2) {
+      quantiles = new double[2];
+      quantiles[0] = sketch.getMinItem();
+      quantiles[1] = sketch.getMaxItem();
+    } else if (number > 2) {
+      final double[] ranks = new double[number];
+      final double delta = 1.0 / (number - 1);
+      for (int i = 0; i < number; i++) {
+        ranks[i] = i * delta;
+      }
+      quantiles = sketch.getQuantiles(ranks);
+      quantiles[number - 1] = sketch.getMaxItem(); // to ensure the max value is exact
+    }
+
     if (quantiles == null) { return null; }
     return Util.primitivesToList(quantiles);
   }
