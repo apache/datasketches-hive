@@ -43,7 +43,7 @@ public class GetPmfFromStringsSketchUDFTest {
 
   @Test
   public void emptyListOfSplitPoints() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
@@ -55,14 +55,14 @@ public class GetPmfFromStringsSketchUDFTest {
 
   @Test
   public void emptySketch() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     List<Double> result = new GetPmfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), "a");
     Assert.assertNull(result);
   }
 
   @Test
   public void normalCase() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");

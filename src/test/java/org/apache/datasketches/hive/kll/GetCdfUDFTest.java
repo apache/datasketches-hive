@@ -37,7 +37,7 @@ public class GetCdfUDFTest {
 
   @Test
   public void emptyListOfSplitPoints() {
-    KllFloatsSketch sketch = new KllFloatsSketch();
+    KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -49,14 +49,14 @@ public class GetCdfUDFTest {
 
   @Test
   public void emptySketch() {
-    KllFloatsSketch sketch = new KllFloatsSketch();
+    KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     List<Double> result = new GetCdfUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0f);
     Assert.assertNull(result);
   }
 
   @Test
   public void normalCase() {
-    KllFloatsSketch sketch = new KllFloatsSketch();
+    KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);

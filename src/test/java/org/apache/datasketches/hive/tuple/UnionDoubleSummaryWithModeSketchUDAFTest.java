@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.Sketch;
-import org.apache.datasketches.tuple.SketchIterator;
+import org.apache.datasketches.tuple.TupleSketchIterator;
 import org.apache.datasketches.tuple.Sketches;
 import org.apache.datasketches.tuple.UpdatableSketch;
 import org.apache.datasketches.tuple.UpdatableSketchBuilder;
@@ -163,7 +163,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -208,7 +208,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 2.0);
       }
@@ -257,7 +257,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -306,7 +306,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) result), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 1.0);
       }
@@ -343,7 +343,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) result), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -388,7 +388,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) result), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -433,7 +433,7 @@ public class UnionDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) result), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 2.0);
       }

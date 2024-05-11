@@ -36,7 +36,7 @@ public class SektchToStringUDFTest {
 
   @Test
   public void normalCase() {
-    KllFloatsSketch sketch = new KllFloatsSketch();
+    KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);

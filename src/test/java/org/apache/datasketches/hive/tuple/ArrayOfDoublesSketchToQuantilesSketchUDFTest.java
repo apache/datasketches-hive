@@ -75,8 +75,8 @@ public class ArrayOfDoublesSketchToQuantilesSketchUDFTest {
     Assert.assertNotNull(result);
     DoublesSketch qs = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(result));
     Assert.assertFalse(qs.isEmpty());
-    Assert.assertEquals(qs.getMinValue(), 1.0);
-    Assert.assertEquals(qs.getMaxValue(), 10.0);
+    Assert.assertEquals(qs.getMinItem(), 1.0);
+    Assert.assertEquals(qs.getMaxItem(), 10.0);
   }
 
   @Test
@@ -94,8 +94,8 @@ public class ArrayOfDoublesSketchToQuantilesSketchUDFTest {
     DoublesSketch qs = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(result));
     Assert.assertFalse(qs.isEmpty());
     Assert.assertEquals(qs.getK(), k);
-    Assert.assertEquals(qs.getMinValue(), 2.0);
-    Assert.assertEquals(qs.getMaxValue(), 20.0);
+    Assert.assertEquals(qs.getMinItem(), 2.0);
+    Assert.assertEquals(qs.getMaxItem(), 20.0);
   }
 
 }

@@ -105,11 +105,11 @@ public class UnionSketchUDAFTest {
 
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
 
-      KllFloatsSketch sketch1 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch1 = KllFloatsSketch.newHeapInstance(400);
       sketch1.update(1);
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()) });
 
-      KllFloatsSketch sketch2 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch2 = KllFloatsSketch.newHeapInstance(400);
       sketch2.update(2);
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
 
@@ -117,8 +117,8 @@ public class UnionSketchUDAFTest {
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(200, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), 1f);
-      Assert.assertEquals(resultSketch.getMaxValue(), 2f);
+      Assert.assertEquals(resultSketch.getMinItem(), 1f);
+      Assert.assertEquals(resultSketch.getMaxItem(), 2f);
     }
   }
 
@@ -132,11 +132,11 @@ public class UnionSketchUDAFTest {
 
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
 
-      KllFloatsSketch sketch1 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch1 = KllFloatsSketch.newHeapInstance(400);
       sketch1.update(1);
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()), new IntWritable(400) });
 
-      KllFloatsSketch sketch2 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch2 = KllFloatsSketch.newHeapInstance(400);
       sketch2.update(2);
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()), new IntWritable(400) });
 
@@ -144,8 +144,8 @@ public class UnionSketchUDAFTest {
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), 1f);
-      Assert.assertEquals(resultSketch.getMaxValue(), 2f);
+      Assert.assertEquals(resultSketch.getMinItem(), 1f);
+      Assert.assertEquals(resultSketch.getMaxItem(), 2f);
     }
   }
 
@@ -160,11 +160,11 @@ public class UnionSketchUDAFTest {
 
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
 
-      KllFloatsSketch sketch1 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch1 = KllFloatsSketch.newHeapInstance(400);
       sketch1.update(1);
       eval.merge(state, new BytesWritable(sketch1.toByteArray()));
 
-      KllFloatsSketch sketch2 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch2 = KllFloatsSketch.newHeapInstance(400);
       sketch2.update(2);
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
@@ -172,8 +172,8 @@ public class UnionSketchUDAFTest {
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), 1f);
-      Assert.assertEquals(resultSketch.getMaxValue(), 2f);
+      Assert.assertEquals(resultSketch.getMinItem(), 1f);
+      Assert.assertEquals(resultSketch.getMaxItem(), 2f);
     }
   }
 
@@ -188,11 +188,11 @@ public class UnionSketchUDAFTest {
 
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
 
-      KllFloatsSketch sketch1 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch1 = KllFloatsSketch.newHeapInstance(400);
       sketch1.update(1);
       eval.merge(state, new BytesWritable(sketch1.toByteArray()));
 
-      KllFloatsSketch sketch2 = new KllFloatsSketch(400);
+      KllFloatsSketch sketch2 = KllFloatsSketch.newHeapInstance(400);
       sketch2.update(2);
       eval.merge(state, new BytesWritable(sketch2.toByteArray()));
 
@@ -200,8 +200,8 @@ public class UnionSketchUDAFTest {
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(400, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), 1f);
-      Assert.assertEquals(resultSketch.getMaxValue(), 2f);
+      Assert.assertEquals(resultSketch.getMinItem(), 1f);
+      Assert.assertEquals(resultSketch.getMaxItem(), 2f);
     }
   }
 
@@ -216,11 +216,11 @@ public class UnionSketchUDAFTest {
 
       SketchState state = (SketchState) eval.getNewAggregationBuffer();
 
-      KllFloatsSketch sketch1 = new KllFloatsSketch();
+      KllFloatsSketch sketch1 = KllFloatsSketch.newHeapInstance();
       sketch1.update(1);
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray()) });
 
-      KllFloatsSketch sketch2 = new KllFloatsSketch();
+      KllFloatsSketch sketch2 = KllFloatsSketch.newHeapInstance();
       sketch2.update(2);
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray()) });
 
@@ -228,8 +228,8 @@ public class UnionSketchUDAFTest {
       KllFloatsSketch resultSketch = KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(bytes));
       Assert.assertEquals(resultSketch.getNormalizedRankError(false), KllFloatsSketch.getNormalizedRankError(200, false));
       Assert.assertEquals(resultSketch.getNumRetained(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), 1f);
-      Assert.assertEquals(resultSketch.getMaxValue(), 2f);
+      Assert.assertEquals(resultSketch.getMinItem(), 1f);
+      Assert.assertEquals(resultSketch.getMaxItem(), 2f);
 
       eval.reset(state);
       Assert.assertNull(eval.terminate(state));

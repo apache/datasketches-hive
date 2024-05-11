@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 import org.apache.datasketches.common.ArrayOfItemsSerDe;
 import org.apache.datasketches.common.ArrayOfLongsSerDe;
 import org.apache.datasketches.common.ArrayOfStringsSerDe;
-import org.apache.datasketches.SketchesArgumentException;
+import org.apache.datasketches.common.SketchesArgumentException;
 import org.apache.datasketches.quantiles.ItemsSketch;
 
 @SuppressWarnings("javadoc")
@@ -45,7 +45,7 @@ public class GetQuantileFromStringsSketchUDFTest {
 
   @Test
   public void normalCase() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
@@ -59,7 +59,7 @@ public class GetQuantileFromStringsSketchUDFTest {
   //If a bounds error is not detected from a wrong type assignment, unexpected results could occur.
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void fractionsWrongSketchType() {
-    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Long.class, Comparator.naturalOrder());
     sketch.update(1L);
     sketch.update(2L);
     sketch.update(3L);

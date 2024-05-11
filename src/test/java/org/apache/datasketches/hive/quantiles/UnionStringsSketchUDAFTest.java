@@ -112,20 +112,20 @@ public class UnionStringsSketchUDAFTest {
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
 
-      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch1.update("a");
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)) });
 
-      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch2.update("b");
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(String.class, BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 128);
-      Assert.assertEquals(resultSketch.getRetainedItems(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), "a");
-      Assert.assertEquals(resultSketch.getMaxValue(), "b");
+      Assert.assertEquals(resultSketch.getNumRetained(), 2);
+      Assert.assertEquals(resultSketch.getMinItem(), "a");
+      Assert.assertEquals(resultSketch.getMaxItem(), "b");
     }
   }
 
@@ -140,20 +140,20 @@ public class UnionStringsSketchUDAFTest {
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
 
-      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch1.update("a");
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)), new IntWritable(256) });
 
-      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch2.update("b");
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)), new IntWritable(256) });
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(String.class, BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
-      Assert.assertEquals(resultSketch.getRetainedItems(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), "a");
-      Assert.assertEquals(resultSketch.getMaxValue(), "b");
+      Assert.assertEquals(resultSketch.getNumRetained(), 2);
+      Assert.assertEquals(resultSketch.getMinItem(), "a");
+      Assert.assertEquals(resultSketch.getMaxItem(), "b");
     }
   }
 
@@ -169,20 +169,20 @@ public class UnionStringsSketchUDAFTest {
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
 
-      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch1.update("a");
       eval.merge(state, new BytesWritable(sketch1.toByteArray(serDe)));
 
-      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch2.update("b");
       eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
       BytesWritable bytes = (BytesWritable) eval.terminatePartial(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(String.class, BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
-      Assert.assertEquals(resultSketch.getRetainedItems(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), "a");
-      Assert.assertEquals(resultSketch.getMaxValue(), "b");
+      Assert.assertEquals(resultSketch.getNumRetained(), 2);
+      Assert.assertEquals(resultSketch.getMinItem(), "a");
+      Assert.assertEquals(resultSketch.getMaxItem(), "b");
     }
   }
 
@@ -198,20 +198,20 @@ public class UnionStringsSketchUDAFTest {
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
 
-      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch1.update("a");
       eval.merge(state, new BytesWritable(sketch1.toByteArray(serDe)));
 
-      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(256, comparator);
+      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(String.class, 256, comparator);
       sketch2.update("b");
       eval.merge(state, new BytesWritable(sketch2.toByteArray(serDe)));
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(String.class, BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 256);
-      Assert.assertEquals(resultSketch.getRetainedItems(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), "a");
-      Assert.assertEquals(resultSketch.getMaxValue(), "b");
+      Assert.assertEquals(resultSketch.getNumRetained(), 2);
+      Assert.assertEquals(resultSketch.getMinItem(), "a");
+      Assert.assertEquals(resultSketch.getMaxItem(), "b");
     }
   }
 
@@ -227,20 +227,20 @@ public class UnionStringsSketchUDAFTest {
       @SuppressWarnings("unchecked")
       ItemsUnionState<String> state = (ItemsUnionState<String>) eval.getNewAggregationBuffer();
 
-      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(comparator);
+      ItemsSketch<String> sketch1 = ItemsSketch.getInstance(String.class, comparator);
       sketch1.update("a");
       eval.iterate(state, new Object[] { new BytesWritable(sketch1.toByteArray(serDe)) });
 
-      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(comparator);
+      ItemsSketch<String> sketch2 = ItemsSketch.getInstance(String.class, comparator);
       sketch2.update("b");
       eval.iterate(state, new Object[] { new BytesWritable(sketch2.toByteArray(serDe)) });
 
       BytesWritable bytes = (BytesWritable) eval.terminate(state);
-      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
+      ItemsSketch<String> resultSketch = ItemsSketch.getInstance(String.class, BytesWritableHelper.wrapAsMemory(bytes), comparator, serDe);
       Assert.assertEquals(resultSketch.getK(), 128);
-      Assert.assertEquals(resultSketch.getRetainedItems(), 2);
-      Assert.assertEquals(resultSketch.getMinValue(), "a");
-      Assert.assertEquals(resultSketch.getMaxValue(), "b");
+      Assert.assertEquals(resultSketch.getNumRetained(), 2);
+      Assert.assertEquals(resultSketch.getMinItem(), "a");
+      Assert.assertEquals(resultSketch.getMaxItem(), "b");
 
       eval.reset(state);
       Assert.assertNull(eval.terminate(state));

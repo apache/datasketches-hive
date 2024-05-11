@@ -37,7 +37,7 @@ public class GetQuantilesUDFTest {
 
   @Test
   public void emptyListOfFractions() {
-    final KllFloatsSketch sketch = new KllFloatsSketch();
+    final KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -48,7 +48,7 @@ public class GetQuantilesUDFTest {
 
   @Test
   public void fractionsNormalCase() {
-    final KllFloatsSketch sketch = new KllFloatsSketch();
+    final KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);

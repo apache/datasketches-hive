@@ -44,7 +44,7 @@ public class StringsSketchToStringUDFTest {
 
   @Test
   public void normalCase() {
-    final ItemsSketch<String> sketch = ItemsSketch.getInstance(COMPARATOR);
+    final ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, COMPARATOR);
     final String result = new StringsSketchToStringUDF().evaluate(new BytesWritable(sketch.toByteArray(SERDE)));
     Assert.assertNotNull(result);
     Assert.assertTrue(result.length() > 0);

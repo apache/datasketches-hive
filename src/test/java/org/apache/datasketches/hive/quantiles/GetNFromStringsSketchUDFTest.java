@@ -44,7 +44,7 @@ public class GetNFromStringsSketchUDFTest {
 
   @Test
   public void normalCase() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");

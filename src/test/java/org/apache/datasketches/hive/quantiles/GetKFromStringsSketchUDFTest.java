@@ -44,7 +44,7 @@ public class GetKFromStringsSketchUDFTest {
 
   @Test
   public void normalCase() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     Integer result = new GetKFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)));
     Assert.assertNotNull(result);
     Assert.assertEquals(result, Integer.valueOf(128));
