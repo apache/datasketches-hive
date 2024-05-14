@@ -61,6 +61,7 @@ public class DoubleSummarySketchToPercentileUDF extends UDF {
     }
     final Sketch<DoubleSummary> sketch =
         Sketches.heapifySketch(BytesWritableHelper.wrapAsMemory(serializedSketch), SUMMARY_DESERIALIZER);
+    if (sketch.isEmpty()) { return Double.NaN; }
     final UpdateDoublesSketch qs = DoublesSketch.builder().setK(QUANTILES_SKETCH_K).build();
     final TupleSketchIterator<DoubleSummary> it = sketch.iterator();
     while (it.next()) {
