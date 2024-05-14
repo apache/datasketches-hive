@@ -67,13 +67,25 @@ public class GetCdfFromStringsSketchUDFTest {
     sketch.update("b");
     sketch.update("c");
     sketch.update("d");
+
+    // inclusive
     List<Double> result = new GetCdfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), "a", "c", "d");
+    Assert.assertNotNull(result);
+    Assert.assertEquals((double)result.size(), 4);
+    Assert.assertEquals((double)result.get(0), 0.25);
+    Assert.assertEquals((double)result.get(1), 0.75);
+    Assert.assertEquals((double)result.get(2), 1.0);
+    Assert.assertEquals((double)result.get(3), 1.0);
+
+    // exclusive
+    result = new GetCdfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, "a", "c", "d");
     Assert.assertNotNull(result);
     Assert.assertEquals((double)result.size(), 4);
     Assert.assertEquals((double)result.get(0), 0.0);
     Assert.assertEquals((double)result.get(1), 0.5);
     Assert.assertEquals((double)result.get(2), 0.75);
     Assert.assertEquals((double)result.get(3), 1.0);
+
   }
 
 }

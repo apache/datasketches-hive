@@ -61,20 +61,32 @@ public class GetQuantilesFromStringsSketchUDFTest {
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
+    sketch.update("d");
+
+    // inclusive
     List<String> result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0.0, 0.5, 1.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals(result.get(0), "a");
     Assert.assertEquals(result.get(1), "b");
-    Assert.assertEquals(result.get(2), "c");
+    Assert.assertEquals(result.get(2), "d");
+
+    // exclusive
+    result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, 0.0, 0.5, 1.0);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals(result.get(0), "a");
+    Assert.assertEquals(result.get(1), "c");
+    Assert.assertEquals(result.get(2), "d");
   }
 
-  @Test(expectedExceptions = SketchesArgumentException.class)
+  @Test
   public void evenlySpacedZero() {
     ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
-    new GetQuantilesFromStringsSketchUDF()
+    List<String> result = new GetQuantilesFromStringsSketchUDF()
       .evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0);
+    Assert.assertNull(result);
   }
 
   @Test
@@ -90,12 +102,23 @@ public class GetQuantilesFromStringsSketchUDFTest {
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
+    sketch.update("d");
+
+    // inclusive
     List<String> result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), 3);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals(result.get(0), "a");
     Assert.assertEquals(result.get(1), "b");
-    Assert.assertEquals(result.get(2), "c");
+    Assert.assertEquals(result.get(2), "d");
+
+    // exclusive
+    result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, 3);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals(result.get(0), "a");
+    Assert.assertEquals(result.get(1), "c");
+    Assert.assertEquals(result.get(2), "d");
   }
 
   //Note: this exception is only caught because a bounds error was detected.

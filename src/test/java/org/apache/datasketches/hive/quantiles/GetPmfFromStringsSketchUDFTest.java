@@ -67,7 +67,18 @@ public class GetPmfFromStringsSketchUDFTest {
     sketch.update("b");
     sketch.update("c");
     sketch.update("d");
+
+    // inclusive
     List<Double> result = new GetPmfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), "a", "c", "e");
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 4);
+    Assert.assertEquals((double)result.get(0), 0.25);
+    Assert.assertEquals((double)result.get(1), 0.5);
+    Assert.assertEquals((double)result.get(2), 0.25);
+    Assert.assertEquals((double)result.get(3), 0.0);
+
+    // exclusive
+    result = new GetPmfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, "a", "c", "e");
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 4);
     Assert.assertEquals((double)result.get(0), 0.0);

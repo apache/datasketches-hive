@@ -49,10 +49,19 @@ public class GetQuantileFromStringsSketchUDFTest {
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
+    sketch.update("d");
+
+    // inclusive
     String result = new GetQuantileFromStringsSketchUDF()
         .evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0.5);
     Assert.assertNotNull(result);
     Assert.assertEquals(result, "b");
+
+    // exclusive
+    result = new GetQuantileFromStringsSketchUDF()
+        .evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, 0.5);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result, "c");
   }
 
   //Note: this exception is only caught because a bounds error was detected.
