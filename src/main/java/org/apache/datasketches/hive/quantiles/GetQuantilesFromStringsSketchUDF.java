@@ -36,10 +36,9 @@ import org.apache.hadoop.io.BytesWritable;
     value = "_FUNC_(sketch, [inclusive,] fractions...) or _FUNC_(sketch, [inclusive,] number)",
     extended = "Returns quantile values from a given ItemsSketch<String> based on a given"
     + " list of fractions or a number of evenly spaced fractions."
-    + " The optional boolean parameter 'inclusive' determines if the interval is inclusive,"
-    + " which is inclusive of the left split point and exclusive of the right split point, or"
-    + " the alternative of exclusive of the split point and inclusive of the right split point."
-    + " Defaults to inclusive (of left split point) when not specified."
+    + " The optional boolean parameter 'inclusive' (default: true) determines if the result includes"
+    + " values less than or equal to each target fraction or, if false, only values strictly less than"
+    + " each target fraction."
     + " The fractions represent normalized ranks, and must be from 0 to 1 inclusive."
     + " For example, a fraction of 0.5 corresponds to 50th percentile,"
     + " which is the median value of the distribution (the number separating the higher"
@@ -65,7 +64,7 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
   /**
    * Returns a list of quantile values from a given sketch
    * @param serializedSketch serialized sketch
-   * @param inclusive if true, the interval is inclusive of the left split point and exclusive of the right split point
+   * @param inclusive if true, the given ranks are considered inclusive (include weight of an item)
    * @param fractions list of values from 0 to 1 inclusive
    * @return list of quantile values
    */
@@ -95,7 +94,7 @@ public class GetQuantilesFromStringsSketchUDF extends UDF {
   /**
    * Returns a list of quantile values from a given sketch
    * @param serializedSketch serialized sketch
-   * @param inclusive if true, the interval is inclusive of the left split point and exclusive of the right split point
+   * @param inclusive if true, the given ranks are considered inclusive (include weight of an item)
    * @param number of evenly spaced fractions
    * @return list of quantile values
    */

@@ -39,9 +39,17 @@ public class GetQuantileUDFTest {
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
-    final Float result = new GetQuantileUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
+    sketch.update(4);
+
+    // inclusive
+    Float result = new GetQuantileUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
     Assert.assertNotNull(result);
     Assert.assertEquals((double)result, 2f);
+
+    // exclusive
+    result = new GetQuantileUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 0.5);
+    Assert.assertNotNull(result);
+    Assert.assertEquals((double)result, 3f);
   }
 
 }

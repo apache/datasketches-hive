@@ -40,9 +40,17 @@ public class GetRankUDFTest {
     sketch.update(2);
     sketch.update(3);
     sketch.update(4);
-    final Double result = new GetRankUDF().evaluate(new BytesWritable(sketch.toByteArray()), 3f);
+
+    // inclusive
+    Double result = new GetRankUDF().evaluate(new BytesWritable(sketch.toByteArray()), 3f);
+    Assert.assertNotNull(result);
+    Assert.assertEquals((double)result, 0.75);
+
+    // exclusive
+    result = new GetRankUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 3f);
     Assert.assertNotNull(result);
     Assert.assertEquals((double)result, 0.5);
+
   }
 
 }

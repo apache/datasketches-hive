@@ -61,7 +61,18 @@ public class GetCdfUDFTest {
     sketch.update(2);
     sketch.update(3);
     sketch.update(4);
+
+    // inclusive
     List<Double> result = new GetCdfUDF().evaluate(new BytesWritable(sketch.toByteArray()), 1f, 3f, 4f);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 4);
+    Assert.assertEquals((double)result.get(0), 0.25);
+    Assert.assertEquals((double)result.get(1), 0.75);
+    Assert.assertEquals((double)result.get(2), 1.0);
+    Assert.assertEquals((double)result.get(3), 1.0);
+
+    // exclusive
+    result = new GetCdfUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 1f, 3f, 4f);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 4);
     Assert.assertEquals((double)result.get(0), 0.0);

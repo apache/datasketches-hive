@@ -35,10 +35,9 @@ import org.apache.hadoop.io.BytesWritable;
     value = "_FUNC_(sketch, [inclusive,] split points...)",
     extended = "Returns an approximation to the Probability Mass Function (PMF)"
     + " from a sketch given a set of split points (values)."
-    + " The optional boolean parameter 'inclusive' determines if the interval is inclusive,"
-    + " which is inclusive of the left split point and exclusive of the right split point, or"
-    + " the alternative of exclusive of the split point and inclusive of the right split point."
-    + " Defaults to inclusive (of left split point) when not specified."
+    + " The optional boolean parameter 'inclusive' (default: true) determines whether the rank of an"
+    + " item includes its own weight. If true, such items are included in the interval to the left of"
+    + " the split point; otherwise they are included in the interval to the right of the split point."
     + " Split points are an array of M unique, monotonically increasing values"
     + " that divide the domain into M+1 consecutive disjoint intervals."
     + " The function returns an array of M+1 doubles, each of which is an approximation"
