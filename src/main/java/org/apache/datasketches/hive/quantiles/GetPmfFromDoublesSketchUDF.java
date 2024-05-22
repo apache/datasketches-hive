@@ -23,15 +23,19 @@ import java.util.List;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.quantiles.DoublesSketch;
+import org.apache.datasketches.quantilescommon.QuantileSearchCriteria;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 @Description(
   name = "GetPMF",
-  value = "_FUNC_(sketch, split points...)",
+  value = "_FUNC_(sketch, [inclusive,] split points...)",
   extended = "Returns an approximation to the Probability Mass Function (PMF)"
   + " from a sketch given a set of split points (values)."
+  + " The optional boolean parameter 'inclusive' (default: true) determines whether the rank of an"
+  + " item includes its own weight. If true, such items are included in the interval to the left of"
+  + " the split point; otherwise they are included in the interval to the right of the split point."
   + " Split points are an array of M unique, monotonically increasing values"
   + " that divide the real number line into M+1 consecutive disjoint intervals."
   + " The function returns an array of M+1 doubles, each of which is an approximation"
@@ -42,15 +46,29 @@ import org.apache.hadoop.io.BytesWritable;
 public class GetPmfFromDoublesSketchUDF extends UDF {
 
   /**
-   * Returns a list of fractions (PMF) from a given sketch
+   * Returns a list of fractions (PMF) from a given sketch. Equivalent to calling
+   * GetPMF(sketch, true, splitPoints...)
    * @param serializedSketch serialized sketch
    * @param splitPoints list of unique and monotonically increasing values
    * @return list of fractions from 0 to 1
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Double... splitPoints) {
+    return evaluate(serializedSketch, true, splitPoints);
+  }
+
+  /**
+   * Returns a list of fractions (PMF) from a given sketch
+   * @param serializedSketch serialized sketch
+   * @param inclusive if true, the interval is inclusive of the left split point and exclusive of the right split point
+   * @param splitPoints list of unique and monotonically increasing values
+   * @return list of fractions from 0 to 1
+   */
+  public List<Double> evaluate(final BytesWritable serializedSketch, final Boolean inclusive, final Double... splitPoints) {
     if (serializedSketch == null) { return null; }
     final DoublesSketch sketch = DoublesSketch.wrap(BytesWritableHelper.wrapAsMemory(serializedSketch));
-    final double[] pmf = sketch.getPMF(Util.objectsToPrimitives(splitPoints));
+    if (sketch.isEmpty()) { return null; }
+    final double[] pmf = sketch.getPMF(Util.objectsToPrimitives(splitPoints),
+                                       (inclusive ? QuantileSearchCriteria.INCLUSIVE : QuantileSearchCriteria.EXCLUSIVE));
     if (pmf == null) { return null; }
     return Util.primitivesToList(pmf);
   }

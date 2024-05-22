@@ -19,7 +19,7 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
+import static org.apache.datasketches.thetacommon.ThetaUtil.DEFAULT_NOMINAL_ENTRIES;
 
 import java.util.Arrays;
 import java.util.List;

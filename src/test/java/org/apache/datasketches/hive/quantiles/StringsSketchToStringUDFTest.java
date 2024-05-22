@@ -23,8 +23,8 @@ import java.util.Comparator;
 
 import org.apache.hadoop.io.BytesWritable;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.quantiles.ItemsSketch;
 
 import org.testng.annotations.Test;
@@ -44,7 +44,7 @@ public class StringsSketchToStringUDFTest {
 
   @Test
   public void normalCase() {
-    final ItemsSketch<String> sketch = ItemsSketch.getInstance(COMPARATOR);
+    final ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, COMPARATOR);
     final String result = new StringsSketchToStringUDF().evaluate(new BytesWritable(sketch.toByteArray(SERDE)));
     Assert.assertNotNull(result);
     Assert.assertTrue(result.length() > 0);

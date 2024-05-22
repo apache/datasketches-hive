@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.frequencies;
 
 import java.util.Arrays;
 
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.frequencies.ErrorType;
 import org.apache.datasketches.frequencies.ItemsSketch;
 import org.apache.datasketches.hive.common.BytesWritableHelper;

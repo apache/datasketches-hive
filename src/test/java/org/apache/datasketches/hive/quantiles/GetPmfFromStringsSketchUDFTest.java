@@ -22,8 +22,8 @@ package org.apache.datasketches.hive.quantiles;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
-import org.apache.datasketches.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
@@ -43,7 +43,7 @@ public class GetPmfFromStringsSketchUDFTest {
 
   @Test
   public void emptyListOfSplitPoints() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
@@ -55,19 +55,30 @@ public class GetPmfFromStringsSketchUDFTest {
 
   @Test
   public void emptySketch() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     List<Double> result = new GetPmfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), "a");
     Assert.assertNull(result);
   }
 
   @Test
   public void normalCase() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
     sketch.update("d");
+
+    // inclusive
     List<Double> result = new GetPmfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), "a", "c", "e");
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 4);
+    Assert.assertEquals((double)result.get(0), 0.25);
+    Assert.assertEquals((double)result.get(1), 0.5);
+    Assert.assertEquals((double)result.get(2), 0.25);
+    Assert.assertEquals((double)result.get(3), 0.0);
+
+    // exclusive
+    result = new GetPmfFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, "a", "c", "e");
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 4);
     Assert.assertEquals((double)result.get(0), 0.0);

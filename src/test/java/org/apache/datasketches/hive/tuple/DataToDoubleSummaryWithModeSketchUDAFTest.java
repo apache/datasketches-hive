@@ -19,14 +19,14 @@
 
 package org.apache.datasketches.hive.tuple;
 
-import static org.apache.datasketches.Util.DEFAULT_NOMINAL_ENTRIES;
+import static org.apache.datasketches.thetacommon.ThetaUtil.DEFAULT_NOMINAL_ENTRIES;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.tuple.Sketch;
-import org.apache.datasketches.tuple.SketchIterator;
+import org.apache.datasketches.tuple.TupleSketchIterator;
 import org.apache.datasketches.tuple.Sketches;
 import org.apache.datasketches.tuple.UpdatableSketch;
 import org.apache.datasketches.tuple.UpdatableSketchBuilder;
@@ -168,7 +168,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
           BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)), new DoubleSummaryDeserializer());
       Assert.assertFalse(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -202,7 +202,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       // because of sampling probability < 1
       Assert.assertTrue(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 1.0);
       }
@@ -251,7 +251,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) r.get(2)), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -300,7 +300,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) result), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -329,7 +329,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       Sketch<DoubleSummary> resultSketch = Sketches.heapifySketch(
           BytesWritableHelper.wrapAsMemory((BytesWritable) result), new DoubleSummaryDeserializer());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 3.0);
       }
@@ -364,7 +364,7 @@ public class DataToDoubleSummaryWithModeSketchUDAFTest {
       // because of sampling probability < 1
       Assert.assertTrue(resultSketch.isEstimationMode());
       Assert.assertEquals(resultSketch.getEstimate(), 2.0, 0.05);
-      SketchIterator<DoubleSummary> it = resultSketch.iterator();
+      TupleSketchIterator<DoubleSummary> it = resultSketch.iterator();
       while (it.next()) {
         Assert.assertEquals(it.getSummary().getValue(), 2.0);
       }

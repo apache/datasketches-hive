@@ -21,7 +21,7 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.Comparator;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
 import org.apache.datasketches.memory.Memory;
 import org.apache.datasketches.quantiles.ItemsSketch;
 import org.apache.datasketches.quantiles.ItemsUnion;
@@ -29,11 +29,13 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AbstractAggreg
 
 class ItemsUnionState<T> extends AbstractAggregationBuffer {
 
+  private final Class<T> clazz_;
   private final Comparator<? super T> comparator_;
   private final ArrayOfItemsSerDe<T> serDe_;
   private ItemsUnion<T> union;
 
-  ItemsUnionState(final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
+  ItemsUnionState(final Class<T> clazz, final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
+    this.clazz_ = clazz;
     this.comparator_ = comparator;
     this.serDe_ = serDe;
   }
@@ -41,9 +43,9 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
   // initializing is needed only in the first phase (iterate)
   void init(final int k) {
     if (k > 0) {
-      this.union = ItemsUnion.getInstance(k, this.comparator_);
+      this.union = ItemsUnion.getInstance(this.clazz_, k, this.comparator_);
     } else {
-      this.union = ItemsUnion.getInstance(this.comparator_);
+      this.union = ItemsUnion.getInstance(this.clazz_, this.comparator_);
     }
   }
 
@@ -53,18 +55,18 @@ class ItemsUnionState<T> extends AbstractAggregationBuffer {
 
   void update(final T value) {
     if (this.union == null) {
-      this.union = ItemsUnion.getInstance(this.comparator_);
+      this.union = ItemsUnion.getInstance(this.clazz_, this.comparator_);
     }
     this.union.update(value);
   }
 
   void update(final Memory serializedSketch) {
     final ItemsSketch<T> incomingSketch =
-        ItemsSketch.getInstance(serializedSketch, this.comparator_, this.serDe_);
+        ItemsSketch.getInstance(this.clazz_, serializedSketch, this.comparator_, this.serDe_);
     if (this.union == null) {
       this.union = ItemsUnion.getInstance(incomingSketch);
     } else {
-      this.union.update(incomingSketch);
+      this.union.union(incomingSketch);
     }
   }
 

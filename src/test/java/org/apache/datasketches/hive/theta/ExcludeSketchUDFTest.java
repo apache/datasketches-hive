@@ -19,11 +19,11 @@
 
 package org.apache.datasketches.hive.theta;
 
-import static org.apache.datasketches.Util.DEFAULT_UPDATE_SEED;
+import static org.apache.datasketches.thetacommon.ThetaUtil.DEFAULT_UPDATE_SEED;
 import static org.testng.Assert.fail;
 import static org.testng.AssertJUnit.assertEquals;
 
-import org.apache.datasketches.SketchesArgumentException;
+import org.apache.datasketches.common.SketchesArgumentException;
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.theta.Sketch;
 import org.apache.datasketches.theta.Sketches;

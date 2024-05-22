@@ -40,9 +40,17 @@ public class GetQuantileFromDoublesSektchUDFTest {
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
+    sketch.update(4);
+
+    // inclusive
     Double result = new GetQuantileFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.5);
     Assert.assertNotNull(result);
     Assert.assertEquals((double)result, 2.0);
+
+    // exclusive
+    result = new GetQuantileFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 0.5);
+    Assert.assertNotNull(result);
+    Assert.assertEquals((double)result, 3.0);
   }
 
 }

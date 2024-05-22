@@ -23,15 +23,19 @@ import java.util.List;
 
 import org.apache.datasketches.hive.common.BytesWritableHelper;
 import org.apache.datasketches.kll.KllFloatsSketch;
+import org.apache.datasketches.quantilescommon.QuantileSearchCriteria;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.BytesWritable;
 
 @Description(
   name = "GetCDF",
-  value = "_FUNC_(sketch, split points...)",
+  value = "_FUNC_(sketch, [inclusive,] split points...)",
   extended = "Returns an approximation to the Cumulative Distribution Function (CDF)"
   + " from a sketch given a set of split points (values)."
+  + " The optional boolean parameter 'inclusive' (default: true) determines if the result includes"
+  + " values less than or equal to each target fraction or, if false, only values strictly less than"
+  + " each target fraction."
   + " Split points are an array of M unique, monotonically increasing values"
   + " that divide the real number line into M+1 consecutive disjoint intervals."
   + " The function returns an array of M+1 double valuess, the first M of which are approximations"
@@ -42,16 +46,31 @@ import org.apache.hadoop.io.BytesWritable;
 public class GetCdfUDF extends UDF {
 
   /**
-   * Returns a list of ranks (CDF) from a given sketch
+   * Returns a list of ranks (CDF) from a given sketch. Equivalent to calling
+   * GetCDF(sketch, true, splitPoints...)
    * @param serializedSketch serialized sketch
    * @param splitPoints list of unique and monotonically increasing values
    * @return list of fractions from 0 to 1
    */
   public List<Double> evaluate(final BytesWritable serializedSketch, final Float... splitPoints) {
+    return evaluate(serializedSketch, true, splitPoints);
+  }
+
+  /**
+   * Returns a list of ranks (CDF) from a given sketch. Equivalent to calling
+   * GetCDF(sketch, true, splitPoints...)
+   * @param serializedSketch serialized sketch
+   * @param inclusive if true, the interval is inclusive of the left split point and exclusive of the right split point
+   * @param splitPoints list of unique and monotonically increasing values
+   * @return list of fractions from 0 to 1
+   */
+  public List<Double> evaluate(final BytesWritable serializedSketch, final Boolean inclusive, final Float... splitPoints) {
     if (serializedSketch == null) { return null; }
     final KllFloatsSketch sketch =
         KllFloatsSketch.heapify(BytesWritableHelper.wrapAsMemory(serializedSketch));
-    final double[] cdf = sketch.getCDF(Util.objectsToPrimitives(splitPoints));
+    if (sketch.isEmpty()) { return null; }
+    final double[] cdf = sketch.getCDF(Util.objectsToPrimitives(splitPoints),
+        inclusive ? QuantileSearchCriteria.INCLUSIVE : QuantileSearchCriteria.EXCLUSIVE);
     if (cdf == null) { return null; }
     return Util.primitivesToList(cdf);
   }

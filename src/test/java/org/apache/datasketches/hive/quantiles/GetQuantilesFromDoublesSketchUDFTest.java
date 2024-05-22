@@ -21,7 +21,6 @@ package org.apache.datasketches.hive.quantiles;
 
 import java.util.List;
 
-import org.apache.datasketches.SketchesArgumentException;
 import org.apache.datasketches.quantiles.DoublesSketch;
 import org.apache.datasketches.quantiles.UpdateDoublesSketch;
 import org.apache.hadoop.io.BytesWritable;
@@ -54,12 +53,24 @@ public class GetQuantilesFromDoublesSketchUDFTest {
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
+    sketch.update(4);
+
+    // inclusive
     List<Double> result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0, 0.5, 1.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals((double)result.get(0), 1.0);
     Assert.assertEquals((double)result.get(1), 2.0);
-    Assert.assertEquals((double)result.get(2), 3.0);
+    Assert.assertEquals((double)result.get(2), 4.0);
+
+    // exclusive
+    result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 0.0, 0.5, 1.0);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals((double)result.get(0), 1.0);
+    Assert.assertEquals((double)result.get(1), 3.0);
+    Assert.assertEquals((double)result.get(2), 4.0);
+
   }
 
   @Test
@@ -69,11 +80,12 @@ public class GetQuantilesFromDoublesSketchUDFTest {
     Assert.assertNull(result);
   }
 
-  @Test(expectedExceptions = SketchesArgumentException.class)
+  @Test
   public void evenlySpacedZero() {
     UpdateDoublesSketch sketch = DoublesSketch.builder().build();
     sketch.update(1);
-    new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0);
+    List<Double> result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0);
+    Assert.assertNull(result);
   }
 
   @Test
@@ -82,12 +94,24 @@ public class GetQuantilesFromDoublesSketchUDFTest {
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
+    sketch.update(4);
+
+    // inclusive
     List<Double> result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), 3);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals((double)result.get(0), 1.0);
     Assert.assertEquals((double)result.get(1), 2.0);
-    Assert.assertEquals((double)result.get(2), 3.0);
+    Assert.assertEquals((double)result.get(2), 4.0);
+
+    // exclusive
+    result = new GetQuantilesFromDoublesSketchUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 3);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals((double)result.get(0), 1.0);
+    Assert.assertEquals((double)result.get(1), 3.0);
+    Assert.assertEquals((double)result.get(2), 4.0);
+
   }
 
 }

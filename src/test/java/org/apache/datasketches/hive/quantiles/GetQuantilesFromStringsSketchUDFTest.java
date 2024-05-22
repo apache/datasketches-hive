@@ -26,10 +26,10 @@ import org.apache.hadoop.io.BytesWritable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.apache.datasketches.ArrayOfItemsSerDe;
-import org.apache.datasketches.ArrayOfLongsSerDe;
-import org.apache.datasketches.ArrayOfStringsSerDe;
-import org.apache.datasketches.SketchesArgumentException;
+import org.apache.datasketches.common.ArrayOfItemsSerDe;
+import org.apache.datasketches.common.ArrayOfLongsSerDe;
+import org.apache.datasketches.common.ArrayOfStringsSerDe;
+import org.apache.datasketches.common.SketchesArgumentException;
 import org.apache.datasketches.quantiles.ItemsSketch;
 
 @SuppressWarnings("javadoc")
@@ -46,7 +46,7 @@ public class GetQuantilesFromStringsSketchUDFTest {
 
   @Test
   public void emptyListOfFractions() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
@@ -57,52 +57,75 @@ public class GetQuantilesFromStringsSketchUDFTest {
 
   @Test
   public void fractionsNormalCase() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
+    sketch.update("d");
+
+    // inclusive
     List<String> result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0.0, 0.5, 1.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals(result.get(0), "a");
     Assert.assertEquals(result.get(1), "b");
-    Assert.assertEquals(result.get(2), "c");
+    Assert.assertEquals(result.get(2), "d");
+
+    // exclusive
+    result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, 0.0, 0.5, 1.0);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals(result.get(0), "a");
+    Assert.assertEquals(result.get(1), "c");
+    Assert.assertEquals(result.get(2), "d");
   }
 
-  @Test(expectedExceptions = SketchesArgumentException.class)
+  @Test
   public void evenlySpacedZero() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
-    new GetQuantilesFromStringsSketchUDF()
+    List<String> result = new GetQuantilesFromStringsSketchUDF()
       .evaluate(new BytesWritable(sketch.toByteArray(serDe)), 0);
+    Assert.assertNull(result);
   }
 
   @Test
   public void evenlySpacedEmptySketch() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     List<String> result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), 1);
     Assert.assertNull(result);
   }
 
   @Test
   public void evenlySpacedNormalCase() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(comparator);
+    ItemsSketch<String> sketch = ItemsSketch.getInstance(String.class, comparator);
     sketch.update("a");
     sketch.update("b");
     sketch.update("c");
+    sketch.update("d");
+
+    // inclusive
     List<String> result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), 3);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals(result.get(0), "a");
     Assert.assertEquals(result.get(1), "b");
-    Assert.assertEquals(result.get(2), "c");
+    Assert.assertEquals(result.get(2), "d");
+
+    // exclusive
+    result = new GetQuantilesFromStringsSketchUDF().evaluate(new BytesWritable(sketch.toByteArray(serDe)), false, 3);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals(result.get(0), "a");
+    Assert.assertEquals(result.get(1), "c");
+    Assert.assertEquals(result.get(2), "d");
   }
 
   //Note: this exception is only caught because a bounds error was detected.
   //If a bounds error is not detected from a wrong type assignment, unexpected results could occur.
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void fractionsWrongSketchType() {
-    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Long.class, Comparator.naturalOrder());
     sketch.update(1L);
     sketch.update(2L);
     sketch.update(3L);
@@ -114,7 +137,7 @@ public class GetQuantilesFromStringsSketchUDFTest {
   //If a bounds error is not detected from a wrong type assignment, unexpected results could occur.
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void evenlySpacedWrongSketchType() {
-    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<Long> sketch = ItemsSketch.getInstance(Long.class, Comparator.naturalOrder());
     sketch.update(1L);
     sketch.update(2L);
     sketch.update(3L);

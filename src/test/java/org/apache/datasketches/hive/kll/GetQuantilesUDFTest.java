@@ -37,7 +37,7 @@ public class GetQuantilesUDFTest {
 
   @Test
   public void emptyListOfFractions() {
-    final KllFloatsSketch sketch = new KllFloatsSketch();
+    final KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -48,16 +48,28 @@ public class GetQuantilesUDFTest {
 
   @Test
   public void fractionsNormalCase() {
-    final KllFloatsSketch sketch = new KllFloatsSketch();
+    final KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
-    final List<Float> result = new GetQuantilesUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0, 0.5, 1.0);
+    sketch.update(4);
+
+    // inclusive
+    List<Float> result = new GetQuantilesUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0.0, 0.5, 1.0);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 3);
     Assert.assertEquals((double)result.get(0), 1f);
     Assert.assertEquals((double)result.get(1), 2f);
-    Assert.assertEquals((double)result.get(2), 3f);
+    Assert.assertEquals((double)result.get(2), 4f);
+
+    // exclusive
+    result = new GetQuantilesUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 0.0, 0.5, 1.0);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 3);
+    Assert.assertEquals((double)result.get(0), 1f);
+    Assert.assertEquals((double)result.get(1), 3f);
+    Assert.assertEquals((double)result.get(2), 4f);
+
   }
 
 }

@@ -37,7 +37,7 @@ public class GetPmfUDFTest {
 
   @Test
   public void emptyListOfSplitPoints() {
-    KllFloatsSketch sketch = new KllFloatsSketch();
+    KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
@@ -49,19 +49,30 @@ public class GetPmfUDFTest {
 
   @Test
   public void emptySketch() {
-    KllFloatsSketch sketch = new KllFloatsSketch();
+    KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     List<Double> result = new GetPmfUDF().evaluate(new BytesWritable(sketch.toByteArray()), 0f);
     Assert.assertNull(result);
   }
 
   @Test
   public void normalCase() {
-    KllFloatsSketch sketch = new KllFloatsSketch();
+    KllFloatsSketch sketch = KllFloatsSketch.newHeapInstance();
     sketch.update(1);
     sketch.update(2);
     sketch.update(3);
     sketch.update(4);
+
+    // inclusive
     List<Double> result = new GetPmfUDF().evaluate(new BytesWritable(sketch.toByteArray()), 1f, 3f, 5f);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(result.size(), 4);
+    Assert.assertEquals((double)result.get(0), 0.25);
+    Assert.assertEquals((double)result.get(1), 0.5);
+    Assert.assertEquals((double)result.get(2), 0.25);
+    Assert.assertEquals((double)result.get(3), 0.0);
+
+    // exclusive
+    result = new GetPmfUDF().evaluate(new BytesWritable(sketch.toByteArray()), false, 1f, 3f, 5f);
     Assert.assertNotNull(result);
     Assert.assertEquals(result.size(), 4);
     Assert.assertEquals((double)result.get(0), 0.0);

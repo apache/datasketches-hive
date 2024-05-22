@@ -1,4 +1,4 @@
-# Eclipse project files 
+# Eclipse project files
 .classpath
 .project
 .settings/
@@ -12,6 +12,7 @@
 
 # Additional tools
 .clover/
+.vscode/
 
 # OSX files
 .DS_Store
